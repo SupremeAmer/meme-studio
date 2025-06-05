@@ -1,7 +1,0 @@
-<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-  <!-- Ellipse background, optional -->
-  <ellipse cx="100" cy="100" rx="90" ry="90" fill="#61dafb" opacity="0.2"/>
-  <!-- Replace 'mylogo.png' with your logo image in public/ if you want -->
-  <!-- <image href="/mylogo.png" x="35" y="35" width="130" height="130"/> -->
-  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-size="40" fill="#222">MEME</text>
-</svg>
