@@ -1,8 +1,8 @@
 // ==== Appwrite Config ====
 const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
-const APPWRITE_PROJECT = "YOUR_PROJECT_ID";
-const APPWRITE_DB = "YOUR_DATABASE_ID";
-const APPWRITE_COLLECTION = "YOUR_COLLECTION_ID";
+const APPWRITE_PROJECT = "683de53b0032c338fa4b";
+const APPWRITE_DB = "683de6560007db2161b7";
+const APPWRITE_COLLECTION = "Meme";
 
 const client = new window.appwrite.Client();
 client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
