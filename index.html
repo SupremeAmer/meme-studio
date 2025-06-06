@@ -68,12 +68,12 @@
       authError.textContent = "";
       if (isRegister) {
         authTitle.textContent = "Register";
-        authForm.querySelector('button[type="submit"]').textContent = "Register";
+        authForm.querySelector('button[type=\"submit\"]').textContent = "Register";
         usernameField.classList.remove('hidden');
         toggleAuthBtn.textContent = "Already have an account? Login";
       } else {
         authTitle.textContent = "Login";
-        authForm.querySelector('button[type="submit"]').textContent = "Login";
+        authForm.querySelector('button[type=\"submit\"]').textContent = "Login";
         usernameField.classList.add('hidden');
         toggleAuthBtn.textContent = "Don't have an account? Register";
       }
