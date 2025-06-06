@@ -58,6 +58,10 @@
         <input type="email" id="email" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Email" required autocomplete="email" />
         <input type="password" id="password" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Password" required autocomplete="current-password" />
         <button type="submit" class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 font-bold hover:scale-105 transition-transform shadow-md">Login</button>
+        <button id="googleSignInBtn" type="button"
+  class="bg-white border border-gray-300 rounded-lg py-2 px-4 w-full flex items-center justify-center gap-2 font-semibold text-gray-700 hover:bg-gray-100 transition mb-2">
+  <img src="https://unpkg.com/simple-icons@v11/icons/google.svg" alt="Google" class="w-5 h-5"> Sign in with Google
+</button>
       </form>
       <div class="text-center mt-4">
         <button id="toggleAuthBtn" class="text-indigo-700 hover:underline text-sm font-semibold transition-custom">Don't have an account? Register</button>
@@ -169,9 +173,7 @@
       isRegister = !isRegister;
       showAuth();
     };
-
-    // Register/Login
-    // Register/Login
+// Robust Register/Login Handler
 authForm.onsubmit = async (e) => {
   e.preventDefault();
   authError.textContent = "";
@@ -179,23 +181,24 @@ authForm.onsubmit = async (e) => {
   const password = document.getElementById('password').value.trim();
   const name = document.getElementById('username') ? document.getElementById('username').value.trim() : '';
   try {
+    // 1. Register or Login
     if (isRegister) {
       if (!name) {
         authError.textContent = "Please enter a username.";
         return;
       }
-      // 1. Create account and session
+      // Create user account and session
       await account.create('unique()', email, password, name);
       await account.createEmailSession(email, password);
     } else {
-      // 2. Just login
       await account.createEmailSession(email, password);
     }
 
-    // 3. Make sure user profile doc exists (create if missing)
+    // 2. Ensure user profile document exists in users collection
     const me = await account.get();
     let docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
     if (!docs.documents.length) {
+      // Create profile doc if missing
       await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, me.$id, {
         username: me.name || name || email.split('@')[0],
         email: me.email,
@@ -208,9 +211,25 @@ authForm.onsubmit = async (e) => {
       docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
     }
     userProfile = docs.documents[0];
+
+    // 3. Show the app
     showApp();
-  } catch(err) {
+  } catch (err) {
     authError.textContent = err?.message || "Authentication failed";
+  }
+};
+    // Google Sign-In Handler
+document.getElementById('googleSignInBtn').onclick = async () => {
+  try {
+    // Initiate OAuth2 with Google
+    account.createOAuth2Session(
+      'google',
+      window.location.origin + window.location.pathname, // success redirect
+      window.location.origin + window.location.pathname  // failure redirect
+    );
+    // The browser will redirect, so nothing else runs here
+  } catch (err) {
+    authError.textContent = err?.message || "Google sign-in failed";
   }
 };
 
