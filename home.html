@@ -121,8 +121,6 @@
       }
     });
 
-    // ---- App Logic ----
-
     function fadeInOut(el) {
       el.classList.add('animate-fadeIn');
       setTimeout(() => el.classList.remove('animate-fadeIn'), 700);
@@ -423,12 +421,6 @@
       userProfile = allUsers.find(u=>u.$id===userProfile.$id);
       followers = userProfile.followers || [];
       following = userProfile.following || [];
-    }
-
-    async function refreshState() {
-      await fetchAllUsers();
-      renderProfileCard();
-      renderChatCard();
     }
 
     function subscribeRealtime() {
