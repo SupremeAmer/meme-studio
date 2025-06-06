@@ -4,94 +4,108 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Meme Social</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            fadeIn: "fadeIn 0.7s ease-out",
+            bounceIn: "bounceIn 0.4s cubic-bezier(.8,-0.6,0.2,1.5)"
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: 0 }, '100%': { opacity: 1 } },
+            bounceIn: {
+              '0%': { opacity: 0, transform: 'scale(0.95) translateY(32px)' },
+              '70%': { opacity: 1, transform: 'scale(1.02) translateY(-6px)' },
+              '100%': { opacity: 1, transform: 'scale(1) translateY(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap">
+  <!-- Heroicons for modern icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
   <style>
-    /* ...same as before, with a few additions for new features... */
-    .section { margin-bottom:2rem;}
-    #leaderboard, #adminPanel, #dmPanel, #notificationsPanel {
-      background: #fff;
-      border-radius: 1.5rem;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      padding: 1.2rem 1rem;
-      margin-bottom: 1.2rem;
-      transition: background 0.4s, color 0.4s;
-    }
-    .darkmode #leaderboard, .darkmode #adminPanel, .darkmode #dmPanel, .darkmode #notificationsPanel {
-      background: #283245;
-      color: #fff;
-    }
-    #leaderboard ol { margin-left: 1.2em; }
-    #dmMessages { max-height:180px; overflow:auto; margin-bottom:1em;}
-    .dm-message { background:#eaf2ff; margin:4px 0; border-radius:0.7em; padding:0.6em;}
-    .dm-message.you { background:#b5e0ff; }
-    .darkmode .dm-message, .darkmode .dm-message.you { background: #33405c; }
-    #notificationsList { max-height:160px; overflow:auto; }
-    .notification-item { padding:0.3em 0; border-bottom:1px solid #eee; }
-    .admin-meme { display:flex; align-items:center; margin-bottom:1em;}
-    .admin-meme img { width:60px; height:60px; object-fit:cover; margin-right:1em;}
-    .flag-btn {background:#e53e3e; color:#fff; border:none; border-radius:0.5em; padding:0.4em 0.8em; cursor:pointer;}
-    .remove-btn {background:#222c36; color:#fff; border:none; border-radius:0.5em; padding:0.4em 0.8em; cursor:pointer;}
+    body { font-family: 'Inter', sans-serif; }
+    /* Scrollbar styling for feed/chat */
+    ::-webkit-scrollbar { width: 8px; background: #f3f4f6; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+    .transition-custom { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
   </style>
 </head>
-<body>
-  <nav class="navbar">
-    <span>Meme Social</span>
-    <span class="actions">
-      <button class="btn" id="darkBtn" title="Toggle dark mode">🌙</button>
-      <button class="btn" id="logoutBtn" style="display:none;">Logout</button>
+<body class="bg-gradient-to-tr from-blue-50 to-indigo-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white/90 backdrop-blur shadow-md px-6 py-2 flex justify-between items-center sticky top-0 z-50 transition-custom">
+    <span class="text-2xl font-extrabold text-indigo-600 tracking-tight flex items-center gap-2">
+      <i class="fas fa-crown text-yellow-400 animate-bounce"></i> Meme Social
     </span>
+    <div id="userDropdownArea"></div>
   </nav>
-  <div class="container">
-    <div id="authCard" class="card"></div>
-    <div id="appCard" class="card hidden">
-      <div id="userWelcome"></div>
-      <form id="memeForm" enctype="multipart/form-data">
-        <h3>Post a Meme</h3>
-        <input type="file" id="memeFile" accept="image/*" required class="input" /><br>
-        <input type="text" id="memeCaption" placeholder="Caption" class="input" maxlength="160" required>
-        <button type="submit" class="btn">Post Meme</button>
-        <div id="memeFormError" class="error"></div>
+
+  <!-- Auth Section -->
+  <main class="flex flex-col items-center mt-16" id="authSection">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-fadeIn">
+      <h2 class="text-3xl font-extrabold text-indigo-600 text-center mb-6 tracking-tight" id="authTitle">Login</h2>
+      <form id="authForm" class="flex flex-col gap-3">
+        <div id="usernameField" class="hidden">
+          <input type="text" id="username" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Username" autocomplete="username" />
+        </div>
+        <input type="email" id="email" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Email" required autocomplete="email" />
+        <input type="password" id="password" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Password" required autocomplete="current-password" />
+        <button type="submit" class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 font-bold hover:scale-105 transition-transform shadow-md">Login</button>
       </form>
+      <div class="text-center mt-4">
+        <button id="toggleAuthBtn" class="text-indigo-700 hover:underline text-sm font-semibold transition-custom">Don't have an account? Register</button>
+      </div>
+      <div class="text-red-500 text-center mt-2 font-medium" id="authError"></div>
     </div>
-    <div class="section" id="notificationsPanel" style="display:none;">
-      <h3>Notifications</h3>
-      <div id="notificationsList"></div>
+  </main>
+
+  <!-- Main App Section -->
+  <main class="container mx-auto mt-12 hidden" id="appSection">
+    <div class="flex flex-col md:flex-row gap-10 animate-fadeIn">
+      <!-- Left: Profile & Notifications -->
+      <div class="md:w-1/3 flex flex-col gap-8">
+        <div id="profileCard" class="animate-bounceIn"></div>
+        <div id="notificationsCard" class="animate-fadeIn"></div>
+        <div id="chatCard" class="animate-fadeIn"></div>
+      </div>
+      <!-- Right: Meme Posting and Feed -->
+      <div class="md:w-2/3 flex flex-col gap-8">
+        <div class="bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
+          <h3 class="text-xl font-bold mb-3 flex items-center gap-2"><i class="fas fa-upload text-indigo-400"></i> Post a Meme</h3>
+          <form id="memeForm" class="space-y-3">
+            <input type="file" id="memeFile" accept="image/*" required class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" />
+            <input type="text" id="memeCaption" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Caption" maxlength="160" required />
+            <button type="submit" class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 px-4 font-bold hover:scale-105 transition-transform shadow-md w-full">Post Meme</button>
+            <div class="text-red-500 text-center" id="memeFormError"></div>
+          </form>
+        </div>
+        <div class="bg-white rounded-2xl shadow-xl p-6 animate-fadeIn">
+          <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fas fa-fire text-orange-400 animate-bounce"></i> Latest Memes</h3>
+          <div id="memeFeed" class="flex flex-col gap-8"></div>
+        </div>
+      </div>
     </div>
-    <div class="section" id="leaderboard" style="display:none;">
-      <h3>Leaderboard</h3>
-      <ol id="leaderboardList"></ol>
-    </div>
-    <div class="section" id="dmPanel" style="display:none;">
-      <h3>Direct Messages</h3>
-      <select id="dmUserSelect" class="input"></select>
-      <div id="dmMessages"></div>
-      <form id="dmForm">
-        <input type="text" id="dmInput" class="input" placeholder="Type a message..." maxlength="200" required>
-        <button class="btn" type="submit">Send</button>
-      </form>
-    </div>
-    <div class="section" id="adminPanel" style="display:none;">
-      <h3>Admin Panel</h3>
-      <div id="flaggedMemes"></div>
-    </div>
-    <div id="feedSection">
-      <h3>Latest Memes</h3>
-      <div id="feedEmpty" class="feed-empty">No memes yet! Be the first to create one.</div>
-      <div id="memeFeed"></div>
-    </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+  </main>
+
   <script>
-    // ==== Appwrite Config ====
+    // ==== CONFIG: REPLACE WITH YOUR IDs ====
     const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
     const APPWRITE_PROJECT = "683de53b0032c338fa4b";
     const APPWRITE_DB = "683de6560007db2161b7";
-    const APPWRITE_COLLECTION = "Meme";
-    const APPWRITE_BUCKET = "memes-bucket";
-    const APPWRITE_USERS = "users"; // Custom collection for user profiles
-    const APPWRITE_DMS = "dms"; // For direct messages
-    const APPWRITE_NOTIFS = "notifications"; // For notifications
-    const ADMIN_EMAILS = ["admin@example.com"]; // Add your admin emails
+    const APPWRITE_USERS = "Meme";
+    const APPWRITE_MEMES = "683de6880026536928e4";
+    const APPWRITE_BUCKET_AVATARS = "avatars_bucket";
+    const APPWRITE_BUCKET_MEMES = "Memesocially";
+    const APPWRITE_NOTIFICATIONS = "notifications";
+    const APPWRITE_CHATS = "chats";
+    // ==== END CONFIG ====
 
     const client = new window.appwrite.Client();
     client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
@@ -101,122 +115,135 @@
     const realtime = new window.appwrite.Realtime(client);
     const ID = window.appwrite.ID;
 
-    // ==== DOM Elements ====
-    const authCard = document.getElementById('authCard');
-    const appCard = document.getElementById('appCard');
+    // DOM
+    const authSection = document.getElementById('authSection');
+    const appSection = document.getElementById('appSection');
+    const authForm = document.getElementById('authForm');
+    const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+    const authTitle = document.getElementById('authTitle');
+    const authError = document.getElementById('authError');
+    const usernameField = document.getElementById('usernameField');
+    const userDropdownArea = document.getElementById('userDropdownArea');
     const memeForm = document.getElementById('memeForm');
     const memeFile = document.getElementById('memeFile');
     const memeCaption = document.getElementById('memeCaption');
     const memeFormError = document.getElementById('memeFormError');
     const memeFeed = document.getElementById('memeFeed');
-    const userWelcome = document.getElementById('userWelcome');
-    const feedEmpty = document.getElementById('feedEmpty');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const darkBtn = document.getElementById('darkBtn');
-    // New features:
-    const leaderboardPanel = document.getElementById('leaderboard');
-    const leaderboardList = document.getElementById('leaderboardList');
-    const adminPanel = document.getElementById('adminPanel');
-    const flaggedMemes = document.getElementById('flaggedMemes');
-    const dmPanel = document.getElementById('dmPanel');
-    const dmUserSelect = document.getElementById('dmUserSelect');
-    const dmMessages = document.getElementById('dmMessages');
-    const dmForm = document.getElementById('dmForm');
-    const dmInput = document.getElementById('dmInput');
-    const notificationsPanel = document.getElementById('notificationsPanel');
-    const notificationsList = document.getElementById('notificationsList');
+    const profileCard = document.getElementById('profileCard');
+    const notificationsCard = document.getElementById('notificationsCard');
+    const chatCard = document.getElementById('chatCard');
 
-    // ==== State ====
-    let user = null;
+    // State
+    let isRegister = false;
+    let userProfile = null;
     let memes = [];
     let allUsers = [];
-    let selectedDMUser = null;
-    let myNotifs = [];
-    let myDMSubscription = null;
-    let unsubscribeFeed = null;
+    let notifications = [];
+    let followers = [];
+    let following = [];
+    let profileAvatarUrl = "";
 
-    // ==== Auth ====
-    async function checkSession() {
-      try {
-        user = await account.get();
-        showApp();
-      } catch {
-        showAuth();
+    function fadeInOut(el) {
+      el.classList.add('animate-fadeIn');
+      setTimeout(() => el.classList.remove('animate-fadeIn'), 700);
+    }
+
+    // Auth UI
+    function showAuth() {
+      appSection.classList.add('hidden');
+      authSection.classList.remove('hidden');
+      authError.textContent = "";
+      if (isRegister) {
+        authTitle.textContent = "Register";
+        authForm.querySelector('button[type="submit"]').textContent = "Register";
+        usernameField.classList.remove('hidden');
+        toggleAuthBtn.textContent = "Already have an account? Login";
+      } else {
+        authTitle.textContent = "Login";
+        authForm.querySelector('button[type="submit"]').textContent = "Login";
+        usernameField.classList.add('hidden');
+        toggleAuthBtn.textContent = "Don't have an account? Register";
       }
     }
-
-    function showAuth() {
-      authCard.innerHTML = `
-        <h2>Meme Social</h2>
-        <form id="authForm">
-          <input type="email" placeholder="Email" id="email" required class="input" />
-          <input type="password" placeholder="Password" id="password" required class="input" />
-          <button type="submit" class="btn" id="authBtn">Login</button>
-          <div>
-            <a href="#" id="toggleAuth">Don't have an account? Register</a>
-          </div>
-          <div id="authError" class="error"></div>
-        </form>
-      `;
-      appCard.classList.add('hidden');
-      authCard.classList.remove('hidden');
-      leaderboardPanel.style.display = "none";
-      adminPanel.style.display = "none";
-      dmPanel.style.display = "none";
-      notificationsPanel.style.display = "none";
-      memeFeed.innerHTML = "";
-      feedEmpty.style.display = "block";
-      let isRegister = false;
-      const authForm = document.getElementById('authForm');
-      const authBtn = document.getElementById('authBtn');
-      const toggleAuth = document.getElementById('toggleAuth');
-      const authError = document.getElementById('authError');
-      toggleAuth.addEventListener("click", e => {
-        e.preventDefault();
-        isRegister = !isRegister;
-        authBtn.textContent = isRegister ? "Register" : "Login";
-        toggleAuth.textContent = isRegister ? "Already have an account? Sign in" : "Don't have an account? Register";
-        authError.textContent = "";
-      });
-      authForm.addEventListener("submit", async e => {
-        e.preventDefault();
-        authError.textContent = "";
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        try {
-          if (isRegister) {
-            await account.create('unique()', email, password);
-            // Also create user profile doc
-            await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, ID.unique(), {
-              email: email,
-              memes: 0,
-              likes: 0,
-              isAdmin: ADMIN_EMAILS.includes(email)
-            });
-          }
-          await account.createEmailSession(email, password);
-          user = await account.get();
-          showApp();
-        } catch (err) {
-          authError.textContent = err.message || "Authentication failed";
-        }
-      });
-    }
-
-    logoutBtn.onclick = async () => {
-      await account.deleteSession("current");
-      user = null;
-      if (unsubscribeFeed) unsubscribeFeed();
-      if (myDMSubscription) myDMSubscription();
+    toggleAuthBtn.onclick = () => {
+      isRegister = !isRegister;
       showAuth();
     };
 
-    // ==== Dark Mode ====
-    darkBtn.onclick = () => {
-      document.body.classList.toggle('darkmode');
+    // Register/Login
+    authForm.onsubmit = async (e) => {
+      e.preventDefault();
+      authError.textContent = "";
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const name = document.getElementById('username') ? document.getElementById('username').value.trim() : '';
+      try {
+        if (isRegister) {
+          if (!name) {
+            authError.textContent = "Please enter a username.";
+            return;
+          }
+          await account.create('unique()', email, password, name);
+          await account.createEmailSession(email, password);
+          const appUser = await account.get();
+          await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, appUser.$id, {
+            username: name,
+            email,
+            bio: "",
+            avatar: null,
+            followers: [],
+            following: [],
+            createdAt: new Date().toISOString()
+          });
+        } else {
+          await account.createEmailSession(email, password);
+        }
+        userProfile = await getFullUserProfile();
+        showApp();
+      } catch(err) {
+        authError.textContent = err.message || "Authentication failed";
+      }
     };
 
-    // ==== Meme Posting ====
+    // Profile dropdown, avatar, logout
+    function showProfileDropdown() {
+      profileAvatarUrl = userProfile.avatar
+        ? storage.getFilePreview(APPWRITE_BUCKET_AVATARS, userProfile.avatar)
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.username||userProfile.email)}&background=6366f1&color=fff&rounded=true&size=128`;
+      userDropdownArea.innerHTML = `
+        <div class="relative group">
+          <button class="flex items-center space-x-2 focus:outline-none transition-custom hover:scale-105">
+            <img src="${profileAvatarUrl}" class="rounded-full w-9 h-9 border-2 border-indigo-400 object-cover shadow" />
+            <i class="fas fa-chevron-down text-indigo-400"></i>
+          </button>
+          <div class="absolute right-0 mt-2 w-56 bg-white border rounded-lg shadow-lg ring-1 ring-indigo-200 hidden group-hover:block z-40 animate-fadeIn">
+            <div class="px-4 py-3 border-b">
+              <div class="font-bold text-indigo-600">${userProfile.username || "No Name"}</div>
+              <div class="text-xs text-gray-500">${userProfile.email}</div>
+              <div class="flex gap-2 mt-2"><button id="editProfileBtn" class="text-indigo-500 text-xs underline">Edit Profile</button></div>
+            </div>
+            <button id="logoutBtn" class="block w-full text-left px-4 py-2 hover:bg-indigo-50 text-red-500">Logout</button>
+          </div>
+        </div>
+      `;
+      setTimeout(() => {
+        document.getElementById('logoutBtn').onclick = async () => {
+          await account.deleteSession("current");
+          userProfile = null;
+          showAuth();
+        };
+        document.getElementById('editProfileBtn').onclick = showEditProfileModal;
+      }, 100);
+    }
+
+    // Fetch full user profile from DB
+    async function getFullUserProfile() {
+      const me = await account.get();
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
+      return docs.documents[0];
+    }
+
+    // Meme Posting
     memeForm.onsubmit = async (e) => {
       e.preventDefault();
       memeFormError.textContent = "";
@@ -225,24 +252,19 @@
         return;
       }
       try {
-        // Upload file to Appwrite Storage
         const file = memeFile.files[0];
-        const fileUpload = await storage.createFile(APPWRITE_BUCKET, ID.unique(), file);
+        const fileUpload = await storage.createFile(APPWRITE_BUCKET_MEMES, ID.unique(), file);
         const fileId = fileUpload.$id;
-        // Create meme document
-        await databases.createDocument(APPWRITE_DB, APPWRITE_COLLECTION, ID.unique(), {
+        await databases.createDocument(APPWRITE_DB, APPWRITE_MEMES, ID.unique(), {
           image: fileId,
           caption: memeCaption.value,
-          user: user.email,
-          likes: 0,
-          reactions: {},
+          userId: userProfile.$id,
+          userName: userProfile.username,
+          userEmail: userProfile.email,
+          likes: [],
           comments: [],
-          flagged: false
+          createdAt: new Date().toISOString()
         });
-        // Update user meme count
-        const uDoc = await getUserDoc(user.email);
-        if (uDoc)
-          await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, uDoc.$id, { memes: (uDoc.memes||0)+1 });
         memeFile.value = "";
         memeCaption.value = "";
       } catch(err) {
@@ -250,282 +272,277 @@
       }
     };
 
-    // ==== Feed Rendering ====
+    // Meme Feed
     async function fetchMemes() {
       try {
-        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_COLLECTION, ['orderDesc($createdAt)']);
+        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, ['orderDesc($createdAt)']);
         memes = docs.documents;
         renderFeed();
       } catch {
-        memeFeed.innerHTML = '<div class="error">Failed to load memes.</div>';
+        memeFeed.innerHTML = '<div class="text-red-500 text-center">Failed to load memes.</div>';
       }
     }
-
     function renderFeed() {
       memeFeed.innerHTML = "";
       if (!memes || memes.length === 0) {
-        feedEmpty.style.display = "block";
+        memeFeed.innerHTML = `<div class="text-gray-400 text-center text-lg mt-10">No memes yet! Be the first to post.</div>`;
         return;
       }
-      feedEmpty.style.display = "none";
       memes.forEach(meme => {
-        if(meme.flagged && !isAdmin()) return; // hide flagged from normal users
         const memeDiv = document.createElement("div");
-        memeDiv.className = "meme-card";
-        // Image
+        memeDiv.className = "rounded-xl shadow bg-indigo-50/60 p-4 animate-bounceIn transition-custom hover:scale-[1.01]";
+        const userAvatar = allUsers.find(u=>u.$id===meme.userId)?.avatar
+          ? storage.getFilePreview(APPWRITE_BUCKET_AVATARS, allUsers.find(u=>u.$id===meme.userId).avatar)
+          : `https://ui-avatars.com/api/?name=${encodeURIComponent(meme.userName||meme.userEmail)}&background=6366f1&color=fff&rounded=true&size=64`;
+        memeDiv.innerHTML += `
+          <div class="flex items-center gap-3 mb-2">
+            <img src="${userAvatar}" class="rounded-full w-8 h-8 object-cover border border-indigo-200" />
+            <span class="font-semibold">${meme.userName||"anon"}</span>
+            <span class="text-xs text-gray-400 ml-2">${new Date(meme.createdAt).toLocaleString()}</span>
+          </div>`;
         const img = document.createElement("img");
-        img.src = storage.getFilePreview(APPWRITE_BUCKET, meme.image);
+        img.src = storage.getFilePreview(APPWRITE_BUCKET_MEMES, meme.image);
         img.alt = "Meme";
+        img.className = "rounded-lg w-full max-h-64 object-contain mb-2 transition-custom hover:scale-105 shadow";
         memeDiv.appendChild(img);
-        // Caption
         const cap = document.createElement("div");
-        cap.className = "caption";
+        cap.className = "font-semibold text-lg";
         cap.textContent = meme.caption || "";
         memeDiv.appendChild(cap);
-        // Meta
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.textContent = `By: ${meme.user || "anon"}`;
-        memeDiv.appendChild(meta);
-        // Reactions/Likes
-        const actions = document.createElement("div");
-        actions.className = "actions";
-        actions.innerHTML = `
-          <button title="Like">👍</button> <span>${meme.likes||0}</span>
-          <button title="Love">❤️</button>
-          <button class="flag-btn" title="Flag" style="float:right;">🚩</button>
-        `;
-        // Like button
-        actions.children[0].onclick = async () => {
-          await databases.updateDocument(APPWRITE_DB, APPWRITE_COLLECTION, meme.$id, { likes: (meme.likes||0)+1 });
-          await addNotif(meme.user, `${user.email} liked your meme!`);
-          // Update leaderboard
-          const uDoc = await getUserDoc(meme.user);
-          if (uDoc) await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, uDoc.$id, { likes: (uDoc.likes||0)+1 });
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-6 my-2";
+        const likeBtn = document.createElement("button");
+        likeBtn.className = "flex items-center text-indigo-600 hover:text-indigo-800 transition-custom";
+        likeBtn.innerHTML = `<i class="fas fa-heart mr-1 ${meme.likes?.includes(userProfile.$id) ? 'text-pink-500 animate-bounce' : ''}"></i>
+        <span>${(meme.likes && meme.likes.length) || 0}</span>`;
+        likeBtn.onclick = async () => {
+          if (!meme.likes) meme.likes = [];
+          if (!meme.likes.includes(userProfile.$id)) {
+            meme.likes.push(userProfile.$id);
+            await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id, { likes: meme.likes });
+            await addNotification(meme.userId, 'like', userProfile.$id, meme.$id, `${userProfile.username} liked your meme!`);
+          }
         };
-        // Love button
-        actions.children[2].onclick = async () => {
-          let reacts = meme.reactions || {};
-          reacts.love = (reacts.love||0)+1;
-          await databases.updateDocument(APPWRITE_DB, APPWRITE_COLLECTION, meme.$id, { reactions: reacts });
-          await addNotif(meme.user, `${user.email} loved your meme!`);
-        };
-        // Flag button
-        actions.children[4].onclick = async () => {
-          await databases.updateDocument(APPWRITE_DB, APPWRITE_COLLECTION, meme.$id, { flagged: true });
-          await addNotif(ADMIN_EMAILS[0], `${user.email} flagged a meme.`);
-        };
-        memeDiv.appendChild(actions);
-        // Comments
-        const commentsSection = document.createElement("div");
-        commentsSection.className = "comment-list";
-        if(meme.comments && meme.comments.length>0) {
-          meme.comments.forEach(c =>
-            commentsSection.innerHTML += `
-              <div class="comment-card">
-                <div class="meta">${c.user||'anon'}:</div>
-                <div>${c.text}</div>
-              </div>
-            `);
+        row.appendChild(likeBtn);
+        const commentCount = document.createElement("span");
+        commentCount.className = "flex items-center text-gray-500";
+        commentCount.innerHTML = `<i class="fas fa-comment-dots mr-1"></i> ${(meme.comments && meme.comments.length) || 0}`;
+        row.appendChild(commentCount);
+        memeDiv.appendChild(row);
+        const commentsDiv = document.createElement("div");
+        if (meme.comments && meme.comments.length) {
+          meme.comments.forEach(c => {
+            const cdiv = document.createElement("div");
+            cdiv.className = "text-sm bg-white/60 rounded p-2 my-1";
+            const commentUser = allUsers.find(u=>u.$id===c.userId);
+            let commenter = commentUser ? commentUser.username : (c.username || c.userId || "anon");
+            cdiv.innerHTML = `<span class="font-bold">${commenter}</span>: ${c.text}`;
+            commentsDiv.appendChild(cdiv);
+          });
         }
-        // Add comment form
         const commentForm = document.createElement("form");
+        commentForm.className = "flex gap-2 mt-2";
         commentForm.innerHTML = `
-          <input type="text" placeholder="Add a comment..." class="input" maxlength="120" required>
-          <button class="btn" type="submit">Post</button>
+          <input type="text" placeholder="Add a comment..." class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg flex-1 px-2 py-1 transition-custom" maxlength="100" required />
+          <button class="bg-indigo-500 text-white rounded px-3 py-1 font-semibold hover:bg-indigo-600 transition-custom" type="submit">Post</button>
         `;
         commentForm.onsubmit = async (e) => {
           e.preventDefault();
           const val = commentForm.querySelector('input').value;
           let newComments = meme.comments || [];
-          newComments.push({user: user.email, text: val});
-          await databases.updateDocument(APPWRITE_DB, APPWRITE_COLLECTION, meme.$id, { comments: newComments });
+          newComments.push({userId: userProfile.$id, username: userProfile.username, text: val, createdAt: new Date().toISOString()});
+          await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id, { comments: newComments });
+          await addNotification(meme.userId, 'comment', userProfile.$id, meme.$id, `${userProfile.username} commented on your meme!`);
           commentForm.reset();
-          await addNotif(meme.user, `${user.email} commented on your meme!`);
         };
-        commentsSection.appendChild(commentForm);
-        memeDiv.appendChild(commentsSection);
+        commentsDiv.appendChild(commentForm);
+        memeDiv.appendChild(commentsDiv);
+
         memeFeed.appendChild(memeDiv);
+        fadeInOut(memeDiv);
       });
     }
 
-    // ==== Leaderboard ====
-    async function renderLeaderboard() {
-      try {
-        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, ['orderDesc(likes)'], 5);
-        leaderboardList.innerHTML = "";
-        docs.documents.forEach((u, i) => {
-          leaderboardList.innerHTML += `<li>${u.email} — ${u.likes||0} likes, ${u.memes||0} memes</li>`;
-        });
-        leaderboardPanel.style.display = "block";
-      } catch {
-        leaderboardPanel.style.display = "none";
-      }
-    }
-
-    // ==== Admin Panel ====
-    async function renderAdmin() {
-      if (!isAdmin()) {
-        adminPanel.style.display = "none";
-        return;
-      }
-      try {
-        const docs = memes.filter(m => m.flagged);
-        flaggedMemes.innerHTML = docs.length
-          ? docs.map(m =>
-              `<div class="admin-meme">
-                 <img src="${storage.getFilePreview(APPWRITE_BUCKET, m.image)}">
-                 <span>${m.caption} by ${m.user}</span>
-                 <button class="remove-btn" onclick="removeMeme('${m.$id}')">Remove</button>
-               </div>`
-            ).join("")
-          : "<em>No flagged memes.</em>";
-        adminPanel.style.display = "block";
-      } catch {
-        adminPanel.style.display = "none";
-      }
-    }
-    // Remove meme (admin only)
-    window.removeMeme = async function(id) {
-      await databases.deleteDocument(APPWRITE_DB, APPWRITE_COLLECTION, id);
-      await addNotif(ADMIN_EMAILS[0], `A meme was removed by admin.`);
-    };
-
-    function isAdmin() {
-      return ADMIN_EMAILS.includes(user.email);
-    }
-
-    // ==== Direct Messages ====
-    async function renderDM() {
-      try {
-        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, []);
-        allUsers = docs.documents;
-        dmUserSelect.innerHTML = allUsers.filter(u=>u.email!==user.email).map(u=>
-          `<option value="${u.email}">${u.email}</option>`
-        ).join("");
-        if (allUsers.length>1) {
-          selectedDMUser = dmUserSelect.value = allUsers.find(u=>u.email!==user.email).email;
-          loadDMs(selectedDMUser);
-        } else {
-          dmMessages.innerHTML = "<em>No other users yet!</em>";
-        }
-        dmUserSelect.onchange = () => {
-          selectedDMUser = dmUserSelect.value;
-          loadDMs(selectedDMUser);
+    // Profile Card
+    function renderProfileCard() {
+      if (!userProfile) return;
+      const avatarUrl = userProfile.avatar ? storage.getFilePreview(APPWRITE_BUCKET_AVATARS, userProfile.avatar) : `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.username||userProfile.email)}&background=6366f1&color=fff&rounded=true&size=128`;
+      profileCard.innerHTML = `
+        <div class="bg-gradient-to-b from-indigo-100/80 to-white rounded-2xl shadow-xl p-6 flex flex-col items-center animate-fadeIn">
+          <img src="${avatarUrl}" class="rounded-full w-24 h-24 border-4 border-indigo-400 object-cover shadow mb-1 transition-custom hover:scale-105" />
+          <div class="font-bold text-2xl text-indigo-700 mt-2 mb-1">${userProfile.username}</div>
+          <div class="text-gray-500 mb-2">${userProfile.bio||"<span class='italic text-gray-300'>No bio</span>"}</div>
+          <div class="flex gap-5 my-2 text-sm">
+            <div><b>${followers.length}</b> <span class="text-indigo-500">Followers</span></div>
+            <div><b>${following.length}</b> <span class="text-indigo-500">Following</span></div>
+            <div><b>${allUserLikesCount(userProfile.$id)}</b> <span class="text-indigo-500">Likes</span></div>
+          </div>
+          <input type="file" id="avatarUpload" accept="image/*" class="mt-2 text-xs text-gray-500" />
+        </div>
+      `;
+      setTimeout(() => {
+        document.getElementById('avatarUpload').onchange = async (e) => {
+          const f = e.target.files[0];
+          if (!f) return;
+          const uploaded = await storage.createFile(APPWRITE_BUCKET_AVATARS, ID.unique(), f);
+          await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userProfile.$id, { avatar: uploaded.$id });
+          userProfile.avatar = uploaded.$id;
+          renderProfileCard();
+          showProfileDropdown();
         };
-        dmPanel.style.display = "block";
-      } catch {
-        dmPanel.style.display = "none";
-      }
-    }
-    async function loadDMs(withUser) {
-      // Show all DMs between me and withUser (in either direction)
-      if (myDMSubscription) myDMSubscription();
-      dmMessages.innerHTML = "<em>Loading...</em>";
-      try {
-        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_DMS, [
-          `or(user1=${user.email},user2=${user.email})`,
-          `or(user1=${withUser},user2=${withUser})`
-        ]);
-        const msgs = docs.documents.filter(
-          d => (d.user1===user.email && d.user2===withUser) || (d.user2===user.email && d.user1===withUser)
-        ).sort((a,b)=>a.$createdAt.localeCompare(b.$createdAt));
-        dmMessages.innerHTML = msgs.length
-          ? msgs.map(m =>
-            `<div class="dm-message${m.user1===user.email?' you':''}">
-              <b>${m.user1}:</b> ${m.text}
-            </div>`
-          ).join("") : "<em>No messages yet.</em>";
-        // Subscribe for new
-        myDMSubscription = realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_DMS}.documents`, e => {
-          if (e.payload.user1===user.email && e.payload.user2===withUser || e.payload.user2===user.email && e.payload.user1===withUser) {
-            loadDMs(withUser);
-          }
-        });
-      } catch {
-        dmMessages.innerHTML = "<em>Error loading DMs</em>";
-      }
-    }
-    dmForm.onsubmit = async (e) => {
-      e.preventDefault();
-      if (!selectedDMUser) return;
-      const txt = dmInput.value;
-      await databases.createDocument(APPWRITE_DB, APPWRITE_DMS, ID.unique(), {
-        user1: user.email,
-        user2: selectedDMUser,
-        text: txt
-      });
-      await addNotif(selectedDMUser, `${user.email} sent you a DM: "${txt}"`);
-      dmInput.value = "";
-    };
-
-    // ==== Notifications ====
-    async function addNotif(to, msg) {
-      await databases.createDocument(APPWRITE_DB, APPWRITE_NOTIFS, ID.unique(), {
-        to,
-        msg,
-        seen: false,
-        date: new Date().toISOString()
-      });
-    }
-    async function renderNotifications() {
-      try {
-        // Load my notifs
-        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_NOTIFS, [
-          `to=${user.email}`,
-          "orderDesc(date)"
-        ]);
-        myNotifs = docs.documents;
-        notificationsList.innerHTML = myNotifs.length
-          ? myNotifs.map(n =>
-            `<div class="notification-item">${n.msg} <small>${new Date(n.date).toLocaleString()}</small></div>`
-          ).join("")
-          : "<em>No notifications yet.</em>";
-        notificationsPanel.style.display = "block";
-      } catch {
-        notificationsPanel.style.display = "none";
-      }
+      }, 100);
     }
 
-    // ==== Helper: Get user doc by email ====
-    async function getUserDoc(email) {
-      try {
-        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${email}`]);
-        return docs.documents[0] || null;
-      } catch { return null; }
-    }
-
-    // ==== Real-time ====
-    function subscribeFeed() {
-      if (unsubscribeFeed) unsubscribeFeed(); // Remove previous
-      unsubscribeFeed = realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_COLLECTION}.documents`, response => {
-        fetchMemes();
-        renderLeaderboard();
-        renderAdmin();
-      });
-      // Notifications real-time
-      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_NOTIFS}.documents`, e => {
-        renderNotifications();
-      });
-    }
-
-    // ==== App Show ====
-    function showApp() {
-      userWelcome.innerHTML = `Welcome, <b>${user.email}</b>!`;
-      authCard.classList.add('hidden');
-      appCard.classList.remove('hidden');
-      logoutBtn.style.display = "inline-block";
-      fetchMemes();
-      renderLeaderboard();
-      renderAdmin();
-      renderDM();
+    // Notifications
+    async function fetchNotifications() {
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_NOTIFICATIONS, [`userId=${userProfile.$id}`, 'orderDesc($createdAt)'], 10);
+      notifications = docs.documents;
       renderNotifications();
-      subscribeFeed();
+    }
+    function renderNotifications() {
+      notificationsCard.innerHTML = `
+        <div class="bg-gradient-to-b from-indigo-100/80 to-white rounded-2xl shadow-xl p-4 animate-fadeIn">
+          <div class="font-semibold text-lg mb-2 flex items-center gap-2">
+            <i class="fas fa-bell text-indigo-400 animate-bounce"></i> Notifications
+          </div>
+          <div class="max-h-36 overflow-y-auto pr-2">
+            ${notifications.length ? notifications.map(n => `<div class="text-sm py-1 border-b border-indigo-100">${n.message} <span class="text-xs text-gray-400">${new Date(n.createdAt).toLocaleTimeString()}</span></div>`).join("") : '<em class="text-gray-400">No notifications</em>'}
+          </div>
+        </div>
+      `;
     }
 
-    // ==== On Load ====
-    window.addEventListener("DOMContentLoaded", () => {
-      checkSession();
+    // Chat Card
+    function renderChatCard() {
+      chatCard.innerHTML = `
+        <div class="bg-gradient-to-b from-indigo-100/80 to-white rounded-2xl shadow-xl p-4 animate-fadeIn">
+          <div class="font-semibold text-lg mb-2 flex items-center gap-2">
+            <i class="fas fa-paper-plane text-indigo-400"></i> Real-Time Chat
+          </div>
+          <select id="chatUserSelect" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-2 py-1 w-full mb-2 transition-custom"></select>
+          <div id="chatMessages" class="bg-white/80 rounded p-2 h-32 overflow-y-auto mb-2 text-sm"></div>
+          <form id="chatForm" class="flex gap-2">
+            <input type="text" id="chatInput" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg flex-1 px-2 py-1 transition-custom" placeholder="Type message..." maxlength="100" required />
+            <button class="bg-indigo-500 text-white rounded px-3 py-1 font-semibold hover:bg-indigo-600 transition-custom" type="submit">Send</button>
+          </form>
+        </div>
+      `;
+      setTimeout(() => { renderChatLogic(); }, 100);
+    }
+    let currentChatUserId = null, chatMessagesDiv = null;
+    async function renderChatLogic() {
+      const select = document.getElementById('chatUserSelect');
+      chatMessagesDiv = document.getElementById('chatMessages');
+      select.innerHTML = allUsers.filter(u=>u.$id!==userProfile.$id).map(u=>`<option value="${u.$id}">${u.username}</option>`).join("");
+      currentChatUserId = select.value = select.options[0]?.value || null;
+      if (currentChatUserId) loadChat();
+      select.onchange = e => { currentChatUserId = select.value; loadChat(); };
+      document.getElementById('chatForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if (!currentChatUserId) return;
+        const text = document.getElementById('chatInput').value;
+        const chatId = chatKey(userProfile.$id, currentChatUserId);
+        let chatDoc;
+        try {
+          chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
+        } catch {
+          await databases.createDocument(APPWRITE_DB, APPWRITE_CHATS, chatId, {
+            members: [userProfile.$id, currentChatUserId],
+            messages: []
+          });
+          chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
+        }
+        let messages = chatDoc.messages || [];
+        messages.push({from: userProfile.$id, text, createdAt: new Date().toISOString()});
+        await databases.updateDocument(APPWRITE_DB, APPWRITE_CHATS, chatId, {messages});
+        await addNotification(currentChatUserId, 'message', userProfile.$id, null, `${userProfile.username} sent you a message`);
+        document.getElementById('chatInput').value = '';
+        loadChat();
+      };
+    }
+    function chatKey(a,b) { return [a,b].sort().join("_"); }
+    async function loadChat() {
+      if (!currentChatUserId) return;
+      const chatId = chatKey(userProfile.$id, currentChatUserId);
+      try {
+        const chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
+        const messages = chatDoc.messages || [];
+        chatMessagesDiv.innerHTML = messages.map(m => `<div class="my-1 ${m.from===userProfile.$id?"text-right":""}"><span class="bg-indigo-100 rounded px-2 py-1 inline-block">${m.text}</span> <span class="text-xs text-gray-400">${new Date(m.createdAt).toLocaleTimeString()}</span></div>`).join("");
+        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+      } catch {
+        chatMessagesDiv.innerHTML = `<em class="text-gray-400">No messages</em>`;
+      }
+    }
+
+    // Notification helper
+    async function addNotification(toUserId, type, fromUserId, memeId, msg) {
+      await databases.createDocument(APPWRITE_DB, APPWRITE_NOTIFICATIONS, ID.unique(), {
+        userId: toUserId,
+        type,
+        fromUserId,
+        memeId,
+        message: msg,
+        seen: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    function allUserLikesCount(uid) {
+      return memes.reduce((acc, m)=>acc+(m.userId===uid && m.likes ? m.likes.length : 0), 0);
+    }
+
+    function showEditProfileModal() {
+      const bio = prompt("Enter new bio:", userProfile.bio||"");
+      if (bio !== null) {
+        databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userProfile.$id, {bio});
+        userProfile.bio = bio;
+        renderProfileCard();
+      }
+    }
+
+    // Fetch all users, followers, following
+    async function fetchAllUsers() {
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS);
+      allUsers = docs.documents;
+      userProfile = allUsers.find(u=>u.$id===userProfile.$id);
+      followers = userProfile.followers || [];
+      following = userProfile.following || [];
+    }
+
+    async function refreshState() {
+      await fetchAllUsers();
+      renderProfileCard();
+      renderChatCard();
+    }
+
+    function subscribeRealtime() {
+      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_MEMES}.documents`, fetchMemes);
+      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_NOTIFICATIONS}.documents`, fetchNotifications);
+      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_USERS}.documents`, async () => { await fetchAllUsers(); renderProfileCard(); });
+      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_CHATS}.documents`, loadChat);
+    }
+
+    async function showApp() {
+      authSection.classList.add('hidden');
+      appSection.classList.remove('hidden');
+      await fetchAllUsers();
+      showProfileDropdown();
+      renderProfileCard();
+      renderChatCard();
+      await fetchNotifications();
+      await fetchMemes();
+      subscribeRealtime();
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const me = await account.get();
+        const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
+        userProfile = docs.documents[0];
+        showApp();
+      } catch {
+        showAuth();
+      }
     });
   </script>
 </body>
