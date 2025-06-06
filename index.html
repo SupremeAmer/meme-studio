@@ -171,39 +171,48 @@
     };
 
     // Register/Login
-    authForm.onsubmit = async (e) => {
-      e.preventDefault();
-      authError.textContent = "";
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const name = document.getElementById('username') ? document.getElementById('username').value.trim() : '';
-      try {
-        if (isRegister) {
-          if (!name) {
-            authError.textContent = "Please enter a username.";
-            return;
-          }
-          await account.create('unique()', email, password, name);
-          await account.createEmailSession(email, password);
-          const appUser = await account.get();
-          await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, appUser.$id, {
-            username: name,
-            email,
-            bio: "",
-            avatar: null,
-            followers: [],
-            following: [],
-            createdAt: new Date().toISOString()
-          });
-        } else {
-          await account.createEmailSession(email, password);
-        }
-        userProfile = await getFullUserProfile();
-        showApp();
-      } catch(err) {
-        authError.textContent = err.message || "Authentication failed";
+    // Register/Login
+authForm.onsubmit = async (e) => {
+  e.preventDefault();
+  authError.textContent = "";
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const name = document.getElementById('username') ? document.getElementById('username').value.trim() : '';
+  try {
+    if (isRegister) {
+      if (!name) {
+        authError.textContent = "Please enter a username.";
+        return;
       }
-    };
+      // 1. Create account and session
+      await account.create('unique()', email, password, name);
+      await account.createEmailSession(email, password);
+    } else {
+      // 2. Just login
+      await account.createEmailSession(email, password);
+    }
+
+    // 3. Make sure user profile doc exists (create if missing)
+    const me = await account.get();
+    let docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
+    if (!docs.documents.length) {
+      await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, me.$id, {
+        username: me.name || name || email.split('@')[0],
+        email: me.email,
+        bio: "",
+        avatar: null,
+        followers: [],
+        following: [],
+        createdAt: new Date().toISOString()
+      });
+      docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
+    }
+    userProfile = docs.documents[0];
+    showApp();
+  } catch(err) {
+    authError.textContent = err?.message || "Authentication failed";
+  }
+};
 
     // Profile dropdown, avatar, logout
     function showProfileDropdown() {
