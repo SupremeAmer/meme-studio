@@ -9,35 +9,72 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
   <style>
     body { font-family: 'Inter', sans-serif; }
+    .logo-animated {
+      animation: logoBounce 1.5s infinite alternate cubic-bezier(.8,-0.6,0.2,1.5);
+      will-change: transform;
+    }
+    @keyframes logoBounce {
+      0% { transform: scale(1) rotate(0deg);}
+      40% { transform: scale(1.08) rotate(-4deg);}
+      60% { transform: scale(0.95) rotate(6deg);}
+      100% { transform: scale(1) rotate(0deg);}
+    }
+    .fade-in {
+      animation: fadeIn .8s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(24px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .button-pop {
+      transition: transform 0.15s cubic-bezier(.4,0,.2,1), box-shadow 0.2s;
+    }
+    .button-pop:hover {
+      transform: scale(1.07) translateY(-2px) rotate(-1deg);
+      box-shadow: 0 8px 20px 0 rgba(99,102,241,.14);
+    }
+    .glass {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.11);
+    }
+    .input-animated {
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input-animated:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px #6366f1bb;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-tr from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center">
 
-  <nav class="bg-white/90 backdrop-blur shadow-md px-6 py-2 w-full flex justify-between items-center sticky top-0 z-50">
+  <nav class="bg-white/80 glass shadow-md px-6 py-2 w-full flex justify-between items-center sticky top-0 z-50 fade-in">
     <span class="text-2xl font-extrabold text-indigo-600 tracking-tight flex items-center gap-2">
-      <i class="fas fa-crown text-yellow-400 animate-bounce"></i> Meme Social
+      <img class="logo-animated" src="logo.png" alt="Meme Social Logo" style="height:2.4em;width:2.4em;"/>
+      Meme <span class="text-yellow-400">Social</span>
     </span>
   </nav>
 
-  <main class="flex flex-col items-center mt-16" id="authSection">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full animate-fadeIn">
-      <h2 class="text-3xl font-extrabold text-indigo-600 text-center mb-6 tracking-tight" id="authTitle">Login</h2>
-      <form id="authForm" class="flex flex-col gap-3">
+  <main class="flex flex-col items-center mt-16 fade-in" id="authSection">
+    <div class="glass rounded-2xl shadow-2xl p-8 max-w-md w-full fade-in" style="animation-delay:.12s;">
+      <h2 class="text-3xl font-extrabold text-indigo-600 text-center mb-6 tracking-tight fade-in" style="animation-delay:.22s;" id="authTitle">Login</h2>
+      <form id="authForm" class="flex flex-col gap-3 fade-in" style="animation-delay:.32s;">
         <div id="usernameField" class="hidden">
-          <input type="text" id="username" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Username" autocomplete="username" />
+          <input type="text" id="username" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Username" autocomplete="username" />
         </div>
-        <input type="email" id="email" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Email" required autocomplete="email" />
-        <input type="password" id="password" class="input border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Password" required autocomplete="current-password" />
-        <button type="submit" class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 font-bold hover:scale-105 transition-transform shadow-md">Login</button>
+        <input type="email" id="email" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Email" required autocomplete="email" />
+        <input type="password" id="password" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Password" required autocomplete="current-password" />
+        <button type="submit" class="button-pop bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 font-bold transition-transform shadow-md">Login</button>
         <button id="googleSignInBtn" type="button"
-          class="bg-white border border-gray-300 rounded-lg py-2 px-4 w-full flex items-center justify-center gap-2 font-semibold text-gray-700 hover:bg-gray-100 transition mb-2">
+          class="button-pop bg-white border border-gray-300 rounded-lg py-2 px-4 w-full flex items-center justify-center gap-2 font-semibold text-gray-700 hover:bg-gray-100 transition">
           <img src="https://unpkg.com/simple-icons@v11/icons/google.svg" alt="Google" class="w-5 h-5"> Sign in with Google
         </button>
       </form>
-      <div class="text-center mt-4">
+      <div class="text-center mt-4 fade-in" style="animation-delay:.45s;">
         <button id="toggleAuthBtn" class="text-indigo-700 hover:underline text-sm font-semibold transition-custom">Don't have an account? Register</button>
       </div>
-      <div class="text-red-500 text-center mt-2 font-medium" id="authError"></div>
+      <div class="text-red-500 text-center mt-2 font-medium fade-in" style="animation-delay:.55s;" id="authError"></div>
     </div>
   </main>
 
@@ -68,12 +105,12 @@
       authError.textContent = "";
       if (isRegister) {
         authTitle.textContent = "Register";
-        authForm.querySelector('button[type=\"submit\"]').textContent = "Register";
+        authForm.querySelector('button[type="submit"]').textContent = "Register";
         usernameField.classList.remove('hidden');
         toggleAuthBtn.textContent = "Already have an account? Login";
       } else {
         authTitle.textContent = "Login";
-        authForm.querySelector('button[type=\"submit\"]').textContent = "Login";
+        authForm.querySelector('button[type="submit"]').textContent = "Login";
         usernameField.classList.add('hidden');
         toggleAuthBtn.textContent = "Don't have an account? Register";
       }
@@ -128,6 +165,8 @@
         window.location.href = "home.html";
       } catch (err) {
         authError.textContent = err?.message || "Authentication failed";
+        authError.classList.add("animate-bounce");
+        setTimeout(()=>authError.classList.remove("animate-bounce"), 700);
       }
     };
 
@@ -141,6 +180,8 @@
         );
       } catch (err) {
         authError.textContent = err?.message || "Google sign-in failed";
+        authError.classList.add("animate-bounce");
+        setTimeout(()=>authError.classList.remove("animate-bounce"), 700);
       }
     };
   </script>
