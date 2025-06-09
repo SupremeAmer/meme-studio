@@ -1,187 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Meme Social - Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .logo-animated {
-      animation: logoBounce 1.5s infinite alternate cubic-bezier(.8,-0.6,0.2,1.5);
-      will-change: transform;
-    }
-    @keyframes logoBounce {
-      0% { transform: scale(1) rotate(0deg);}
-      40% { transform: scale(1.08) rotate(-4deg);}
-      60% { transform: scale(0.95) rotate(6deg);}
-      100% { transform: scale(1) rotate(0deg);}
-    }
-    .fade-in {
-      animation: fadeIn .8s cubic-bezier(.4,0,.2,1);
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(24px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .button-pop {
-      transition: transform 0.15s cubic-bezier(.4,0,.2,1), box-shadow 0.2s;
-    }
-    .button-pop:hover {
-      transform: scale(1.07) translateY(-2px) rotate(-1deg);
-      box-shadow: 0 8px 20px 0 rgba(99,102,241,.14);
-    }
-    .glass {
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.11);
-    }
-    .input-animated {
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .input-animated:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 2px #6366f1bb;
-    }
-  </style>
-</head>
-<body class="bg-gradient-to-tr from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center">
-
-  <nav class="bg-white/80 glass shadow-md px-6 py-2 w-full flex justify-between items-center sticky top-0 z-50 fade-in">
-    <span class="text-2xl font-extrabold text-indigo-600 tracking-tight flex items-center gap-2">
-      <img class="logo-animated" src="logo.png" alt="Meme Social Logo" style="height:2.4em;width:2.4em;"/>
-      Meme <span class="text-yellow-400">Social</span>
-    </span>
-  </nav>
-
-  <main class="flex flex-col items-center mt-16 fade-in" id="authSection">
-    <div class="glass rounded-2xl shadow-2xl p-8 max-w-md w-full fade-in" style="animation-delay:.12s;">
-      <h2 class="text-3xl font-extrabold text-indigo-600 text-center mb-6 tracking-tight fade-in" style="animation-delay:.22s;" id="authTitle">Login</h2>
-      <form id="authForm" class="flex flex-col gap-3 fade-in" style="animation-delay:.32s;">
-        <div id="usernameField" class="hidden">
-          <input type="text" id="username" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Username" autocomplete="username" />
-        </div>
-        <input type="email" id="email" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Email" required autocomplete="email" />
-        <input type="password" id="password" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Password" required autocomplete="current-password" />
-        <button type="submit" class="button-pop bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 font-bold transition-transform shadow-md">Login</button>
-        <button id="googleSignInBtn" type="button"
-          class="button-pop bg-white border border-gray-300 rounded-lg py-2 px-4 w-full flex items-center justify-center gap-2 font-semibold text-gray-700 hover:bg-gray-100 transition">
-          <img src="https://unpkg.com/simple-icons@v11/icons/google.svg" alt="Google" class="w-5 h-5"> Sign in with Google
-        </button>
-      </form>
-      <div class="text-center mt-4 fade-in" style="animation-delay:.45s;">
-        <button id="toggleAuthBtn" class="text-indigo-700 hover:underline text-sm font-semibold transition-custom">Don't have an account? Register</button>
-      </div>
-      <div class="text-red-500 text-center mt-2 font-medium fade-in" style="animation-delay:.55s;" id="authError"></div>
-    </div>
-  </main>
-
+  <meta charset="UTF-8">
+  <title>SupremeAmer Auth</title>
   <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+    <div id="form-toggle" class="flex justify-center mb-6">
+      <button id="show-login" class="px-4 py-2 mr-2 bg-blue-100 text-blue-700 rounded">Login</button>
+      <button id="show-register" class="px-4 py-2 bg-gray-100 text-gray-700 rounded">Register</button>
+    </div>
+    <form id="register-form" class="hidden space-y-4">
+      <input type="text" id="reg-username" class="w-full border p-2 rounded" placeholder="Username" required />
+      <input type="email" id="reg-email" class="w-full border p-2 rounded" placeholder="Email" required />
+      <input type="password" id="reg-password" class="w-full border p-2 rounded" placeholder="Password" required />
+      <input type="text" id="reg-invitedby" class="w-full border p-2 rounded bg-gray-100" placeholder="Invited By (referrer)" readonly style="display:none"/>
+      <button type="submit" class="w-full bg-green-600 text-white p-2 rounded">Register</button>
+    </form>
+    <form id="login-form" class="space-y-4">
+      <input type="email" id="login-email" class="w-full border p-2 rounded" placeholder="Email" required />
+      <input type="password" id="login-password" class="w-full border p-2 rounded" placeholder="Password" required />
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded">Login</button>
+    </form>
+
+    <!-- Facebook Login Button -->
+    <div class="flex justify-center my-4">
+      <button id="fb-login-btn" class="w-full bg-blue-800 text-white p-2 rounded">Login with Facebook</button>
+    </div>
+    <!-- GitHub Login Button -->
+    <div class="flex justify-center my-2">
+      <button id="github-login-btn" class="w-full bg-gray-900 text-white p-2 rounded flex items-center justify-center gap-2">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 .198a8 8 0 0 0-2.53 15.6c.4.074.547-.174.547-.386 0-.19-.007-.693-.01-1.36-2.226.483-2.695-1.073-2.695-1.073-.364-.924-.89-1.17-.89-1.17-.726-.497.055-.487.055-.487.803.057 1.226.825 1.226.825.714 1.222 1.872.87 2.328.666.072-.517.28-.871.508-1.073-1.777-.202-3.644-.889-3.644-3.956 0-.874.312-1.588.823-2.148-.083-.203-.357-1.018.078-2.122 0 0 .672-.215 2.2.82A7.67 7.67 0 0 1 8 4.844c.68.003 1.366.092 2.005.27 1.527-1.035 2.198-.82 2.198-.82.437 1.104.162 1.919.08 2.122.513.56.823 1.274.823 2.148 0 3.074-1.87 3.752-3.65 3.95.287.25.543.739.543 1.49 0 1.075-.01 1.942-.01 2.205 0 .214.145.463.55.384A8.001 8.001 0 0 0 8 .197z"/></svg>
+        Login with GitHub
+      </button>
+    </div>
+    <p id="profile" class="mt-2 text-center text-green-700"></p>
+    <div id="error" class="mt-4 text-red-600"></div>
+  </div>
+
+  <div id="fb-root"></div>
   <script>
-    // ==== CONFIG: REPLACE WITH YOUR IDs ====
-    const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
-    const APPWRITE_PROJECT = "683de53b0032c338fa4b";
-    const APPWRITE_DB = "683de6560007db2161b7";
-    const APPWRITE_USERS = "Meme";
-    // ==== END CONFIG ====
-
-    const client = new window.appwrite.Client();
-    client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
-    const account = new window.appwrite.Account(client);
-    const databases = new window.appwrite.Databases(client);
-
-    // DOM
-    const authForm = document.getElementById('authForm');
-    const toggleAuthBtn = document.getElementById('toggleAuthBtn');
-    const authTitle = document.getElementById('authTitle');
-    const authError = document.getElementById('authError');
-    const usernameField = document.getElementById('usernameField');
-
-    let isRegister = false;
-
-    function showAuth() {
-      authError.textContent = "";
-      if (isRegister) {
-        authTitle.textContent = "Register";
-        authForm.querySelector('button[type="submit"]').textContent = "Register";
-        usernameField.classList.remove('hidden');
-        toggleAuthBtn.textContent = "Already have an account? Login";
-      } else {
-        authTitle.textContent = "Login";
-        authForm.querySelector('button[type="submit"]').textContent = "Login";
-        usernameField.classList.add('hidden');
-        toggleAuthBtn.textContent = "Don't have an account? Register";
-      }
-    }
-    toggleAuthBtn.onclick = () => {
-      isRegister = !isRegister;
-      showAuth();
+    (function(d, s, id){
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) {return;}
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '3535690456739980',
+        xfbml      : true,
+        version    : 'v22.0'
+      });
     };
-
-    // Redirect to home.html if already logged in
-    window.addEventListener("DOMContentLoaded", async () => {
-      try {
-        await account.get();
-        window.location.href = "home.html";
-      } catch {
-        showAuth();
+    document.addEventListener('DOMContentLoaded', function() {
+      const fbLoginBtn = document.getElementById('fb-login-btn');
+      if (fbLoginBtn) {
+        fbLoginBtn.onclick = function(e) {
+          e.preventDefault();
+          FB.login(function(response) {
+            if (response.authResponse) {
+              FB.api('/me', {fields: 'name,email'}, function(response) {
+                window.location.href = 'home.html';
+              });
+            } else {
+              document.getElementById("profile").innerText = "User cancelled Facebook login or did not authorize.";
+            }
+          }, {scope: 'email,public_profile'});
+        }
       }
     });
+  </script>
+  <script>
+    // Appwrite setup
+    const client = new Appwrite.Client();
+    client.setEndpoint('https://fra.cloud.appwrite.io/v1').setProject('68370442000c3c15b9f3');
+    const account = new Appwrite.Account(client);
+    const databases = new Appwrite.Databases(client);
+    const dbId = '683705ff00244f73e93f';
+    const usersColl = 'users';
 
-    // Register/Login Handler
-    authForm.onsubmit = async (e) => {
+    // Toggle between Login/Register
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    document.getElementById('show-login').onclick = () => {
+      loginForm.classList.remove('hidden');
+      registerForm.classList.add('hidden');
+    };
+    document.getElementById('show-register').onclick = () => {
+      registerForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+    };
+
+    // Pre-fill invitedBy
+    const urlParams = new URLSearchParams(window.location.search);
+    const invitedBy = urlParams.get('invite');
+    if (invitedBy) {
+      const invitedByInput = document.getElementById('reg-invitedby');
+      invitedByInput.value = invitedBy;
+      invitedByInput.style.display = '';
+      invitedByInput.readOnly = true;
+    }
+
+    // Registration
+    registerForm.onsubmit = async function(e) {
       e.preventDefault();
-      authError.textContent = "";
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const name = document.getElementById('username') ? document.getElementById('username').value.trim() : '';
+      const username = document.getElementById('reg-username').value;
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
       try {
-        if (isRegister) {
-          if (!name) {
-            authError.textContent = "Please enter a username.";
-            return;
-          }
-          await account.create('unique()', email, password, name);
-          await account.createEmailSession(email, password);
-          // Create profile doc if not exists
-          const me = await account.get();
-          let docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
-          if (!docs.documents.length) {
-            await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, me.$id, {
-              username: me.name || name || email.split('@')[0],
-              email: me.email,
-              bio: "",
-              avatar: null,
-              followers: [],
-              following: [],
-              createdAt: new Date().toISOString()
-            });
-          }
-        } else {
-          await account.createEmailSession(email, password);
-        }
-        window.location.href = "home.html";
+        // 1. Create Appwrite account
+        const resp = await account.create('unique()', email, password, username);
+        // 2. (Optionally) Log in session immediately
+        await account.createEmailSession(email, password);
+        // 3. Create user profile in DB
+        const doc = await databases.createDocument(
+          dbId, usersColl, 'unique()', {
+            email: email,
+            name: username,
+            invitedBy: invitedBy || "",
+            walletAddress: "",
+            welcomeBonus: false
+        });
+        // 4. Optionally prompt to connect wallet (add your logic if needed)
+        // Redirect to home
+        window.location.href = 'home.html';
       } catch (err) {
-        authError.textContent = err?.message || "Authentication failed";
-        authError.classList.add("animate-bounce");
-        setTimeout(()=>authError.classList.remove("animate-bounce"), 700);
+        document.getElementById('error').innerText = err.message;
       }
     };
 
-    // Google Sign-In Handler
-    document.getElementById('googleSignInBtn').onclick = async () => {
+    // Login
+    loginForm.onsubmit = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
       try {
-        account.createOAuth2Session(
-          'google',
-          window.location.origin + window.location.pathname.replace("index.html", "home.html"),
-          window.location.origin + window.location.pathname
-        );
-      } catch (err) {
-        authError.textContent = err?.message || "Google sign-in failed";
-        authError.classList.add("animate-bounce");
-        setTimeout(()=>authError.classList.remove("animate-bounce"), 700);
+        await account.createEmailSession(email, password);
+        window.location.href = 'home.html';
+      } catch (error) {
+        document.getElementById('error').innerText = error.message;
       }
     };
   </script>
