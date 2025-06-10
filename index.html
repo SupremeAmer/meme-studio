@@ -3,186 +3,629 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Meme Social - Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Meme Social</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .logo-animated {
-      animation: logoBounce 1.5s infinite alternate cubic-bezier(.8,-0.6,0.2,1.5);
-      will-change: transform;
-    }
-    @keyframes logoBounce {
-      0% { transform: scale(1) rotate(0deg);}
-      40% { transform: scale(1.08) rotate(-4deg);}
-      60% { transform: scale(0.95) rotate(6deg);}
-      100% { transform: scale(1) rotate(0deg);}
-    }
-    .fade-in {
-      animation: fadeIn .8s cubic-bezier(.4,0,.2,1);
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(24px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .button-pop {
-      transition: transform 0.15s cubic-bezier(.4,0,.2,1), box-shadow 0.2s;
-    }
-    .button-pop:hover {
-      transform: scale(1.07) translateY(-2px) rotate(-1deg);
-      box-shadow: 0 8px 20px 0 rgba(99,102,241,.14);
-    }
-    .glass {
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.11);
-    }
-    .input-animated {
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .input-animated:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 2px #6366f1bb;
-    }
+    /* --- Animations and core style (add your style.css for more) --- */
+    .logo-anim { animation: logoSpin 2s infinite linear; }
+    @keyframes logoSpin { 0%{transform:rotate(-5deg) scale(1);} 50%{transform:rotate(7deg) scale(1.10);} 100%{transform:rotate(-5deg) scale(1);} }
+    .fade-in { animation: fadeIn .8s cubic-bezier(.4,0,.2,1);}
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: translateY(0);}}
+    .hide { display: none; }
+    .avatar { border-radius: 50%; object-fit: cover; }
+    .hashtag { color: #6366f1; cursor: pointer; }
+    .admin-btn { background: #ef4444; color: #fff; border: none; border-radius: 5px; padding: 3px 9px; margin-left: 5px; }
+    .notif-unseen { font-weight: bold; background: #facc15; border-radius: 50%; padding: 2px 6px; color: #fff; }
+    /* ... more in your style.css ... */
   </style>
 </head>
-<body class="bg-gradient-to-tr from-blue-50 to-indigo-100 min-h-screen flex flex-col items-center">
-
-  <nav class="bg-white/80 glass shadow-md px-6 py-2 w-full flex justify-between items-center sticky top-0 z-50 fade-in">
-    <span class="text-2xl font-extrabold text-indigo-600 tracking-tight flex items-center gap-2">
-      <img class="logo-animated" src="logo.png" alt="Meme Social Logo" style="height:2.4em;width:2.4em;"/>
-      Meme <span class="text-yellow-400">Social</span>
+<body>
+  <nav class="center">
+    <span style="font-size:2rem;font-weight:bold;color:#6366f1;letter-spacing:0.02em;">
+      <img src="https://supremeamer.github.io/meme-socially/assets/logo.png" class="logo-anim" alt="logo" style="height:2.1em;vertical-align:middle;"/> Meme <span style="color:#facc15;">Social</span>
     </span>
   </nav>
-
-  <main class="flex flex-col items-center mt-16 fade-in" id="authSection">
-    <div class="glass rounded-2xl shadow-2xl p-8 max-w-md w-full fade-in" style="animation-delay:.12s;">
-      <h2 class="text-3xl font-extrabold text-indigo-600 text-center mb-6 tracking-tight fade-in" style="animation-delay:.22s;" id="authTitle">Login</h2>
-      <form id="authForm" class="flex flex-col gap-3 fade-in" style="animation-delay:.32s;">
-        <div id="usernameField" class="hidden">
-          <input type="text" id="username" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Username" autocomplete="username" />
-        </div>
-        <input type="email" id="email" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Email" required autocomplete="email" />
-        <input type="password" id="password" class="input input-animated border-2 border-indigo-100 focus:border-indigo-400 rounded-lg px-4 py-2 w-full transition-custom" placeholder="Password" required autocomplete="current-password" />
-        <button type="submit" class="button-pop bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg py-2 font-bold transition-transform shadow-md">Login</button>
-        <button id="facebookSignInBtn" type="button"
-          class="button-pop bg-white border border-gray-300 rounded-lg py-2 px-4 w-full flex items-center justify-center gap-2 font-semibold text-gray-700 hover:bg-gray-100 transition">
-          <img src="https://unpkg.com/simple-icons@v11/icons/facebook.svg" alt="Facebook" class="w-5 h-5"> Sign in with Facebook
+  <main>
+    <!-- Auth UI -->
+    <div id="authCard" class="card center">
+      <h2 id="authTitle">Login</h2>
+      <form id="authForm">
+        <div id="usernameRegField" class="hide"><input type="text" id="regUsername" placeholder="Username" autocomplete="username" required /></div>
+        <input type="email" id="authEmail" placeholder="Email" autocomplete="email" required />
+        <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required />
+        <button type="submit" id="authBtn">Login</button>
+        <button id="googleSignInBtn" type="button" style="background:#fff;color:#6366f1;border:1.5px solid #6366f1;margin-top:.5em;">
+          <img src="https://unpkg.com/simple-icons@v11/icons/google.svg" alt="Google" style="width:1.3em;height:1.3em;vertical-align:middle;"> Sign in with Google
         </button>
       </form>
-      <div class="text-center mt-4 fade-in" style="animation-delay:.45s;">
-        <button id="toggleAuthBtn" class="text-indigo-700 hover:underline text-sm font-semibold transition-custom">Don't have an account? Register</button>
+      <div style="margin:1em 0;">
+        <button id="toggleAuthBtn" style="border:none;background:none;color:#6366f1;cursor:pointer;">Don't have an account? Register</button>
       </div>
-      <div class="text-red-500 text-center mt-2 font-medium fade-in" style="animation-delay:.55s;" id="authError"></div>
+      <div id="authError" style="color:#dc2626;font-weight:bold;"></div>
+    </div>
+
+    <!-- Main App UI -->
+    <div id="appCard" class="card hide">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <button id="profilePageBtn">Profile</button>
+          <button id="feedBtn">Feed</button>
+          <button id="exploreBtn">Explore</button>
+          <button id="adminBtn" class="admin-btn hide">Admin</button>
+        </div>
+        <div>
+          <button id="notifBtn">🔔 <span id="notifUnread" class="notif-unseen hide"></span></button>
+          <button id="logoutBtn" style="background:#f3f4f6;color:#6366f1;padding:0.5em 1.1em;border-radius:8px;border:none;">Logout</button>
+        </div>
+      </div>
+      <div id="mainContent"></div>
+      <!-- Notifications Modal -->
+      <div id="notifModal" class="card hide" style="position:fixed;top:10vh;left:0;right:0;max-width:470px;margin:auto;z-index:1001;">
+        <h3>Notifications <button id="notifModalClose" style="float:right;">✕</button></h3>
+        <div id="notifList"></div>
+      </div>
+      <!-- Admin Modal -->
+      <div id="adminModal" class="card hide" style="position:fixed;top:10vh;left:0;right:0;max-width:470px;margin:auto;z-index:1010;">
+        <h3>Admin Reports <button id="adminModalClose" style="float:right;">✕</button></h3>
+        <div id="adminReports"></div>
+      </div>
     </div>
   </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
   <script>
-    // ==== CONFIG: REPLACE WITH YOUR IDs ====
+    // ==== CONFIG: USE YOUR APPWRITE IDs ====
     const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
     const APPWRITE_PROJECT = "683de53b0032c338fa4b";
     const APPWRITE_DB = "683de6560007db2161b7";
     const APPWRITE_USERS = "Meme";
+    const APPWRITE_MEMES = "683de6880026536928e4";
+    const APPWRITE_BUCKET = "Memesocially";
+    const APPWRITE_NOTIFS = "notifications";
+    const APPWRITE_REPORTS = "[YOUR_REPORTS_COLLECTION_ID]";
+    const APPWRITE_CHATS = "chats";
     // ==== END CONFIG ====
 
+    // --- Appwrite SDK setup ---
     const client = new window.appwrite.Client();
     client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
     const account = new window.appwrite.Account(client);
     const databases = new window.appwrite.Databases(client);
+    const storage = new window.appwrite.Storage(client);
+    const realtime = new window.appwrite.Realtime(client);
+    const ID = window.appwrite.ID;
 
-    // DOM
-    const authForm = document.getElementById('authForm');
-    const toggleAuthBtn = document.getElementById('toggleAuthBtn');
-    const authTitle = document.getElementById('authTitle');
-    const authError = document.getElementById('authError');
-    const usernameField = document.getElementById('usernameField');
+    // --- UI Elements ---
+    const authCard = document.getElementById("authCard");
+    const appCard = document.getElementById("appCard");
+    const mainContent = document.getElementById("mainContent");
+    const authForm = document.getElementById("authForm");
+    const toggleAuthBtn = document.getElementById("toggleAuthBtn");
+    const authTitle = document.getElementById("authTitle");
+    const authError = document.getElementById("authError");
+    const usernameRegField = document.getElementById("usernameRegField");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const regUsername = document.getElementById("regUsername");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const feedBtn = document.getElementById("feedBtn");
+    const exploreBtn = document.getElementById("exploreBtn");
+    const profilePageBtn = document.getElementById("profilePageBtn");
+    const notifBtn = document.getElementById("notifBtn");
+    const notifModal = document.getElementById("notifModal");
+    const notifModalClose = document.getElementById("notifModalClose");
+    const notifList = document.getElementById("notifList");
+    const notifUnread = document.getElementById("notifUnread");
+    const adminBtn = document.getElementById("adminBtn");
+    const adminModal = document.getElementById("adminModal");
+    const adminModalClose = document.getElementById("adminModalClose");
+    const adminReports = document.getElementById("adminReports");
 
+    // --- State ---
     let isRegister = false;
+    let currentUser = null; // { $id, email, name, ... }
+    let currentProfile = null; // profile doc
+    let currentFeed = "all"; // or "following"
+    let allUsers = [];
+    let myNotifications = [];
+    let unseenNotif = 0;
+    let isAdmin = false;
 
+    // --- UI Navigation ---
     function showAuth() {
+      authCard.classList.remove("hide");
+      appCard.classList.add("hide");
       authError.textContent = "";
-      if (isRegister) {
-        authTitle.textContent = "Register";
-        authForm.querySelector('button[type="submit"]').textContent = "Register";
-        usernameField.classList.remove('hidden');
-        toggleAuthBtn.textContent = "Already have an account? Login";
-      } else {
-        authTitle.textContent = "Login";
-        authForm.querySelector('button[type="submit"]').textContent = "Login";
-        usernameField.classList.add('hidden');
-        toggleAuthBtn.textContent = "Don't have an account? Register";
-      }
+      authTitle.textContent = isRegister ? "Register" : "Login";
+      authForm.querySelector('button[type="submit"]').textContent = isRegister ? "Register" : "Login";
+      usernameRegField.classList.toggle("hide", !isRegister);
+      authEmail.placeholder = isRegister ? "Email for Register" : "Email";
     }
-    toggleAuthBtn.onclick = () => {
-      isRegister = !isRegister;
-      showAuth();
-    };
 
-    // Redirect to home.html if already logged in
-    window.addEventListener("DOMContentLoaded", async () => {
-      try {
-        await account.get();
-        window.location.href = "home.html";
-      } catch {
-        showAuth();
-      }
-    });
+    async function showApp() {
+      authCard.classList.add("hide");
+      appCard.classList.remove("hide");
+      await loadAllUsers();
+      await fetchProfile();
+      await fetchNotifications();
+      showFeed();
+      if (isAdmin) adminBtn.classList.remove("hide"); else adminBtn.classList.add("hide");
+    }
 
-    // Register/Login Handler
+    // --- Auth logic ---
+    toggleAuthBtn.onclick = () => { isRegister = !isRegister; showAuth(); };
     authForm.onsubmit = async (e) => {
       e.preventDefault();
       authError.textContent = "";
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const name = document.getElementById('username') ? document.getElementById('username').value.trim() : '';
+      const email = authEmail.value.trim();
+      const password = authPassword.value.trim();
+      const username = isRegister ? regUsername.value.trim() : "";
       try {
         if (isRegister) {
-          if (!name) {
-            authError.textContent = "Please enter a username.";
-            return;
-          }
-          await account.create('unique()', email, password, name);
+          if (!username) return authError.textContent = "Username required";
+          await account.create(ID.unique(), email, password, username);
           await account.createEmailSession(email, password);
           // Create profile doc if not exists
           const me = await account.get();
-          let docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`email=${me.email}`]);
+          let docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`userId=${me.$id}`]);
           if (!docs.documents.length) {
             await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, me.$id, {
-              username: me.name || name || email.split('@')[0],
-              email: me.email,
+              userId: me.$id,
+              username: username,
               bio: "",
               avatar: null,
               followers: [],
               following: [],
-              createdAt: new Date().toISOString()
+              createdAt: new Date().toISOString(),
+              isAdmin: false
             });
           }
         } else {
           await account.createEmailSession(email, password);
         }
-        window.location.href = "home.html";
+        await initUser();
       } catch (err) {
         authError.textContent = err?.message || "Authentication failed";
-        authError.classList.add("animate-bounce");
-        setTimeout(()=>authError.classList.remove("animate-bounce"), 700);
       }
     };
-
-    // Facebook Sign-In Handler
-    document.getElementById('facebookSignInBtn').onclick = async () => {
+    document.getElementById('googleSignInBtn').onclick = async () => {
       try {
         account.createOAuth2Session(
-          'facebook',
-          window.location.origin + window.location.pathname.replace("index.html", "home.html"),
+          'google',
+          window.location.origin + window.location.pathname, // success redirect
           window.location.origin + window.location.pathname
         );
       } catch (err) {
-        authError.textContent = err?.message || "Facebook sign-in failed";
-        authError.classList.add("animate-bounce");
-        setTimeout(()=>authError.classList.remove("animate-bounce"), 700);
+        authError.textContent = err?.message || "Google sign-in failed";
       }
+    };
+
+    // --- Logout ---
+    logoutBtn.onclick = async () => {
+      await account.deleteSession("current");
+      currentUser = null;
+      showAuth();
+    };
+
+    // --- Initial User Check ---
+    window.addEventListener("DOMContentLoaded", async () => { await initUser(); });
+
+    async function initUser() {
+      try {
+        currentUser = await account.get();
+        await showApp();
+      } catch {
+        showAuth();
+      }
+    }
+
+    // --- Load all user profiles ---
+    async function loadAllUsers() {
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [], 100);
+      allUsers = docs.documents;
+    }
+
+    // --- Fetch my profile ---
+    async function fetchProfile() {
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`userId=${currentUser.$id}`], 1);
+      if (docs.documents.length) {
+        currentProfile = docs.documents[0];
+        isAdmin = !!currentProfile.isAdmin;
+      }
+    }
+
+    // --- FEED: Main meme feed with likes, comments, report, infinite scroll ---
+    feedBtn.onclick = showFeed;
+    async function showFeed() {
+      mainContent.innerHTML = `
+      <form id="memeForm" enctype="multipart/form-data" style="margin-bottom:1.6em;">
+        <input type="file" id="memeImage" accept="image/*" required />
+        <input type="text" id="memeCaption" placeholder="Caption (hashtags start with #)" maxlength="200" required />
+        <button type="submit" id="postMemeBtn">Post Meme</button>
+      </form>
+      <div style="margin-bottom:1em;">
+        <button id="feedAllBtn" ${currentFeed=="all"?"style='font-weight:bold'":""}>All</button>
+        <button id="feedFollowingBtn" ${currentFeed=="following"?"style='font-weight:bold'":""}>Following</button>
+        <input style="margin-left:20px;" type="text" id="searchInput" placeholder="🔎 Search users / #hashtags" />
+      </div>
+      <div id="memesFeed"></div>
+      <div id="feedLoading" class="center">Loading...</div>
+      `;
+      setTimeout(()=>{
+        document.getElementById("feedAllBtn").onclick = ()=>{currentFeed="all"; showFeed();};
+        document.getElementById("feedFollowingBtn").onclick = ()=>{currentFeed="following"; showFeed();};
+        document.getElementById("searchInput").oninput = (e)=>{searchFeed(e.target.value);};
+        document.getElementById("memeForm").onsubmit = postMeme;
+        loadMemesFeed();
+      }, 80);
+    }
+
+    // --- Infinite scroll for memes ---
+    let memesPage = 0, memesPerPage = 10, memesLoaded = [];
+    async function loadMemesFeed() {
+      memesPage = 0; memesLoaded = [];
+      document.getElementById("memesFeed").innerHTML = "";
+      document.getElementById("feedLoading").style.display = "block";
+      await appendMemesFeed();
+      window.onscroll = async () => {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) await appendMemesFeed();
+      };
+    }
+    async function appendMemesFeed() {
+      if (document.getElementById("feedLoading").style.display=="none") return;
+      let q = ['orderDesc($createdAt)'];
+      if (currentFeed=="following") {
+        const ids = (currentProfile?.following||[]).map(f=>f.userId);
+        if (!ids.length) {document.getElementById("feedLoading").style.display="none";return;}
+        q.push(...ids.map(uid=>`userId=${uid}`));
+      }
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, q, memesPerPage, memesPage*memesPerPage);
+      if (!docs.documents.length) {document.getElementById("feedLoading").style.display="none";return;}
+      memesLoaded = memesLoaded.concat(docs.documents);
+      renderMemes(memesLoaded, document.getElementById("memesFeed"));
+      memesPage++;
+    }
+
+    // --- Post Meme ---
+    async function postMeme(e) {
+      e.preventDefault();
+      const file = document.getElementById("memeImage").files[0];
+      const caption = document.getElementById("memeCaption").value;
+      const hashtags = caption.match(/#[a-zA-Z0-9_]+/g) || [];
+      try {
+        const fileUpload = await storage.createFile(APPWRITE_BUCKET, ID.unique(), file);
+        const fileId = fileUpload.$id;
+        await databases.createDocument(APPWRITE_DB, APPWRITE_MEMES, ID.unique(), {
+          image: fileId,
+          caption,
+          userId: currentUser.$id,
+          userName: currentProfile.username,
+          hashtags: hashtags.map(h=>h.toLowerCase()),
+          likes: [],
+          comments: [],
+          createdAt: new Date().toISOString(),
+          reportedBy: []
+        });
+        document.getElementById("memeForm").reset();
+        showFeed();
+      } catch (err) { alert(err?.message || "Failed to post meme."); }
+    }
+
+    // --- Render Memes with like, comment, report, hashtags, profile links ---
+    function renderMemes(memes, container) {
+      container.innerHTML = "";
+      memes.forEach(meme => {
+        const imgURL = storage.getFilePreview(APPWRITE_BUCKET, meme.image);
+        const isLiked = (meme.likes||[]).includes(currentUser.$id);
+        const memeDiv = document.createElement("div");
+        memeDiv.className = "card fade-in";
+        memeDiv.innerHTML = `
+          <div style="display:flex;align-items:center;gap:0.7em;">
+            <span class="avatar" style="background:#6366f1;color:#fff;font-weight:bold;border-radius:8px;padding:.15em .7em 0 .7em;font-size:1.05em;cursor:pointer;" onclick="showUserProfile('${meme.userId}')">${meme.userName||"anon"}</span>
+            <span style="color:#64748b;font-size:.9em;">${new Date(meme.createdAt).toLocaleString()}</span>
+          </div>
+          <img src="${imgURL}" class="meme-img fade-in"/>
+          <div style="font-weight:bold;font-size:1.15em;margin-top:.5em;">${renderCaptionHashtags(meme.caption)}</div>
+          <div style="margin:0.7em 0;">
+            <button class="likeBtn" data-id="${meme.$id}" style="color:${isLiked?'#f43f5e':'#64748b'};">♥ ${meme.likes.length}</button>
+            <button class="commentBtn" data-id="${meme.$id}">💬 ${meme.comments.length}</button>
+            <button class="reportBtn" data-id="${meme.$id}">🚩</button>
+            ${isAdmin?'<button class="deleteBtn" data-id="'+meme.$id+'">🗑️</button>':''}
+          </div>
+          <div id="comments-${meme.$id}" class="hide"></div>
+        `;
+        container.appendChild(memeDiv);
+        // Like
+        memeDiv.querySelector('.likeBtn').onclick = ()=>toggleLike(meme);
+        // Comment
+        memeDiv.querySelector('.commentBtn').onclick = ()=>toggleComments(meme);
+        // Report
+        memeDiv.querySelector('.reportBtn').onclick = ()=>reportMeme(meme);
+        // Delete (admin)
+        if (isAdmin && memeDiv.querySelector('.deleteBtn')) memeDiv.querySelector('.deleteBtn').onclick = ()=>deleteMeme(meme);
+      });
+    }
+
+    function renderCaptionHashtags(caption) {
+      return caption.replace(/#[a-zA-Z0-9_]+/g, tag=>`<span class='hashtag' onclick="hashtagExplore('${tag.toLowerCase()}')">${tag}</span>`);
+    }
+
+    // --- Like/Unlike ---
+    async function toggleLike(meme) {
+      let likes = meme.likes||[];
+      const idx = likes.indexOf(currentUser.$id);
+      if (idx === -1) {
+        likes.push(currentUser.$id);
+        await addNotification(meme.userId, "like", meme.$id, null, `${currentProfile.username} liked your meme!`);
+      } else likes.splice(idx, 1);
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id, { likes });
+      showFeed();
+    }
+
+    // --- Comments ---
+    async function toggleComments(meme) {
+      const cdiv = document.getElementById("comments-"+meme.$id);
+      if (!cdiv) return;
+      cdiv.classList.toggle("hide");
+      if (!cdiv.classList.contains("hide")) renderComments(meme, cdiv);
+    }
+    function renderComments(meme, cdiv) {
+      cdiv.innerHTML = `
+        <div>${(meme.comments||[]).map(c=>
+          `<div style="margin-bottom:0.5em;">
+            <b style="cursor:pointer;" onclick="showUserProfile('${c.userId}')">${c.userName}</b>:
+            <span>${c.text}</span>
+            <button onclick="reportComment('${meme.$id}','${c.createdAt}')" style="font-size:.95em;">🚩</button>
+            ${(isAdmin||c.userId===currentUser.$id)?`<button onclick="deleteComment('${meme.$id}','${c.createdAt}')" style="font-size:.95em;">🗑️</button>`:""}
+          </div>`
+        ).join("")}</div>
+        <form onsubmit="event.preventDefault();addComment('${meme.$id}')">
+          <input type="text" id="commentInput-${meme.$id}" placeholder="Add a comment..." maxlength="100" required style="margin-bottom:0.5em;"/>
+          <button type="submit">Post</button>
+        </form>
+      `;
+    }
+    async function addComment(memeId) {
+      const meme = await databases.getDocument(APPWRITE_DB, APPWRITE_MEMES, memeId);
+      let comments = meme.comments||[];
+      const text = document.getElementById("commentInput-"+memeId).value;
+      comments.push({userId: currentUser.$id, userName: currentProfile.username, text, createdAt: new Date().toISOString(), reportedBy: []});
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, memeId, { comments });
+      await addNotification(meme.userId, "comment", meme.$id, null, `${currentProfile.username} commented on your meme!`);
+      showFeed();
+    }
+    async function deleteComment(memeId, createdAt) {
+      const meme = await databases.getDocument(APPWRITE_DB, APPWRITE_MEMES, memeId);
+      let comments = (meme.comments||[]).filter(c=>c.createdAt!==createdAt);
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, memeId, { comments });
+      showFeed();
+    }
+
+    // --- Report meme/comment ---
+    async function reportMeme(meme) {
+      if ((meme.reportedBy||[]).includes(currentUser.$id)) return alert("Already reported");
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id, { reportedBy: (meme.reportedBy||[]).concat(currentUser.$id) });
+      await databases.createDocument(APPWRITE_DB, APPWRITE_REPORTS, ID.unique(), {
+        type: "meme", targetId: meme.$id, userId: currentUser.$id, status: "pending", createdAt: new Date().toISOString()
+      });
+      alert("Reported. Thank you!");
+    }
+    async function reportComment(memeId, createdAt) {
+      const meme = await databases.getDocument(APPWRITE_DB, APPWRITE_MEMES, memeId);
+      let comment = (meme.comments||[]).find(c=>c.createdAt===createdAt);
+      if (!comment) return;
+      if ((comment.reportedBy||[]).includes(currentUser.$id)) return alert("Already reported");
+      comment.reportedBy = (comment.reportedBy||[]).concat(currentUser.$id);
+      let comments = meme.comments.map(c=>c.createdAt===createdAt?comment:c);
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, memeId, { comments });
+      await databases.createDocument(APPWRITE_DB, APPWRITE_REPORTS, ID.unique(), {
+        type: "comment", targetId: memeId+"|"+createdAt, userId: currentUser.$id, status: "pending", createdAt: new Date().toISOString()
+      });
+      alert("Comment reported. Thank you!");
+    }
+
+    // --- Delete meme (Admin) ---
+    async function deleteMeme(meme) {
+      await databases.deleteDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id);
+      showFeed();
+    }
+
+    // --- SEARCH ---
+    async function searchFeed(query) {
+      query = query.trim();
+      if (!query) return renderMemes(memesLoaded, document.getElementById("memesFeed"));
+      if (query[0]==="#") hashtagExplore(query);
+      else {
+        // Search users by username
+        let user = allUsers.find(u=>u.username.toLowerCase().includes(query.toLowerCase()));
+        if (user) showUserProfile(user.userId);
+      }
+    }
+
+    // --- Hashtag explore ---
+    function hashtagExplore(tag) {
+      mainContent.innerHTML = `<h2>Memes tagged ${tag}</h2><div id="exploreFeed"></div>`;
+      databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, [`hashtags=${tag.toLowerCase()}`,'orderDesc($createdAt)'], 30)
+        .then(docs=>renderMemes(docs.documents, document.getElementById("exploreFeed")));
+    }
+
+    // --- Explore trending ---
+    exploreBtn.onclick = async function() {
+      mainContent.innerHTML = `<h2>Trending Memes</h2><div id="exploreFeed"></div>`;
+      // Last 24 hours, most likes
+      const since = new Date(Date.now()-24*60*60*1000).toISOString();
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, [`orderDesc($createdAt)`], 100);
+      let trending = docs.documents.filter(m=>m.createdAt>since).sort((a,b)=>(b.likes?.length||0)-(a.likes?.length||0)).slice(0, 20);
+      renderMemes(trending, document.getElementById("exploreFeed"));
+    };
+
+    // --- Profile page: own or others ---
+    profilePageBtn.onclick = ()=>showProfile(currentUser.$id);
+    window.showUserProfile = showProfile; // for dynamic links
+    async function showProfile(userId) {
+      let userDoc = allUsers.find(u=>u.userId===userId);
+      if (!userDoc) userDoc = (await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`userId=${userId}`],1)).documents[0];
+      const isMe = userDoc.userId === currentUser.$id;
+      mainContent.innerHTML = `
+        <div style="text-align:center;">
+          <img src="${userDoc.avatar?storage.getFilePreview(APPWRITE_BUCKET, userDoc.avatar):'https://ui-avatars.com/api/?name='+encodeURIComponent(userDoc.username)}" class="avatar" style="width:70px;height:70px;margin-bottom:.7em;">
+          <h2>${userDoc.username}</h2>
+          <div>${userDoc.bio||''}</div>
+          <div>Followers: ${(userDoc.followers||[]).length} | Following: ${(userDoc.following||[]).length}</div>
+          ${isMe?`
+            <button onclick="editProfile()">Edit Profile</button>
+            <input type="file" id="avatarUpload" style="margin-top:.5em;">
+          `:`
+            <button onclick="${isFollowing(userDoc)?'unfollowUser':'followUser'}('${userDoc.userId}')">${isFollowing(userDoc)?'Unfollow':'Follow'}</button>
+            <button onclick="startChat('${userDoc.userId}')">Message</button>
+          `}
+        </div>
+        <hr/>
+        <h3>${isMe?'Your':'User'} Memes</h3>
+        <div id="profileMemes"></div>
+      `;
+      // Avatar upload
+      setTimeout(()=>{
+        if (isMe && document.getElementById("avatarUpload")) {
+          document.getElementById("avatarUpload").onchange = async (e)=>{
+            const f = e.target.files[0];
+            if (!f) return;
+            const uploaded = await storage.createFile(APPWRITE_BUCKET, ID.unique(), f);
+            await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userId, { avatar: uploaded.$id });
+            showProfile(userId);
+          };
+        }
+      },100);
+      // Memes
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, [`userId=${userId}`,'orderDesc($createdAt)'], 50);
+      renderMemes(docs.documents, document.getElementById("profileMemes"));
+    }
+    window.editProfile = async function() {
+      const bio = prompt("Enter new bio:", currentProfile.bio||"");
+      if (bio!==null) {
+        await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, currentProfile.$id, {bio});
+        await fetchProfile(); showProfile(currentUser.$id);
+      }
+    }
+    function isFollowing(u) { return (currentProfile.following||[]).some(f=>f.userId===u.userId);}
+    window.followUser = async function(userId) {
+      let following = currentProfile.following||[];
+      following.push({userId});
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, currentProfile.$id, {following});
+      let userDoc = allUsers.find(u=>u.userId===userId);
+      let followers = userDoc.followers||[];
+      followers.push({userId: currentProfile.userId});
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userId, {followers});
+      await addNotification(userId, "follow", null, null, `${currentProfile.username} followed you!`);
+      await fetchProfile(); showProfile(userId);
+    }
+    window.unfollowUser = async function(userId) {
+      let following = (currentProfile.following||[]).filter(f=>f.userId!==userId);
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, currentProfile.$id, {following});
+      let userDoc = allUsers.find(u=>u.userId===userId);
+      let followers = (userDoc.followers||[]).filter(f=>f.userId!==currentProfile.userId);
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userId, {followers});
+      await fetchProfile(); showProfile(userId);
+    }
+
+    // --- NOTIFICATIONS ---
+    notifBtn.onclick = ()=>notifModal.classList.remove("hide");
+    notifModalClose.onclick = ()=>notifModal.classList.add("hide");
+    async function fetchNotifications() {
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_NOTIFS, [`userId=${currentUser.$id}`,'orderDesc($createdAt)'], 30);
+      myNotifications = docs.documents;
+      unseenNotif = myNotifications.filter(n=>!n.seen).length;
+      notifUnread.textContent = unseenNotif;
+      notifUnread.classList.toggle("hide", unseenNotif===0);
+      notifList.innerHTML = myNotifications.map(n=>`
+        <div style="padding:0.5em;${n.seen?'':'background:#fef9c3'}">${n.message}
+        <span style="float:right;">${new Date(n.createdAt).toLocaleTimeString()}</span></div>
+      `).join("")||"<em>No notifications</em>";
+      // Mark as seen
+      myNotifications.filter(n=>!n.seen).forEach(async n=>await databases.updateDocument(APPWRITE_DB, APPWRITE_NOTIFS, n.$id, {seen:true}));
+    }
+    async function addNotification(userId, type, memeId, commentId, msg) {
+      await databases.createDocument(APPWRITE_DB, APPWRITE_NOTIFS, ID.unique(), {
+        userId, type, memeId, commentId, message: msg, seen: false, createdAt: new Date().toISOString()
+      });
+    }
+
+    // --- ADMIN REPORT MODAL ---
+    adminBtn.onclick = ()=>showAdmin();
+    adminModalClose.onclick = ()=>adminModal.classList.add("hide");
+    async function showAdmin() {
+      adminModal.classList.remove("hide");
+      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_REPORTS, [`status=pending`,'orderDesc($createdAt)'], 40);
+      adminReports.innerHTML = docs.documents.map(r=>`
+        <div style="margin-bottom:1em;">
+          <b>${r.type}</b> | ${r.targetId} <br/>
+          <button onclick="approveReport('${r.$id}','${r.type}','${r.targetId}')">Approve/Delete</button>
+          <button onclick="rejectReport('${r.$id}')">Reject</button>
+        </div>
+      `).join("")||"<em>No pending reports</em>";
+    }
+    window.approveReport = async function(reportId, type, targetId) {
+      if (type=="meme") await databases.deleteDocument(APPWRITE_DB, APPWRITE_MEMES, targetId);
+      // For comment, parse targetId as "memeId|createdAt"
+      if (type=="comment") {
+        let [memeId, createdAt] = targetId.split("|");
+        await deleteComment(memeId, createdAt);
+      }
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_REPORTS, reportId, {status:"approved"});
+      showAdmin();
+    }
+    window.rejectReport = async function(reportId) {
+      await databases.updateDocument(APPWRITE_DB, APPWRITE_REPORTS, reportId, {status:"rejected"});
+      showAdmin();
+    }
+
+    // --- DIRECT MESSAGING / CHAT ---
+    window.startChat = async function(otherUserId) {
+      const chatId = [currentUser.$id, otherUserId].sort().join("_");
+      mainContent.innerHTML = `
+        <h3>Chat with ${allUsers.find(u=>u.userId===otherUserId)?.username||'User'}</h3>
+        <div id="chatMessages" style="height:220px;overflow-y:auto;background:#f3f4f6;border-radius:10px;padding:.7em;margin-bottom:.7em;"></div>
+        <form id="chatForm">
+          <input type="text" id="chatInput" placeholder="Type your message..." maxlength="200" required />
+          <button type="submit">Send</button>
+        </form>
+      `;
+      // Load messages
+      async function loadChat() {
+        try {
+          const chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
+          const messages = chatDoc.messages||[];
+          document.getElementById("chatMessages").innerHTML =
+            messages.map(m=>`<div style="text-align:${m.from===currentUser.$id?'right':'left'};margin-bottom:.3em;">
+              <span style="display:inline-block;background:${m.from===currentUser.$id?'#6366f1':'#e0e7ff'};color:${m.from===currentUser.$id?'#fff':'#222'};border-radius:8px;padding:3px 12px;">${m.text}</span>
+              <span style="font-size:.8em;color:#64748b;">${new Date(m.createdAt).toLocaleTimeString()}</span>
+            </div>`).join("");
+          document.getElementById("chatMessages").scrollTop = 99999;
+        } catch {
+          document.getElementById("chatMessages").innerHTML = "<em style='color:#64748b;'>No messages.</em>";
+        }
+      }
+      await loadChat();
+      document.getElementById("chatForm").onsubmit = async (e)=>{
+        e.preventDefault();
+        let chatDoc;
+        try {
+          chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
+        } catch {
+          await databases.createDocument(APPWRITE_DB, APPWRITE_CHATS, chatId, {
+            members: [currentUser.$id, otherUserId],
+            messages: []
+          });
+          chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
+        }
+        let messages = chatDoc.messages||[];
+        messages.push({from: currentUser.$id, text: document.getElementById("chatInput").value, createdAt: new Date().toISOString()});
+        await databases.updateDocument(APPWRITE_DB, APPWRITE_CHATS, chatId, {messages});
+        document.getElementById("chatInput").value = '';
+        await loadChat();
+      };
+      // Subscribe for real-time chat updates
+      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_CHATS}.documents.${chatId}`, loadChat);
     };
   </script>
 </body>
