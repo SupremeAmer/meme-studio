@@ -9,22 +9,223 @@
   <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
   <style>
     /* --- Animations and core style (add your style.css for more) --- */
-    .logo-anim { animation: logoSpin 2s infinite linear; }
-    @keyframes logoSpin { 0%{transform:rotate(-5deg) scale(1);} 50%{transform:rotate(7deg) scale(1.10);} 100%{transform:rotate(-5deg) scale(1);} }
-    .fade-in { animation: fadeIn .8s cubic-bezier(.4,0,.2,1);}
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: translateY(0);}}
-    .hide { display: none; }
-    .avatar { border-radius: 50%; object-fit: cover; }
-    .hashtag { color: #6366f1; cursor: pointer; }
-    .admin-btn { background: #ef4444; color: #fff; border: none; border-radius: 5px; padding: 3px 9px; margin-left: 5px; }
-    .notif-unseen { font-weight: bold; background: #facc15; border-radius: 50%; padding: 2px 6px; color: #fff; }
-    /* ... more in your style.css ... */
+    :root {
+  --brand: #6366f1;
+  --brand-dark: #4338ca;
+  --accent: #facc15;
+  --error: #ef4444;
+  --glass-bg: rgba(255,255,255,0.82);
+  --glass-blur: blur(16px);
+  --card-radius: 18px;
+  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
+  --text-main: #222;
+  --text-muted: #64748b;
+  --nav-bg: rgba(255,255,255,0.77);
+  --input-bg: rgba(248,250,255,.46);
+  --input-border: #e0e7ff;
+  --scrollbar-thumb: #c7d2fe;
+  --scrollbar-thumb-hover: #a5b4fc;
+  --selection: #6366f14a;
+  --bg-gradient: linear-gradient(112deg, #e0e7ff 0%, #c7d2fe 100%);
+  --transition: .21s cubic-bezier(.4,0,.2,1);
+}
+
+/* Dark mode overrides */
+body.dark, html.dark {
+  --brand: #818cf8;
+  --brand-dark: #6366f1;
+  --accent: #fde68a;
+  --error: #f87171;
+  --glass-bg: rgba(40,40,60,0.94);
+  --glass-blur: blur(20px);
+  --card-radius: 18px;
+  --shadow: 0 8px 32px 0 rgba(20, 20, 40, 0.27);
+  --text-main: #f3f4f6;
+  --text-muted: #a5b4fc;
+  --nav-bg: rgba(37,37,48,0.92);
+  --input-bg: #23233a;
+  --input-border: #3b3b54;
+  --scrollbar-thumb: #818cf8;
+  --scrollbar-thumb-hover: #6366f1;
+  --selection: #6366f17a;
+  --bg-gradient: linear-gradient(112deg, #23233a 0%, #181827 100%);
+}
+
+html, body {
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  transition: background .45s, color .45s;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* --- Logo Animation --- */
+.logo-anim {
+  animation: logoSpin 2.2s infinite alternate cubic-bezier(.8,-0.6,0.2,1.5);
+  will-change: transform;
+}
+@keyframes logoSpin {
+  0% { transform: scale(1) rotate(-5deg);}
+  40% { transform: scale(1.13) rotate(-9deg);}
+  68% { transform: scale(0.96) rotate(8deg);}
+  100% { transform: scale(1) rotate(-5deg);}
+}
+
+/* --- Card/Glassmorphism --- */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  padding: 2.1rem 1.6rem;
+  margin: 1.2rem auto;
+  max-width: 490px;
+  width: 94%;
+  position: relative;
+  animation: fadeIn .8s cubic-bezier(.4,0,.2,1);
+  transition: background .4s, box-shadow .4s;
+}
+
+/* --- Entry, Fade, Pop --- */
+.fade-in { animation: fadeIn .8s cubic-bezier(.4,0,.2,1);}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(22px);} to { opacity: 1; transform: translateY(0);}}
+.pop-in { animation: popIn .3s cubic-bezier(.62,.01,.47,1.37);}
+@keyframes popIn { from { transform: scale(.93); opacity:0;} to { transform: scale(1); opacity:1;} }
+
+/* --- Buttons --- */
+button, input[type="submit"] {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .6em 1.45em;
+  font-weight: 600;
+  font-size: 1.09em;
+  box-shadow: 0 2px 10px #6366f11b;
+  margin: 7px 0 0 0;
+  transition: background var(--transition), transform .16s, box-shadow .18s;
+  cursor: pointer;
+}
+button:hover, input[type="submit"]:hover {
+  background: var(--brand-dark);
+  transform: scale(1.045) translateY(-2px);
+  box-shadow: 0 8px 22px #6366f127;
+}
+button:active { background: #4f46e5; }
+.admin-btn { background: var(--error); }
+.admin-btn:hover { background: #b91c1c; }
+.notif-unseen { font-weight: bold; background: var(--accent); border-radius: 50%; padding: 2px 7px; color: #fff; }
+.hide { display: none !important; }
+.center { text-align: center; }
+
+input, textarea, select {
+  border: 1.7px solid var(--input-border);
+  background: var(--input-bg);
+  border-radius: 8px;
+  padding: .75em 1.1em;
+  margin: 0 0 1.1em 0;
+  font-size: 1rem;
+  width: 100%;
+  color: var(--text-main);
+  transition: border-color .2s, box-shadow .2s, background .4s;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px #6366f12c;
+}
+
+/* --- Avatar/Profile Images --- */
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 12px #6366f11c;
+  width: 56px; height: 56px;
+  border: 3px solid #fff;
+  margin-bottom: .3em;
+  transition: box-shadow .2s, transform .18s;
+}
+.avatar:hover { box-shadow: 0 4px 20px #6366f13a; transform: scale(1.06); }
+
+/* --- Meme Images --- */
+.meme-img {
+  border-radius: 14px;
+  box-shadow: 0 2px 16px #6366f117;
+  margin-bottom: 0.6em;
+  max-width: 100%;
+  max-height: 340px;
+  display: block;
+  margin-left: auto; margin-right: auto;
+  transition: transform .21s cubic-bezier(.4,0,.2,1), box-shadow .19s;
+  background: #f3f4f6;
+}
+body.dark .meme-img { background: #23233a; }
+.meme-img:hover { transform: scale(1.035); box-shadow: 0 8px 32px #6366f13a; }
+
+/* --- Hashtags --- */
+.hashtag {
+  color: var(--brand);
+  background: #eef2ff;
+  padding: 1.5px 7px;
+  margin: 0 1.5px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: .98em;
+  transition: background .15s, color .15s;
+  cursor: pointer;
+}
+.hashtag:hover { background: var(--brand); color: #fff; }
+body.dark .hashtag { background: #23233a; }
+
+/* --- Responsive Nav and Cards --- */
+nav.center {
+  margin: 0 0 1.5em 0;
+  padding: 1.2em 0 .6em 0;
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  border-bottom: 1.5px solid var(--input-border);
+  box-shadow: 0 4px 22px rgba(99,102,241,0.07);
+  text-align: center;
+  position: sticky;
+  top: 0; z-index: 22;
+  transition: background .4s;
+}
+nav img { margin-right: 8px; }
+
+/* --- Modern modal --- */
+.card[style*="position:fixed"] {
+  animation: popIn .32s;
+  box-shadow: 0 16px 48px #6366f13d;
+  border: 2px solid #a5b4fc;
+}
+
+/* --- Mobile/Tablet Responsive --- */
+@media (max-width: 600px) {
+  .card { max-width: 99vw; padding: 1.2rem 0.35rem;}
+  nav.center { font-size: 1.15em; }
+  .avatar { width: 44px; height: 44px; }
+  .meme-img { max-height: 220px; }
+}
+@media (max-width: 900px) {
+  .card { max-width: 98vw; }
+}
+
+/* --- Misc --- */
+::-webkit-scrollbar { width: 9px; background: #f3f4f6; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+::selection { background: var(--selection); }
+a, .link { color: var(--brand); cursor: pointer; transition: color .16s;}
+a:hover, .link:hover { color: var(--brand-dark); text-decoration: underline; }
   </style>
 </head>
 <body>
   <nav class="center">
     <span style="font-size:2rem;font-weight:bold;color:#6366f1;letter-spacing:0.02em;">
       <img src="https://supremeamer.github.io/meme-socially/assets/logo.png" class="logo-anim" alt="logo" style="height:2.1em;vertical-align:middle;"/> Meme <span style="color:#facc15;">Social</span>
+   <button id="themeToggle" title="Switch theme" style="margin-left:20px;vertical-align:middle;background:transparent;border:none;color:var(--brand);font-size:1.4em;cursor:pointer;">
+  <span id="themeIcon">🌙</span>
+</button>
     </span>
   </nav>
   <main>
@@ -627,6 +828,21 @@
       // Subscribe for real-time chat updates
       realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_CHATS}.documents.${chatId}`, loadChat);
     };
+    // Modern dark/light theme toggle with smooth transitions
+const themeToggle = document.getElementById("themeToggle");
+const themeIcon = document.getElementById("themeIcon");
+function setTheme(dark) {
+  document.body.classList.toggle('dark', dark);
+  document.documentElement.classList.toggle('dark', dark);
+  localStorage.setItem('theme', dark ? 'dark' : 'light');
+  themeIcon.textContent = dark ? "🌞" : "🌙";
+}
+themeToggle.onclick = () => setTheme(!document.body.classList.contains('dark'));
+(function() {
+  const userPref = localStorage.getItem('theme');
+  const systemPref = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  setTheme(userPref === 'dark' || (!userPref && systemPref));
+})();
   </script>
 </body>
 </html>
