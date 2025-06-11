@@ -5,404 +5,303 @@
   <title>Meme Creation Studio</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <style>
-body {
-  margin: 0;
-  background: linear-gradient(112deg, #eef2ff 0%, #c7d2fe 100%);
-  font-family: 'Inter', system-ui, sans-serif;
-  min-height: 100vh;
-  color: #222;
-  transition: background 0.4s, color 0.4s;
-}
-
-body.dark {
-  background: linear-gradient(112deg, #23233a 0%, #181827 100%);
-  color: #f3f4f6;
-}
-
-nav {
-  background: rgba(255,255,255,0.92);
-  font-size: 2rem;
-  text-align: center;
-  padding: 1em 0 .7em 0;
-  font-weight: bold;
-  color: #6366f1;
-  box-shadow: 0 4px 24px #6366f119;
-  margin-bottom: 0.7em;
-  backdrop-filter: blur(12px);
-  letter-spacing: 0.01em;
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  transition: background 0.4s;
-}
-
-body.dark nav {
-  background: rgba(37,37,48,0.95);
-  color: #a5b4fc;
-}
-
-nav button {
-  float: right;
-  margin-right: 1em;
-  font-size: 1.3em;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #6366f1;
-  transition: color 0.18s;
-}
-nav button:hover {
-  color: #facc15;
-  transform: scale(1.1) rotate(-8deg);
-}
-
-.container {
-  display: flex;
-  gap: 2em;
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 1.5em 1em 2em 1em;
-  border-radius: 24px;
-  box-shadow: 0 12px 48px 0 rgba(99,102,241,0.13);
-  background: rgba(255,255,255,0.86);
-  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
-  transition: background 0.4s, box-shadow 0.4s;
-}
-
-body.dark .container {
-  background: rgba(24,24,39,0.98);
-  box-shadow: 0 16px 48px #6366f13d;
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(36px);}
-  to { opacity: 1; transform: translateY(0);}
-}
-
-.sidebar {
-  width: 260px;
-  min-width: 180px;
-  background: rgba(248,250,255,0.95);
-  border-radius: 18px;
-  box-shadow: 0 2px 14px #6366f115;
-  padding: 1.1em .9em 1.5em .9em;
-  animation: slideInLeft 0.8s;
-  transition: background 0.4s, box-shadow 0.4s;
-}
-body.dark .sidebar {
-  background: #1e1e2d;
-  box-shadow: 0 2px 22px #6366f130;
-}
-
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-32px);}
-  to { opacity: 1; transform: translateX(0);}
-}
-
-.sidebar h2 {
-  font-size: 1.15em;
-  margin: 0.6em 0 0.7em 0;
-  color: #6366f1;
-  letter-spacing: 0.01em;
-  text-shadow: 0 2px 8px #6366f111;
-}
-body.dark .sidebar h2 { color: #a5b4fc; }
-
-#searchTemplates {
-  width: 100%;
-  padding: .56em .95em;
-  border-radius: 8px;
-  border: 1.6px solid #e0e7ff;
-  margin-bottom: 1em;
-  font-size: 1em;
-  background: #f3f4f6;
-  transition: border-color 0.18s, background 0.3s;
-}
-body.dark #searchTemplates {
-  background: #23233a;
-  border-color: #3b3b54;
-  color: #a5b4fc;
-}
-
-#randomTemplate {
-  background: linear-gradient(90deg,#6366f1 60%,#facc15 100%);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: .45em 1.2em;
-  font-size: 1em;
-  box-shadow: 0 2px 10px #6366f13a;
-  margin-bottom: 1.1em;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.18s;
-  font-weight: 600;
-}
-#randomTemplate:hover {
-  background: linear-gradient(90deg,#facc15 10%,#6366f1 90%);
-  transform: scale(1.06) rotate(-3deg);
-}
-
-.template-grid, .sticker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(80px,1fr));
-  gap: 0.8em;
-  margin-bottom: 1.1em;
-}
-
-.template-select, .sticker {
-  border: 2px solid #e0e7ff;
-  border-radius: 13px;
-  background: #f3f4f6;
-  cursor: pointer;
-  transition: border 0.15s, box-shadow 0.17s, transform 0.18s;
-  overflow: hidden;
-  box-shadow: 0 2px 8px #6366f10d;
-  position: relative;
-  animation: popIn 0.6s;
-}
-@keyframes popIn {
-  from {opacity:0; transform:scale(.87);}
-  to {opacity:1; transform:scale(1);}
-}
-.template-select.selected {
-  border:2.5px solid #6366f1;
-  box-shadow:0 4px 16px #6366f13a;
-  transform: scale(1.05) rotate(-2deg);
-}
-.template-select img, .sticker img {
-  width:100%; height:60px; object-fit:cover;
-  transition: transform 0.17s;
-}
-.template-select.selected img,
-.sticker:hover img {
-  transform: scale(1.07) rotate(-3deg);
-}
-.template-name {
-  text-align:center;
-  font-size:.97em;
-  padding:.3em .1em;
-  width: 100%;
-  background: #eef2ff;
-  color: #6366f1;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-body.dark .template-name { background: #23233a; color: #a5b4fc;}
-
-.upload-label {
-  display: block;
-  margin: .7em 0 1.3em 0;
-  cursor: pointer;
-  color: #6366f1;
-  font-weight: 600;
-  background: #facc155c;
-  border-radius: 7px;
-  padding: .5em 1em;
-  text-align: center;
-  transition: background 0.17s;
-  box-shadow: 0 2px 12px #6366f13a;
-}
-.upload-label:hover {
-  background: #6366f1;
-  color: #fff;
-}
-
-.editor {
-  flex:1 1 430px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(255,255,255,0.85);
-  border-radius: 22px;
-  box-shadow: 0 2px 16px #6366f117;
-  padding: 1.3em 0.9em 2em 0.9em;
-  animation: fadeInUp 1.1s;
-  transition: background 0.4s, box-shadow 0.4s;
-}
-body.dark .editor {
-  background: #181827;
-  box-shadow: 0 2px 22px #6366f130;
-}
-
-#memeCanvas {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 32px #6366f119;
-  margin-bottom: 1.2em;
-  touch-action: none;
-  transition: box-shadow 0.19s;
-  animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
-  max-width: 100vw;
-  width: 100%;
-  height: auto;
-}
-@media (max-width: 600px) {
-  #memeCanvas {
-    width: 96vw !important;
-    min-width: 96vw !important;
-    max-width: 96vw !important;
-    height: auto !important;
-  }
-}
-
-.editor-tools {
-  display: flex;
-  gap: 1.1em;
-  flex-wrap: wrap;
-  margin-bottom: .7em;
-  transition: gap 0.18s;
-}
-.editor-tools button {
-  background: linear-gradient(90deg,#6366f1 60%,#facc15 100%);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: .5em 1.3em;
-  font-size: 1em;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 2px 10px #6366f13a;
-  transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
-}
-.editor-tools button:hover {
-  background: linear-gradient(90deg,#facc15 10%,#6366f1 90%);
-  transform: scale(1.07) rotate(2deg);
-  box-shadow: 0 6px 16px #6366f13a;
-}
-.text-tools {
-  background: #eef2ff;
-  border-radius: 12px;
-  padding: .6em 1em .6em 1em;
-  margin-bottom: .7em;
-  box-shadow: 0 1px 8px #6366f113;
-  animation: fadeInUp 0.6s;
-}
-body.dark .text-tools { background: #23233a; color: #a5b4fc;}
-.text-tools label {
-  margin-right: 1.3em;
-  font-size: 1em;
-  font-weight: 500;
-  cursor: pointer;
-}
-.text-tools input[type="color"], .text-tools input[type="range"], .text-tools select {
-  vertical-align: middle;
-  margin-right: .6em;
-}
-.text-tools input[type="range"] {
-  width: 70px;
-  accent-color: #6366f1;
-}
-.text-tools input[type="text"] {
-  width: 100%;
-  padding: .6em .7em;
-  border-radius: 8px;
-  border: 1.4px solid #e0e7ff;
-  font-size: 1.05em;
-  margin-bottom: .7em;
-  font-family: inherit;
-  transition: border-color 0.18s, background 0.25s;
-}
-.text-tools select {
-  border-radius: 8px;
-  border: 1.4px solid #e0e7ff;
-  padding: .25em .7em;
-  font-size: 1em;
-  background: #f8fafc;
-}
-.text-tools button {
-  background: #6366f1;
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  padding: .28em 1.1em;
-  font-size: 1em;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 2px 8px #6366f120;
-  transition: background 0.13s, transform 0.14s;
-}
-.text-tools button:hover {
-  background: #facc15;
-  color: #222;
-  transform: scale(1.05);
-}
-.ad-area {
-  margin: 0 auto;
-  margin-top: 2em;
-  max-width: 350px;
-  min-height: 90px;
-  border-radius: 14px;
-  background: linear-gradient(90deg,#facc15 0 60%,#6366f1 100%);
-  box-shadow: 0 2px 24px #6366f14a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #222;
-  font-size: 1.15em;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  animation: fadeInUp 0.7s;
-  position: relative;
-}
-.ad-area .close-ad {
-  position: absolute;
-  top: 7px;
-  right: 13px;
-  background: transparent;
-  border: none;
-  color: #222;
-  font-size: 1.2em;
-  cursor: pointer;
-  opacity: 0.7;
-}
-.ad-area .close-ad:hover { opacity: 1; color: #dc2626;}
-@media (max-width: 900px) {
-  .container { flex-direction: column; gap: 1em; }
-  .sidebar { width: 100%; display: flex; flex-wrap: wrap; gap: 1em; }
-  .editor { width: 100%; max-width: 99vw; padding: 1em 0.2em;}
-}
-@media (max-width:600px) {
-  .container { padding: 0.6em 0.1em;}
-  #memeCanvas { width: 96vw !important; min-width: 96vw !important; max-width: 96vw !important; height: auto !important;}
-  .text-tools label { display: block; margin-bottom: .5em;}
-  .ad-area { max-width: 98vw; font-size: 1em; }
-}
-::-webkit-scrollbar { width: 7px; background: #f3f4f6; }
-::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 6px;}
-::-webkit-scrollbar-thumb:hover { background: #a5b4fc;}
-::selection { background: #6366f14a;}
-a, .link { color: #6366f1; cursor: pointer; transition: color .16s;}
-a:hover, .link:hover { color: #facc15; text-decoration: underline;}
-    /* Add footer style */
-    footer {
-      margin-top: 2em;
-      background: rgba(99,102,241,0.07);
-      padding: 1.2em 0 1.2em 0;
-      text-align: center;
-      font-size: 1em;
-      color: #6366f1;
-      border-top: 1.5px solid #e0e7ff;
-      letter-spacing: 0.01em;
+    body {
+      margin: 0;
+      background: linear-gradient(112deg, #eef2ff 0%, #c7d2fe 100%);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      color: #222;
       transition: background 0.4s, color 0.4s;
     }
-    footer a {
+    body.dark {
+      background: linear-gradient(112deg, #23233a 0%, #181827 100%);
+      color: #f3f4f6;
+    }
+    nav {
+      background: rgba(255,255,255,0.92);
+      font-size: 2rem;
+      text-align: center;
+      padding: 1em 0 .7em 0;
+      font-weight: bold;
       color: #6366f1;
-      font-weight: 500;
-      margin: 0 0.6em;
-      text-decoration: underline;
+      box-shadow: 0 4px 24px #6366f119;
+      margin-bottom: 0.7em;
+      backdrop-filter: blur(12px);
+      letter-spacing: 0.01em;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      transition: background 0.4s;
+    }
+    body.dark nav {
+      background: rgba(37,37,48,0.95);
+      color: #a5b4fc;
+    }
+    nav button {
+      float: right;
+      margin-right: 1em;
+      font-size: 1.3em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #6366f1;
       transition: color 0.18s;
     }
-    footer a:hover { color: #facc15; }
-    body.dark footer {
-      background: #23233a;
-      color: #a5b4fc;
-      border-top: 1.5px solid #23233a;
+    nav button:hover {
+      color: #facc15;
+      transform: scale(1.1) rotate(-8deg);
     }
-    body.dark footer a { color: #a5b4fc; }
-    body.dark footer a:hover { color: #facc15; }
-
+    .container {
+      display: flex;
+      gap: 2em;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1.5em 1em 2em 1em;
+      border-radius: 24px;
+      box-shadow: 0 12px 48px 0 rgba(99,102,241,0.13);
+      background: rgba(255,255,255,0.86);
+      animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    body.dark .container {
+      background: rgba(24,24,39,0.98);
+      box-shadow: 0 16px 48px #6366f13d;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(36px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .sidebar {
+      width: 260px;
+      min-width: 180px;
+      background: rgba(248,250,255,0.95);
+      border-radius: 18px;
+      box-shadow: 0 2px 14px #6366f115;
+      padding: 1.1em .9em 1.5em .9em;
+      animation: slideInLeft 0.8s;
+      transition: background 0.4s, box-shadow 0.4s;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2em;
+    }
+    body.dark .sidebar {
+      background: #1e1e2d;
+      box-shadow: 0 2px 22px #6366f130;
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-32px);}
+      to { opacity: 1; transform: translateX(0);}
+    }
+    .sidebar h2 {
+      font-size: 1.15em;
+      margin: 0.6em 0 0.7em 0;
+      color: #6366f1;
+      letter-spacing: 0.01em;
+      text-shadow: 0 2px 8px #6366f111;
+    }
+    body.dark .sidebar h2 { color: #a5b4fc; }
+    .meme-category-dropdown {
+      display: flex;
+      align-items: center;
+      gap: .7em;
+      font-size: 1.07em;
+      margin-bottom: .8em;
+    }
+    #categorySelect {
+      border-radius: 8px;
+      border: 1.5px solid #e0e7ff;
+      padding: .34em 1em;
+      font-size: 1em;
+      background: #f8fafc;
+    }
+    #templateSearch {
+      margin-left: .6em;
+      border-radius: 8px;
+      border: 1.5px solid #e0e7ff;
+      padding: .34em .8em;
+      font-size: 1em;
+      background: #f8fafc;
+      width: 90px;
+    }
+    .fav-toggle {
+      margin-left: auto;
+      cursor: pointer;
+      color: #facc15;
+      font-size: 1.2em;
+      background: none;
+      border: none;
+      transition: color 0.18s;
+    }
+    .fav-toggle.faved { color: #fbbf24; }
+    @media (max-width:600px) {
+      .meme-category-dropdown {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .3em;
+      }
+      #templateSearch { margin-left: 0; width: 100%; }
+    }
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(80px,1fr));
+      gap: 0.8em;
+      margin-bottom: 1.1em;
+    }
+    .template-select {
+      border: 2px solid #e0e7ff;
+      border-radius: 13px;
+      background: #f3f4f6;
+      cursor: pointer;
+      transition: border 0.15s, box-shadow 0.17s, transform 0.18s;
+      overflow: hidden;
+      box-shadow: 0 2px 8px #6366f10d;
+      position: relative;
+      animation: popIn 0.6s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .template-select.selected {
+      border:2.5px solid #6366f1;
+      box-shadow:0 4px 16px #6366f13a;
+      transform: scale(1.05) rotate(-2deg);
+    }
+    .template-select img {
+      width:100%; height:60px; object-fit:cover;
+      transition: transform 0.17s;
+    }
+    .template-select.selected img {
+      transform: scale(1.07) rotate(-3deg);
+    }
+    .template-fav {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      color: #facc15;
+      font-size: 1.3em;
+      cursor: pointer;
+      transition: color 0.18s;
+      z-index: 2;
+      text-shadow: 0 2px 8px #fff7;
+    }
+    .template-fav.faved { color: #fbbf24;}
+    .template-select:hover .template-preview,
+    .template-select:focus .template-preview {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 10;
+    }
+    .template-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.93);
+      border-radius: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s;
+      z-index: 9;
+    }
+    .template-preview img {
+      max-width: 95%; max-height: 130px; object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px #6366f13a;
+      border: 1.5px solid #a5b4fc;
+      background: #fff;
+    }
+    .template-name {
+      text-align:center;
+      font-size:.97em;
+      padding:.3em .1em;
+      width: 100%;
+      background: #eef2ff;
+      color: #6366f1;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      margin-top: .2em;
+    }
+    body.dark .template-name { background: #23233a; color: #a5b4fc;}
+    #seeMoreBtn {
+      display: none;
+      margin:1em auto 0 auto;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: .45em 1.2em;
+      font-size: 1em;
+      box-shadow: 0 2px 10px #6366f13a;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.18s;
+    }
+    #seeMoreBtn:hover {
+      background: #facc15;
+      color: #222;
+      transform: scale(1.06) rotate(-3deg);
+    }
+    .upload-label {
+      display: block;
+      margin: .7em 0 1.3em 0;
+      cursor: pointer;
+      color: #6366f1;
+      font-weight: 600;
+      background: #facc155c;
+      border-radius: 7px;
+      padding: .5em 1em;
+      text-align: center;
+      transition: background 0.17s;
+      box-shadow: 0 2px 12px #6366f13a;
+    }
+    .upload-label:hover {
+      background: #6366f1;
+      color: #fff;
+    }
+    .ad-area {
+      margin: 0 auto;
+      margin-top: 2em;
+      max-width: 350px;
+      min-height: 90px;
+      border-radius: 14px;
+      background: linear-gradient(90deg,#facc15 0 60%,#6366f1 100%);
+      box-shadow: 0 2px 24px #6366f14a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #222;
+      font-size: 1.15em;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      animation: fadeInUp 0.7s;
+      position: relative;
+    }
+    .ad-area .close-ad {
+      position: absolute;
+      top: 7px;
+      right: 13px;
+      background: transparent;
+      border: none;
+      color: #222;
+      font-size: 1.2em;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .ad-area .close-ad:hover { opacity: 1; color: #dc2626;}
+    @media (max-width: 900px) {
+      .container { flex-direction: column; gap: 1em; }
+      .sidebar { width: 100%; min-width: 0; }
+      .editor { width: 100%; max-width: 99vw; padding: 1em 0.2em;}
+    }
+    @media (max-width:600px) {
+      .container { padding: 0.6em 0.1em;}
+      .template-grid { grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); }
+      .text-tools label { display: block; margin-bottom: .5em;}
+      .ad-area { max-width: 98vw; font-size: 1em; }
+    }
     /* Modal for TOS/Privacy */
     .modal-bg {
       position: fixed; top:0; left:0; width:100vw; height:100vh;
@@ -463,6 +362,32 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
     .tos-modal .close-modal:hover { color: #ef4444; opacity: 1; }
     @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
     @keyframes popIn { from {transform: scale(0.93); opacity:0;} to {transform: scale(1); opacity:1;} }
+    footer {
+      margin-top: 2em;
+      background: rgba(99,102,241,0.07);
+      padding: 1.2em 0 1.2em 0;
+      text-align: center;
+      font-size: 1em;
+      color: #6366f1;
+      border-top: 1.5px solid #e0e7ff;
+      letter-spacing: 0.01em;
+      transition: background 0.4s, color 0.4s;
+    }
+    footer a {
+      color: #6366f1;
+      font-weight: 500;
+      margin: 0 0.6em;
+      text-decoration: underline;
+      transition: color 0.18s;
+    }
+    footer a:hover { color: #facc15; }
+    body.dark footer {
+      background: #23233a;
+      color: #a5b4fc;
+      border-top: 1.5px solid #23233a;
+    }
+    body.dark footer a { color: #a5b4fc; }
+    body.dark footer a:hover { color: #facc15; }
   </style>
 </head>
 <body>
@@ -472,20 +397,35 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
   </nav>
   <div class="container" id="mainApp" style="filter: blur(0); pointer-events: auto;">
     <div class="sidebar">
-      <h2>Templates</h2>
-      <input type="text" id="searchTemplates" placeholder="Search templates...">
-      <button id="randomTemplate">Random</button>
-      <div class="template-grid" id="templates"></div>
+      <div class="meme-category-dropdown">
+        <label for="categorySelect">Category:</label>
+        <select id="categorySelect">
+          <option value="all">All</option>
+          <option value="human">Human</option>
+          <option value="animal">Animals</option>
+          <option value="object">Objects</option>
+          <option value="fav">Favorites</option>
+        </select>
+        <input type="text" id="templateSearch" placeholder="Search...">
+        <button class="fav-toggle" id="favToggle" title="Show only favorites">★</button>
+      </div>
+      <div id="templateGrid" class="template-grid"></div>
+      <button id="seeMoreBtn">See more</button>
       <label class="upload-label">
         <input type="file" id="uploadImage" accept="image/*" style="display:none;">
         + Upload Your Own
       </label>
       <h2>Stickers</h2>
-      <div class="sticker-grid" id="stickers"></div>
+      <div class="sticker-grid" id="stickers">
+        <!-- Example stickers -->
+        <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif" alt="😂" style="width:40px;cursor:pointer;">
+        <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif" alt="👍" style="width:40px;cursor:pointer;">
+        <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif" alt="🔥" style="width:40px;cursor:pointer;">
+      </div>
     </div>
     <div class="editor">
-      <canvas id="memeCanvas" width="500" height="500"></canvas>
-      <div class="editor-tools">
+      <canvas id="memeCanvas" width="500" height="500" style="background:#fff;border-radius:18px;box-shadow:0 4px 32px #6366f119;max-width:100%;margin-bottom:1.2em;"></canvas>
+      <div class="editor-tools" style="display:flex;gap:1em;flex-wrap:wrap;margin-bottom:.7em;">
         <button id="addTextBox">+ Add Text</button>
         <button id="undoBtn">Undo</button>
         <button id="redoBtn">Redo</button>
@@ -506,10 +446,10 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
         <label><input type="checkbox" id="shadow"> Shadow</label>
         <button id="curveText">Curved</button>
       </div>
-      <!-- Ad area: hidden initially, shown after meme creation -->
       <div id="adArea" class="ad-area" style="display:none;margin-top:1.5em;"></div>
     </div>
   </div>
+
   <!-- Modal for Terms and Privacy acceptance -->
   <div class="modal-bg" id="tosModalBg">
     <div class="tos-modal">
@@ -532,12 +472,261 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
   </div>
   <footer>
     &copy; 2025 Meme Creation Studio &mdash;
-    <a href="terms.md" target="_blank">Terms &amp; Conditions</a> |
-    <a href="privacy.md" target="_blank">Privacy Policy</a>
+    <a href="#terms" target="_blank">Terms &amp; Conditions</a> |
+    <a href="#privacy" target="_blank">Privacy Policy</a>
   </footer>
-  <script src="app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <script>
-    // Terms and Privacy Modal Logic
+    // -- DEMO DATA --
+    const MEME_TEMPLATES = [
+      {src: "https://i.imgflip.com/1ur9b0.jpg", name: "Distracted Boyfriend", category: "human"},
+      {src: "https://i.imgflip.com/26am.jpg", name: "Grumpy Cat", category: "animal"},
+      {src: "https://i.imgflip.com/2wifvo.jpg", name: "Oprah You Get A", category: "human"},
+      {src: "https://i.imgflip.com/2fm6x.jpg", name: "Distracted Cat", category: "animal"},
+      {src: "https://i.imgflip.com/3si4.jpg", name: "One Does Not Simply", category: "human"},
+      {src: "https://i.imgflip.com/9ehk.jpg", name: "Laughing Leo", category: "human"},
+      {src: "https://i.imgflip.com/2cp1.jpg", name: "Matrix Morpheus", category: "human"},
+      {src: "https://i.imgflip.com/1bhw.jpg", name: "Drake Hotline Bling", category: "human"},
+      {src: "https://i.imgflip.com/1otk96.jpg", name: "Woman Yelling at Cat", category: "human"},
+      {src: "https://i.imgflip.com/30b1gx.jpg", name: "Expanding Brain", category: "object"},
+      {src: "https://i.imgflip.com/3tx4.jpg", name: "Ancient Aliens", category: "human"},
+      {src: "https://i.imgflip.com/3vzej.jpg", name: "Batman Slapping Robin", category: "human"},
+      {src: "https://i.imgflip.com/265k.jpg", name: "Bad Luck Brian", category: "human"},
+      {src: "https://i.imgflip.com/39t1o.jpg", name: "Futurama Fry", category: "human"},
+      {src: "https://i.imgflip.com/1g8my4.jpg", name: "Boardroom Suggestion", category: "human"},
+    ];
+    let favorites = JSON.parse(localStorage.getItem("meme_favorites")||"[]");
+    let currentCategory = "all";
+    let showAllTemplates = false;
+    const showCount = 10;
+    let currentTemplates = [];
+    // Search/filter logic
+    function getCategoryMemes(category, search="") {
+      let memes = (category==="fav")
+        ? MEME_TEMPLATES.filter(t=>favorites.includes(t.src))
+        : (category==="all" ? MEME_TEMPLATES : MEME_TEMPLATES.filter(t=>t.category===category));
+      if(search) memes = memes.filter(t=>t.name.toLowerCase().includes(search.toLowerCase()));
+      return memes;
+    }
+    function renderTemplates(category, showAll=false, search="") {
+      currentTemplates = getCategoryMemes(category, search);
+      const toShow = showAll ? currentTemplates : currentTemplates.slice(0, showCount);
+      const grid = document.getElementById("templateGrid");
+      grid.innerHTML = "";
+      toShow.forEach((tpl, i) => {
+        const div = document.createElement("div");
+        div.className = "template-select";
+        div.innerHTML = `
+          <span class="template-fav${favorites.includes(tpl.src)?" faved":""}" title="Favorite">&#9733;</span>
+          <img src="${tpl.src}" alt="${tpl.name}">
+          <div class="template-preview"><img src="${tpl.src}" alt="${tpl.name}-preview"></div>
+          <div class="template-name">${tpl.name}</div>
+        `;
+        // Favorite toggle
+        div.querySelector(".template-fav").onclick = (e) => {
+          e.stopPropagation();
+          toggleFavorite(tpl.src);
+          renderTemplates(currentCategory, showAllTemplates, document.getElementById("templateSearch").value);
+        };
+        // Select for meme editor
+        div.onclick = () => {
+          document.querySelectorAll(".template-select").forEach((el, j)=>el.classList.toggle("selected",j===i));
+          // Meme canvas logic:
+          fabric.Image.fromURL(tpl.src, function(img) {
+            img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+              scaleX: canvas.width / img.width,
+              scaleY: canvas.height / img.height
+            });
+            canvas.renderAll();
+            saveState();
+          }, { crossOrigin: "anonymous" });
+        };
+        grid.appendChild(div);
+      });
+      document.getElementById("seeMoreBtn").style.display =
+        (!showAll && currentTemplates.length > showCount) ? "" : "none";
+    }
+    document.getElementById("categorySelect").onchange = function(e) {
+      currentCategory = e.target.value;
+      showAllTemplates = false;
+      document.getElementById("templateSearch").value = "";
+      renderTemplates(currentCategory, false);
+    };
+    document.getElementById("templateSearch").oninput = function() {
+      renderTemplates(currentCategory, false, this.value);
+    };
+    document.getElementById("seeMoreBtn").onclick = function() {
+      showAllTemplates = true;
+      renderTemplates(currentCategory, true, document.getElementById("templateSearch").value);
+    };
+    document.getElementById("favToggle").onclick = function() {
+      document.getElementById("categorySelect").value = "fav";
+      currentCategory = "fav";
+      showAllTemplates = false;
+      renderTemplates("fav", false, document.getElementById("templateSearch").value);
+    };
+    function toggleFavorite(src) {
+      if(favorites.includes(src)) favorites = favorites.filter(f=>f!==src);
+      else favorites.push(src);
+      localStorage.setItem("meme_favorites", JSON.stringify(favorites));
+    }
+    renderTemplates("all", false);
+
+    // -------- FABRIC.JS MEME CANVAS (basic demo) --------
+    const canvas = new fabric.Canvas('memeCanvas', {preserveObjectStacking:true,backgroundColor:"#fff"});
+    canvas.setDimensions({width:500, height:500}, {cssOnly:true});
+    // Stickers
+    document.querySelectorAll('.sticker-grid img').forEach(img => {
+      img.onclick = function() {
+        fabric.Image.fromURL(img.src, function(sticker) {
+          sticker.set({ left:canvas.width/2, top:canvas.height/2, scaleX:0.35, scaleY:0.35, hasBorders: true, cornerColor:"#6366f1" });
+          canvas.add(sticker).setActiveObject(sticker);
+          saveState();
+        }, { crossOrigin:"anonymous" });
+      };
+    });
+
+    // Undo/Redo basic
+    let state = [], mods = 0;
+    function saveState() {
+      if (mods < state.length-1) state = state.slice(0,mods+1);
+      state.push(JSON.stringify(canvas));
+      mods = state.length-1;
+    }
+    canvas.on("object:added", saveState);
+    canvas.on("object:modified", saveState);
+    canvas.on("object:removed", saveState);
+    document.getElementById("undoBtn").onclick = function() {
+      if (mods>0) {
+        mods--;
+        canvas.loadFromJSON(state[mods], canvas.renderAll.bind(canvas));
+      }
+    };
+    document.getElementById("redoBtn").onclick = function() {
+      if (mods<state.length-1) {
+        mods++;
+        canvas.loadFromJSON(state[mods], canvas.renderAll.bind(canvas));
+      }
+    };
+
+    // Add Text Box
+    document.getElementById("addTextBox").onclick = function() {
+      const text = new fabric.IText("Edit me!", {
+        left: canvas.width/2, top: 60+Math.random()*280,
+        fill: "#fff",
+        stroke: "#222",
+        fontSize: 38,
+        fontFamily: "Impact",
+        strokeWidth: 3,
+        shadow: "",
+        opacity: 1,
+        originX: "center",
+        originY: "center",
+        editable: true,
+        fontWeight: "bold"
+      });
+      canvas.add(text).setActiveObject(text);
+      saveState();
+      showTextTools(text);
+    };
+
+    // Show text styling tools when text is selected
+    const textTools = document.getElementById("textTools");
+    canvas.on("selection:created", updateTextTools);
+    canvas.on("selection:updated", updateTextTools);
+    canvas.on("selection:cleared", ()=>textTools.style.display="none");
+    function updateTextTools(e) {
+      const obj = e.selected[0];
+      if (obj && obj.type === "i-text") showTextTools(obj);
+      else textTools.style.display="none";
+    }
+    function showTextTools(obj) {
+      textTools.style.display = "block";
+      document.getElementById("fontFamily").value = obj.fontFamily || "Impact";
+      document.getElementById("fontSize").value = obj.fontSize || 38;
+      document.getElementById("fontColor").value = obj.fill || "#fff";
+      document.getElementById("outlineColor").value = obj.stroke || "#222";
+      document.getElementById("opacity").value = obj.opacity || 1;
+      document.getElementById("shadow").checked = !!obj.shadow;
+    }
+    ["fontFamily","fontSize","fontColor","outlineColor","opacity"].forEach(id=>{
+      document.getElementById(id).oninput = function() {
+        const obj = canvas.getActiveObject();
+        if (obj && obj.type==="i-text") {
+          if (id==="fontSize") obj.fontSize = parseInt(this.value);
+          else if (id==="fontFamily") obj.fontFamily = this.value;
+          else if (id==="fontColor") obj.fill = this.value;
+          else if (id==="outlineColor") obj.stroke = this.value;
+          else if (id==="opacity") obj.opacity = parseFloat(this.value);
+          canvas.renderAll();
+          saveState();
+        }
+      };
+    });
+    document.getElementById("shadow").onchange = function() {
+      const obj = canvas.getActiveObject();
+      if (obj && obj.type==="i-text") {
+        obj.shadow = this.checked ? "rgba(0,0,0,0.55) 2px 2px 8px" : "";
+        canvas.renderAll();
+        saveState();
+      }
+    };
+    document.getElementById("curveText").onclick = function() {
+      const obj = canvas.getActiveObject();
+      if (obj && obj.type==="i-text") {
+        alert("Curved text is an advanced feature. Try using a tool like https://www.mockofun.com/tool/curved-text-generator/ and import as image for now!");
+      }
+    };
+
+    // Download meme
+    document.getElementById("downloadBtn").onclick = function() {
+      const url = canvas.toDataURL({ format: "png", quality: 1 });
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "meme.png";
+      a.click();
+      showAdArea();
+    };
+    // Share (Web Share API or fallback)
+    document.getElementById("shareBtn").onclick = function() {
+      canvas.getElement().toBlob(blob => {
+        const file = new File([blob], "meme.png", {type:"image/png"});
+        if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+          navigator.share({files:[file], title:"My Meme", text:"Check out my meme!"});
+        } else {
+          alert("Sharing not supported. Download and share manually!");
+        }
+        showAdArea();
+      });
+    };
+
+    // Upload your own image
+    document.getElementById("uploadImage").onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      fabric.Image.fromURL(url, function(img) {
+        img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
+        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+          scaleX: canvas.width / img.width,
+          scaleY: canvas.height / img.height
+        });
+        canvas.renderAll();
+        saveState();
+      });
+    };
+
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.onclick = () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+      themeToggle.textContent = document.body.classList.contains("dark") ? "🌞" : "🌙";
+    };
+    if(localStorage.getItem("theme")==="dark") themeToggle.onclick();
+
+    // ----- TERMS MODAL LOGIC -----
     function showTOSModal() {
       document.getElementById('tosModalBg').style.display = 'flex';
       document.getElementById('mainApp').style.filter = 'blur(3px)';
@@ -548,7 +737,6 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
       document.getElementById('mainApp').style.filter = '';
       document.getElementById('mainApp').style.pointerEvents = 'auto';
     }
-    // Only show once per session
     if (!sessionStorage.getItem('acceptedTOS')) {
       showTOSModal();
     } else {
@@ -561,6 +749,21 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
       sessionStorage.setItem('acceptedTOS', 'yes');
       hideTOSModal();
     };
+
+    // ----- ADS AFTER MEME CREATION (Demo) -----
+    function showAdArea() {
+      const adArea = document.getElementById("adArea");
+      adArea.innerHTML = `
+        <button class="close-ad" onclick="this.parentNode.style.display='none';return false;">×</button>
+        <div>
+          <div style="text-align:center;margin-bottom:0.5em;">Sponsored</div>
+          <div style="padding:1.2em;background:rgba(255,255,255,0.8);border-radius:10px;">
+            <span style="color:#6366f1;">AdSense</span> / <span style="color:#facc15;">AdsGram</span> Ad Here
+          </div>
+        </div>
+      `;
+      adArea.style.display = "";
+    }
   </script>
 </body>
 </html>
