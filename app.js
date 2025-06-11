@@ -1,4 +1,4 @@
-// --- Theme Toggle ---
+// Theme Toggle
 const themeToggle = document.getElementById('themeToggle');
 function setTheme(mode) {
   if (mode === 'dark') {
@@ -18,7 +18,7 @@ themeToggle.onclick = () => {
 };
 if (localStorage.getItem('theme') === 'dark') setTheme('dark');
 
-// --- Responsive Mobile Section Panel Logic ---
+// Responsive Mobile Section Panel Logic
 window.showPanel = function(panel) {
   document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
   document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
@@ -26,7 +26,7 @@ window.showPanel = function(panel) {
   document.getElementById('panel-'+panel).classList.add('active');
 }
 
-// --- MEME TEMPLATES ---
+// MEME TEMPLATES
 const MEME_TEMPLATES = [
   {src: "https://i.imgflip.com/1ur9b0.jpg", name: "Distracted Boyfriend"},
   {src: "https://i.imgflip.com/26am.jpg", name: "Grumpy Cat"},
@@ -52,9 +52,10 @@ function renderTemplates(showAll=false) {
   templates.forEach((tpl, i) => {
     const div = document.createElement("div");
     div.className = "template-select";
-    div.innerHTML = `<img src="${tpl.src}" alt="${tpl.name}" style="width:100%;height:60px;object-fit:cover;border-radius:11px;">
-      <div class="template-name">${tpl.name}</div>`;
-    // Micro-interaction: pulse on click
+    div.innerHTML = `
+      <img src="${tpl.src}" alt="${tpl.name}">
+      <div class="template-name">${tpl.name}</div>
+    `;
     div.onclick = () => {
       div.animate([
         { boxShadow: "0 0 0 0 #facc15aa", transform: "scale(1)" },
@@ -82,7 +83,7 @@ document.getElementById("seeMoreBtn").onclick = function() {
 };
 renderTemplates();
 
-// --- Stickers/Emojis and GIFs ---
+// Stickers/Emojis and GIFs
 document.querySelectorAll('#stickers img,#gifs img').forEach(img => {
   img.onclick = function() {
     img.animate([
@@ -98,7 +99,7 @@ document.querySelectorAll('#stickers img,#gifs img').forEach(img => {
   };
 });
 
-// --- Upload ---
+// Upload
 document.getElementById("uploadImage").onchange = function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -114,7 +115,7 @@ document.getElementById("uploadImage").onchange = function(e) {
   });
 };
 
-// --- Fabric.js Editor ---
+// Fabric.js Editor
 const canvas = new fabric.Canvas('memeCanvas', {preserveObjectStacking:true,backgroundColor:"#fff"});
 canvas.setDimensions({width:360, height:360}, {cssOnly:true});
 let state = [], mods = 0;
@@ -176,7 +177,7 @@ document.getElementById("shareBtn").onclick = function() {
     showAdArea();
   });
 };
-// -- Music logic --
+// Music logic
 const audio = document.getElementById("bgMusic"), audioBtn = document.getElementById("audioBtn");
 let musicFiles = [
   "your-default-music.mp3"
@@ -194,30 +195,30 @@ audioBtn.onclick = function() {
 };
 audio.addEventListener('ended',()=>audio.play());
 
-// --- TERMS MODAL LOGIC ---
-function showTOSModal() {
-  document.getElementById('tosModalBg').style.display = 'flex';
-  document.getElementById('mainApp').style.filter = 'blur(3px)';
-  document.getElementById('mainApp').style.pointerEvents = 'none';
-}
-function hideTOSModal() {
-  document.getElementById('tosModalBg').style.display = 'none';
-  document.getElementById('mainApp').style.filter = '';
-  document.getElementById('mainApp').style.pointerEvents = 'auto';
-}
-if (!sessionStorage.getItem('acceptedTOS')) {
-  showTOSModal();
-} else {
-  hideTOSModal();
-}
-document.getElementById('acceptTOS').onchange = function() {
-  document.getElementById('acceptTOSBtn').disabled = !this.checked;
-};
-document.getElementById('acceptTOSBtn').onclick = function() {
+// TERMS MODAL LOGIC: fix Accept button
+const acceptTOS = document.getElementById('acceptTOS');
+const acceptTOSBtn = document.getElementById('acceptTOSBtn');
+acceptTOS.addEventListener('change', function() {
+  if (this.checked) {
+    acceptTOSBtn.disabled = false;
+    acceptTOSBtn.classList.add('enabled');
+  } else {
+    acceptTOSBtn.disabled = true;
+    acceptTOSBtn.classList.remove('enabled');
+  }
+});
+acceptTOSBtn.onclick = function() {
   sessionStorage.setItem('acceptedTOS', 'yes');
-  hideTOSModal();
+  document.getElementById('tosModalBg').style.display = 'none';
 };
-// --- ADS AFTER MEME CREATION (Demo) ---
+
+if (!sessionStorage.getItem('acceptedTOS')) {
+  document.getElementById('tosModalBg').style.display = 'flex';
+} else {
+  document.getElementById('tosModalBg').style.display = 'none';
+}
+
+// ADS AFTER MEME CREATION (Demo)
 function showAdArea() {
   const adArea = document.getElementById("adArea");
   adArea.innerHTML = `
