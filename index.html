@@ -2,285 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meme Creation Center</title>
+  <title>Meme Creation Studio</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
-  <style>
-    body {
-      margin: 0; background: #e0e7ff;
-      font-family: 'Inter', system-ui, sans-serif;
-      min-height: 100vh;
-      color: #222;
-    }
-    nav {
-      background: #fff; font-size: 2rem; text-align: center;
-      padding: 1em 0 .5em 0; font-weight: bold; color: #6366f1;
-      box-shadow: 0 4px 20px #6366f119;
-      margin-bottom: 0.7em;
-    }
-    .container {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 1.5em 1em 2em 1em;
-      background: rgba(255,255,255,0.9);
-      border-radius: 20px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
-    }
-    h2 { font-size: 1.4em; margin-bottom: .4em;}
-    .template-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-      gap: 1.1em;
-      margin-bottom: 2em;
-    }
-    .template-select {
-      border: 3px solid #e0e7ff;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: border .17s;
-      box-shadow: 0 2px 8px #6366f10d;
-      background: #f3f4f6;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .template-select.selected {
-      border: 3px solid #6366f1;
-      box-shadow: 0 4px 16px #6366f140;
-    }
-    .template-select img {
-      width: 100%; display: block; height: 120px; object-fit: cover;
-      background: #e0e7ff;
-      transition: transform .14s;
-    }
-    .template-select.selected img {
-      transform: scale(1.06);
-    }
-    .template-name {
-      text-align:center;
-      font-size:.97em;
-      padding:.3em .1em;
-      width: 100%;
-      background: #eef2ff;
-      color: #6366f1;
-      font-weight: 600;
-    }
-    .editor-area {
-      display: flex; flex-wrap: wrap;
-      gap: 2em; align-items: flex-start;
-      margin-bottom: 2em;
-    }
-    .canvas-wrap {
-      background: #e0e7ff;
-      border-radius: 16px;
-      padding: 1em;
-      margin: 0 auto;
-      box-shadow: 0 2px 16px #6366f117;
-      flex: 1 1 350px;
-      max-width: 430px;
-      min-width: 260px;
-    }
-    .tools {
-      flex: 1 1 240px;
-      min-width: 220px;
-      background: #f8fafc;
-      border-radius: 14px;
-      box-shadow: 0 2px 12px #6366f117;
-      padding: 1.2em 1em;
-      font-size: 1em;
-    }
-    .tools label { display: block; margin: .7em 0 0.24em 0;}
-    .tools input[type="color"], .tools input[type="range"] {
-      vertical-align: middle;
-    }
-    .tools input[type="range"] {
-      width: 85%;
-    }
-    .tools input[type="text"] {
-      width: 100%; padding: .6em .7em; border-radius: 7px;
-      border: 1.4px solid #e0e7ff; font-size: 1.05em; margin-bottom: .7em;
-      font-family: inherit;
-    }
-    .tools select, .tools button {
-      font-size: 1em; padding: 0.55em 1.1em; border-radius: 7px; border: none;
-      background: #6366f1; color: #fff; margin: .6em 0 .2em 0; cursor: pointer;
-      box-shadow: 0 2px 8px #6366f120;
-      transition: background .13s;
-    }
-    .tools button:hover { background: #4338ca;}
-    .canvas-controls {
-      display: flex; gap: 1em; margin-top: 1.3em; justify-content: center;
-    }
-    @media (max-width: 900px) {
-      .editor-area { flex-direction: column; gap: 1.2em;}
-      .canvas-wrap, .tools { max-width: 98vw;}
-    }
-    @media (max-width: 600px) {
-      .container { padding: 1.1em 0.2em;}
-      .canvas-wrap { padding: 0.2em;}
-      .template-grid { grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Impact:700,Arial:400,Comic+Sans+MS:400,Helvetica:400&display=swap">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 </head>
 <body>
-  <nav>Meme <span style="color:#facc15">Creation Center</span></nav>
+  <nav>
+    Meme <span style="color:#facc15">Creation Studio</span>
+    <button id="themeToggle" title="Toggle theme">🌙</button>
+  </nav>
   <div class="container">
-    <h2>1. Choose a Meme Template</h2>
-    <div class="template-grid" id="templates"></div>
-    <div class="editor-area" id="editorArea" style="display:none;">
-      <div class="canvas-wrap">
-        <canvas id="memeCanvas" width="420" height="420"></canvas>
+    <div class="sidebar">
+      <h2>Templates</h2>
+      <input type="text" id="searchTemplates" placeholder="Search templates...">
+      <button id="randomTemplate">Random</button>
+      <div class="template-grid" id="templates"></div>
+      <label class="upload-label">
+        <input type="file" id="uploadImage" accept="image/*" style="display:none;">
+        + Upload Your Own
+      </label>
+      <h2>Stickers</h2>
+      <div class="sticker-grid" id="stickers"></div>
+    </div>
+    <div class="editor">
+      <canvas id="memeCanvas" width="500" height="500"></canvas>
+      <div class="editor-tools">
+        <button id="addTextBox">+ Add Text</button>
+        <button id="undoBtn">Undo</button>
+        <button id="redoBtn">Redo</button>
+        <button id="downloadBtn">Download</button>
+        <button id="shareBtn">Share</button>
       </div>
-      <form class="tools" id="toolsForm" autocomplete="off">
-        <h2 style="margin-top:0;font-size:1.2em;">2. Add Text & Style</h2>
-        <label>Text Line 1</label>
-        <input type="text" id="text1" maxlength="80" placeholder="Top text" value="" autocomplete="off"/>
-        <label>Text Line 2</label>
-        <input type="text" id="text2" maxlength="80" placeholder="Bottom text" value="" autocomplete="off"/>
-        <label>Font</label>
-        <select id="fontFamily">
+      <div class="text-tools" id="textTools" style="display:none;">
+        <label>Font: <select id="fontFamily">
           <option value="Impact">Impact</option>
           <option value="Arial">Arial</option>
           <option value="Comic Sans MS">Comic Sans</option>
           <option value="Helvetica">Helvetica</option>
-        </select>
-        <label>Font Size</label>
-        <input type="range" id="fontSize" min="20" max="60" value="38"/>
-        <label>Text Color</label>
-        <input type="color" id="fontColor" value="#ffffff"/>
-        <label>Outline Color</label>
-        <input type="color" id="outlineColor" value="#222222"/>
-        <label>Opacity</label>
-        <input type="range" id="opacity" min="0.2" max="1" step="0.01" value="1"/>
-        <label>Text Position</label>
-        <select id="textPos">
-          <option value="top-bottom">Top & Bottom</option>
-          <option value="top">Top only</option>
-          <option value="bottom">Bottom only</option>
-          <option value="center">Center only</option>
-        </select>
-        <div class="canvas-controls">
-          <button type="button" id="downloadBtn">Download Meme</button>
-          <button type="button" id="resetBtn" style="background:#ef4444;">Reset</button>
-        </div>
-      </form>
+        </select></label>
+        <label>Size: <input type="range" id="fontSize" min="20" max="64" value="38"></label>
+        <label>Color: <input type="color" id="fontColor" value="#ffffff"></label>
+        <label>Outline: <input type="color" id="outlineColor" value="#222222"></label>
+        <label>Opacity: <input type="range" id="opacity" min="0.2" max="1" step="0.01" value="1"></label>
+        <label><input type="checkbox" id="shadow"> Shadow</label>
+        <button id="curveText">Curved</button>
+      </div>
     </div>
   </div>
-  <script>
-    // Responsive grid of meme templates
-    const MEME_TEMPLATES = [
-      {src: "https://i.imgflip.com/1ur9b0.jpg", name: "Distracted Boyfriend"},
-      {src: "https://i.imgflip.com/26am.jpg", name: "Grumpy Cat"},
-      {src: "https://i.imgflip.com/9ehk.jpg", name: "Laughing Leo"},
-      {src: "https://i.imgflip.com/3si4.jpg", name: "One Does Not Simply"},
-      {src: "https://i.imgflip.com/39t1o.jpg", name: "Futurama Fry"},
-      {src: "https://i.imgflip.com/2wifvo.jpg", name: "Oprah You Get A"},
-      {src: "https://i.imgflip.com/1bhw.jpg", name: "Drake Hotline Bling"},
-      {src: "https://i.imgflip.com/30b1gx.jpg", name: "Expanding Brain"},
-      {src: "https://i.imgflip.com/2fm6x.jpg", name: "Distracted Cat"},
-      {src: "https://i.imgflip.com/1otk96.jpg", name: "Woman Yelling at Cat"},
-      {src: "https://i.imgflip.com/3vzej.jpg", name: "Batman Slapping Robin"},
-      {src: "https://i.imgflip.com/265k.jpg", name: "Bad Luck Brian"},
-      {src: "https://i.imgflip.com/1g8my4.jpg", name: "Boardroom Suggestion"},
-      {src: "https://i.imgflip.com/3tx4.jpg", name: "Ancient Aliens"},
-      {src: "https://i.imgflip.com/2cp1.jpg", name: "Matrix Morpheus"}
-    ];
-
-    const templates = document.getElementById("templates");
-    MEME_TEMPLATES.forEach((tpl, i) => {
-      const div = document.createElement("div");
-      div.className = "template-select";
-      div.innerHTML = `<img src="${tpl.src}" alt="${tpl.name}"><div class="template-name">${tpl.name}</div>`;
-      div.onclick = () => selectTemplate(i);
-      templates.appendChild(div);
-    });
-
-    let selectedTemplate = null, imgObj = new window.Image();
-    function selectTemplate(i) {
-      selectedTemplate = MEME_TEMPLATES[i];
-      document.querySelectorAll(".template-select").forEach((el, idx) => {
-        el.classList.toggle("selected", idx===i);
-      });
-      imgObj.crossOrigin = "anonymous";
-      imgObj.src = selectedTemplate.src;
-      imgObj.onload = () => {
-        document.getElementById("editorArea").style.display = "flex";
-        drawMeme();
-      };
-    }
-
-    // Meme Canvas logic
-    const canvas = document.getElementById("memeCanvas");
-    const ctx = canvas.getContext("2d");
-    function drawMeme() {
-      if (!selectedTemplate) return;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.globalAlpha = 1;
-      ctx.drawImage(imgObj, 0, 0, canvas.width, canvas.height);
-
-      // Get text properties
-      const text1 = document.getElementById("text1").value.toUpperCase();
-      const text2 = document.getElementById("text2").value.toUpperCase();
-      const font = document.getElementById("fontFamily").value;
-      const fontSize = +document.getElementById("fontSize").value;
-      const fontColor = document.getElementById("fontColor").value;
-      const outlineColor = document.getElementById("outlineColor").value;
-      const opacity = +document.getElementById("opacity").value;
-      const textPos = document.getElementById("textPos").value;
-
-      ctx.globalAlpha = opacity;
-      ctx.textAlign = "center";
-      ctx.lineJoin = "round";
-      ctx.font = `bold ${fontSize}px ${font}, Impact, Arial Black, sans-serif`;
-
-      // Draw text with outline
-      ctx.strokeStyle = outlineColor;
-      ctx.lineWidth = Math.max(Math.round(fontSize/10), 4);
-      ctx.fillStyle = fontColor;
-
-      if (textPos === "top-bottom" || textPos === "top") {
-        drawMemeText(text1, canvas.width/2, fontSize + 10);
-      }
-      if (textPos === "top-bottom" || textPos === "bottom") {
-        drawMemeText(text2, canvas.width/2, canvas.height - 18);
-      }
-      if (textPos === "center") {
-        drawMemeText(text1, canvas.width/2, canvas.height/2 + fontSize/2);
-        drawMemeText(text2, canvas.width/2, canvas.height/2 + fontSize*1.9);
-      }
-    }
-    function drawMemeText(text, x, y) {
-      ctx.strokeText(text, x, y);
-      ctx.fillText(text, x, y);
-    }
-
-    // Redraw on input
-    document.getElementById("toolsForm").oninput = drawMeme;
-
-    // Download meme
-    document.getElementById("downloadBtn").onclick = function() {
-      const url = canvas.toDataURL();
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "meme.png";
-      a.click();
-    };
-    // Reset meme
-    document.getElementById("resetBtn").onclick = function() {
-      document.getElementById("text1").value = "";
-      document.getElementById("text2").value = "";
-      document.getElementById("fontFamily").value = "Impact";
-      document.getElementById("fontSize").value = "38";
-      document.getElementById("fontColor").value = "#ffffff";
-      document.getElementById("outlineColor").value = "#222222";
-      document.getElementById("opacity").value = "1";
-      document.getElementById("textPos").value = "top-bottom";
-      drawMeme();
-    };
-
-    // Optional: auto-select first template for demo
-    window.onload = () => { selectTemplate(0); };
-  </script>
+  <script src="meme-studio.js"></script>
 </body>
 </html>
