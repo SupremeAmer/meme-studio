@@ -2,454 +2,618 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meme Creation Studio</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Meme Studio - Mobile Optimized</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
-  <style>
-    body {
-      margin: 0;
-      background: linear-gradient(112deg, #eef2ff 0%, #c7d2fe 100%);
-      font-family: 'Inter', system-ui, sans-serif;
-      min-height: 100vh;
-      color: #222;
-      transition: background 0.4s, color 0.4s;
-    }
-    body.dark {
-      background: linear-gradient(112deg, #23233a 0%, #181827 100%);
-      color: #f3f4f6;
-    }
-    nav {
-      background: rgba(255,255,255,0.92);
-      font-size: 2rem;
-      text-align: center;
-      padding: 1em 0 .7em 0;
-      font-weight: bold;
-      color: #6366f1;
-      box-shadow: 0 4px 24px #6366f119;
-      margin-bottom: 0.7em;
-      backdrop-filter: blur(12px);
-      letter-spacing: 0.01em;
-      position: sticky;
-      top: 0;
-      z-index: 3;
-      transition: background 0.4s;
-    }
-    body.dark nav {
-      background: rgba(37,37,48,0.95);
-      color: #a5b4fc;
-    }
-    nav button {
-      float: right;
-      margin-right: 1em;
-      font-size: 1.3em;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #6366f1;
-      transition: color 0.18s;
-    }
-    nav button:hover {
-      color: #facc15;
-      transform: scale(1.1) rotate(-8deg);
-    }
-    .container {
-      display: flex;
-      gap: 2em;
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 1.5em 1em 2em 1em;
-      border-radius: 24px;
-      box-shadow: 0 12px 48px 0 rgba(99,102,241,0.13);
-      background: rgba(255,255,255,0.86);
-      animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
-      transition: background 0.4s, box-shadow 0.4s;
-    }
-    body.dark .container {
-      background: rgba(24,24,39,0.98);
-      box-shadow: 0 16px 48px #6366f13d;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(36px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .sidebar {
-      width: 260px;
-      min-width: 180px;
-      background: rgba(248,250,255,0.95);
-      border-radius: 18px;
-      box-shadow: 0 2px 14px #6366f115;
-      padding: 1.1em .9em 1.5em .9em;
-      animation: slideInLeft 0.8s;
-      transition: background 0.4s, box-shadow 0.4s;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2em;
-    }
-    body.dark .sidebar {
-      background: #1e1e2d;
-      box-shadow: 0 2px 22px #6366f130;
-    }
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-32px);}
-      to { opacity: 1; transform: translateX(0);}
-    }
-    .sidebar h2 {
-      font-size: 1.15em;
-      margin: 0.6em 0 0.7em 0;
-      color: #6366f1;
-      letter-spacing: 0.01em;
-      text-shadow: 0 2px 8px #6366f111;
-    }
-    body.dark .sidebar h2 { color: #a5b4fc; }
-    .meme-category-dropdown {
-      display: flex;
-      align-items: center;
-      gap: .7em;
-      font-size: 1.07em;
-      margin-bottom: .8em;
-    }
-    #categorySelect {
-      border-radius: 8px;
-      border: 1.5px solid #e0e7ff;
-      padding: .34em 1em;
-      font-size: 1em;
-      background: #f8fafc;
-    }
-    #templateSearch {
-      margin-left: .6em;
-      border-radius: 8px;
-      border: 1.5px solid #e0e7ff;
-      padding: .34em .8em;
-      font-size: 1em;
-      background: #f8fafc;
-      width: 90px;
-    }
-    .fav-toggle {
-      margin-left: auto;
-      cursor: pointer;
-      color: #facc15;
-      font-size: 1.2em;
-      background: none;
-      border: none;
-      transition: color 0.18s;
-    }
-    .fav-toggle.faved { color: #fbbf24; }
-    @media (max-width:600px) {
-      .meme-category-dropdown {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: .3em;
-      }
-      #templateSearch { margin-left: 0; width: 100%; }
-    }
-    .template-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit,minmax(80px,1fr));
-      gap: 0.8em;
-      margin-bottom: 1.1em;
-    }
-    .template-select {
-      border: 2px solid #e0e7ff;
-      border-radius: 13px;
-      background: #f3f4f6;
-      cursor: pointer;
-      transition: border 0.15s, box-shadow 0.17s, transform 0.18s;
-      overflow: hidden;
-      box-shadow: 0 2px 8px #6366f10d;
-      position: relative;
-      animation: popIn 0.6s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-    }
-    .template-select.selected {
-      border:2.5px solid #6366f1;
-      box-shadow:0 4px 16px #6366f13a;
-      transform: scale(1.05) rotate(-2deg);
-    }
-    .template-select img {
-      width:100%; height:60px; object-fit:cover;
-      transition: transform 0.17s;
-    }
-    .template-select.selected img {
-      transform: scale(1.07) rotate(-3deg);
-    }
-    .template-fav {
-      position: absolute;
-      top: 8px;
-      right: 10px;
-      color: #facc15;
-      font-size: 1.3em;
-      cursor: pointer;
-      transition: color 0.18s;
-      z-index: 2;
-      text-shadow: 0 2px 8px #fff7;
-    }
-    .template-fav.faved { color: #fbbf24;}
-    .template-select:hover .template-preview,
-    .template-select:focus .template-preview {
-      opacity: 1;
-      pointer-events: auto;
-      z-index: 10;
-    }
-    .template-preview {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255,255,255,0.93);
-      border-radius: 13px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.18s;
-      z-index: 9;
-    }
-    .template-preview img {
-      max-width: 95%; max-height: 130px; object-fit: contain;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px #6366f13a;
-      border: 1.5px solid #a5b4fc;
-      background: #fff;
-    }
-    .template-name {
-      text-align:center;
-      font-size:.97em;
-      padding:.3em .1em;
-      width: 100%;
-      background: #eef2ff;
-      color: #6366f1;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      margin-top: .2em;
-    }
-    body.dark .template-name { background: #23233a; color: #a5b4fc;}
-    #seeMoreBtn {
-      display: none;
-      margin:1em auto 0 auto;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: .45em 1.2em;
-      font-size: 1em;
-      box-shadow: 0 2px 10px #6366f13a;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s, transform 0.18s;
-    }
-    #seeMoreBtn:hover {
-      background: #facc15;
-      color: #222;
-      transform: scale(1.06) rotate(-3deg);
-    }
-    .upload-label {
-      display: block;
-      margin: .7em 0 1.3em 0;
-      cursor: pointer;
-      color: #6366f1;
-      font-weight: 600;
-      background: #facc155c;
-      border-radius: 7px;
-      padding: .5em 1em;
-      text-align: center;
-      transition: background 0.17s;
-      box-shadow: 0 2px 12px #6366f13a;
-    }
-    .upload-label:hover {
-      background: #6366f1;
-      color: #fff;
-    }
-    .ad-area {
-      margin: 0 auto;
-      margin-top: 2em;
-      max-width: 350px;
-      min-height: 90px;
-      border-radius: 14px;
-      background: linear-gradient(90deg,#facc15 0 60%,#6366f1 100%);
-      box-shadow: 0 2px 24px #6366f14a;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #222;
-      font-size: 1.15em;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      animation: fadeInUp 0.7s;
-      position: relative;
-    }
-    .ad-area .close-ad {
-      position: absolute;
-      top: 7px;
-      right: 13px;
-      background: transparent;
-      border: none;
-      color: #222;
-      font-size: 1.2em;
-      cursor: pointer;
-      opacity: 0.7;
-    }
-    .ad-area .close-ad:hover { opacity: 1; color: #dc2626;}
-    @media (max-width: 900px) {
-      .container { flex-direction: column; gap: 1em; }
-      .sidebar { width: 100%; min-width: 0; }
-      .editor { width: 100%; max-width: 99vw; padding: 1em 0.2em;}
-    }
-    @media (max-width:600px) {
-      .container { padding: 0.6em 0.1em;}
-      .template-grid { grid-template-columns: repeat(auto-fit,minmax(110px,1fr)); }
-      .text-tools label { display: block; margin-bottom: .5em;}
-      .ad-area { max-width: 98vw; font-size: 1em; }
-    }
-    /* Modal for TOS/Privacy */
-    .modal-bg {
-      position: fixed; top:0; left:0; width:100vw; height:100vh;
-      background: rgba(30,30,50,0.37);
-      z-index: 10001;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.5s;
-    }
-    .tos-modal {
-      background: #fff;
-      color: #23233a;
-      border-radius: 18px;
-      padding: 2.1em 1.5em 1.6em 1.5em;
-      max-width: 420px;
-      width: 97vw;
-      box-shadow: 0 10px 48px 0 #6366f14c;
-      position: relative;
-      text-align: left;
-      animation: popIn 0.5s;
-      font-size: 1.05em;
-    }
-    .tos-modal h3 { margin-top: 0; color: #6366f1; }
-    .tos-modal label { display: flex; align-items: center; margin-top: 1.2em; }
-    .tos-modal input[type="checkbox"] { margin-right: .6em; accent-color: #6366f1;}
-    .tos-modal button {
-      margin-top: 1.1em;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 9px;
-      padding: .7em 1.7em;
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.14s;
-      display: block;
-      width: 100%;
-    }
-    .tos-modal button:disabled {
-      background: #a5b4fc;
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-    .tos-modal .close-modal {
-      position: absolute;
-      top: 0.7em;
-      right: 1em;
-      background: none;
-      border: none;
-      font-size: 1.4em;
-      color: #6366f1;
-      cursor: pointer;
-      opacity: 0.75;
-      transition: color 0.18s;
-    }
-    .tos-modal .close-modal:hover { color: #ef4444; opacity: 1; }
-    @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
-    @keyframes popIn { from {transform: scale(0.93); opacity:0;} to {transform: scale(1); opacity:1;} }
-    footer {
-      margin-top: 2em;
-      background: rgba(99,102,241,0.07);
-      padding: 1.2em 0 1.2em 0;
-      text-align: center;
-      font-size: 1em;
-      color: #6366f1;
-      border-top: 1.5px solid #e0e7ff;
-      letter-spacing: 0.01em;
-      transition: background 0.4s, color 0.4s;
-    }
-    footer a {
-      color: #6366f1;
-      font-weight: 500;
-      margin: 0 0.6em;
-      text-decoration: underline;
-      transition: color 0.18s;
-    }
-    footer a:hover { color: #facc15; }
-    body.dark footer {
-      background: #23233a;
-      color: #a5b4fc;
-      border-top: 1.5px solid #23233a;
-    }
-    body.dark footer a { color: #a5b4fc; }
-    body.dark footer a:hover { color: #facc15; }
-  </style>
 </head>
+  <style>
+
+ body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: linear-gradient(112deg, #eef2ff 0%, #c7d2fe 100%);
+  transition: background 0.5s, color 0.5s;
+}
+body.dark {
+  background: linear-gradient(112deg, #23233a 0%, #181827 100%);
+  color: #f3f4f6;
+}
+nav {
+  background: #fff;
+  font-size: 1.3em;
+  text-align: center;
+  padding: .7em 0 .7em 0;
+  font-weight: bold;
+  color: #6366f1;
+  box-shadow: 0 2px 12px #6366f12a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e7ff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+}
+body.dark nav {
+  background: #23233a;
+  color: #facc15;
+  box-shadow: 0 2px 12px #23233a33;
+}
+.nav-title {
+  flex: 1;
+  text-align: center;
+  letter-spacing: 0.01em;
+  font-size: 1.25em;
+}
+.theme-toggle-btn {
+  margin-right: 0.6em;
+  background: linear-gradient(112deg, #6366f1 0%, #facc15 100%);
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-size: 1.4em;
+  color: #fff;
+  box-shadow: 0 2px 10px #facc1544;
+  transition: background 0.22s, color 0.22s, box-shadow 0.2s, transform 0.2s;
+  outline: none;
+}
+.theme-toggle-btn:active,
+.theme-toggle-btn:focus {
+  background: linear-gradient(112deg, #facc15 0%, #6366f1 100%);
+  color: #23233a;
+  transform: scale(1.13) rotate(-7deg);
+  box-shadow: 0 6px 24px #facc1599;
+}
+body.dark .theme-toggle-btn {
+  background: linear-gradient(112deg, #181827 0%, #6366f1 100%);
+  color: #facc15;
+}
+.theme-toggle-btn:after {
+  content: attr(data-mode);
+  font-size: .85em;
+  margin-left: .4em;
+  color: inherit;
+  opacity: 0.7;
+  transition: color 0.22s, opacity 0.22s;
+}
+
+.audio-btn {
+  background: linear-gradient(112deg, #6366f1 0%, #facc15 100%);
+  border-radius: 50%;
+  width: 44px; height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  margin-right: .6em;
+  cursor: pointer;
+  font-size: 1.4em;
+  color: #fff;
+  transition: background 0.18s, color 0.18s, box-shadow 0.17s, transform 0.15s;
+  box-shadow: 0 2px 10px #facc1544;
+}
+.audio-btn:active, .audio-btn.playing {
+  background: linear-gradient(112deg, #facc15 0%, #6366f1 100%);
+  color: #23233a;
+  transform: scale(1.11) rotate(-8deg);
+}
+body.dark .audio-btn {
+  background: linear-gradient(112deg, #23233a 0%, #6366f1 100%);
+  color: #facc15;
+}
+
+.mobile-main {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  height: 0;
+  min-height: 0;
+  min-width: 0;
+  background: transparent;
+}
+.mobile-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-bottom: 1px solid #e0e7ff;
+  padding: .2em 0;
+  z-index: 2;
+  box-shadow: 0 1px 8px #6366f10c;
+  position: sticky;
+  top: 54px;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+body.dark .mobile-toolbar {
+  background: #1e1e2d;
+  border-bottom: 1px solid #23233a;
+  box-shadow: 0 1px 12px #23233a77;
+}
+.toolbar-btn {
+  flex: 1 1 0;
+  border: none;
+  background: none;
+  font-size: 1.09em;
+  color: #6366f1;
+  font-weight: 600;
+  padding: .8em 0 .6em 0;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+  border-right: 1px solid #e0e7ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .19em;
+  min-width: 0;
+  box-shadow: none;
+  position: relative;
+  transition: color 0.16s, background 0.16s, box-shadow 0.17s, transform 0.15s;
+  outline: none;
+  user-select: none;
+}
+.toolbar-btn:last-child { border-right: none; }
+.toolbar-btn.active, .toolbar-btn:active {
+  background: linear-gradient(90deg, #6366f1 60%, #facc15 100%);
+  color: #fff;
+  box-shadow: 0 2px 14px #facc1530;
+  transform: scale(1.04) translateY(-1px);
+}
+body.dark .toolbar-btn.active,
+body.dark .toolbar-btn:active {
+  background: linear-gradient(90deg, #23233a 60%, #6366f1 100%);
+  color: #facc15;
+}
+.toolbar-btn svg, .toolbar-btn img {
+  width: 1.45em; height: 1.45em; display: block;
+  margin-bottom: 0.1em;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px #6366f133);
+  transition: filter 0.18s;
+}
+.toolbar-btn:active img,
+.toolbar-btn.active img {
+  filter: drop-shadow(0 2px 4px #6366f14c);
+}
+
+.mobile-content {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  background: #f0f4ff;
+  position: relative;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 2px 16px #6366f11a;
+  margin-bottom: 68px;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+body.dark .mobile-content {
+  background: #181827;
+  box-shadow: 0 2px 24px #23233a44;
+}
+.section-panel {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1em 1.1em 0 1.1em;
+  animation: fadeInUp 0.4s cubic-bezier(.4,0,.2,1);
+  background: transparent;
+  z-index: 2;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+.section-panel.active { display: flex; }
+
+/* Template/Emoji/GIF Grids */
+.template-grid,
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px,1fr));
+  gap: 1em;
+  margin-bottom: 1.1em;
+  padding: 0.2em 0;
+}
+.template-select,
+.sticker-grid img {
+  border: none;
+  border-radius: 13px;
+  background: #fff;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border 0.18s, background 0.18s;
+  box-shadow: 0 4px 32px #6366f11a;
+  position: relative;
+  animation: popIn 0.5s cubic-bezier(.4,0,.2,1);
+  will-change: box-shadow, transform;
+}
+.template-select:active,
+.sticker-grid img:active {
+  box-shadow: 0 7px 22px #6366f13a;
+  transform: scale(1.05) rotate(-2deg);
+  border: 2px solid #6366f1;
+  background: #facc1577;
+}
+body.dark .template-select,
+body.dark .sticker-grid img {
+  background: #23233a;
+}
+.template-select img,
+.sticker-grid img {
+  width: 100%;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 13px;
+  display: block;
+  pointer-events: none;
+  transition: filter 0.17s;
+}
+.template-select:active img {
+  filter: drop-shadow(0 2px 8px #facc154c);
+}
+.template-name {
+  text-align: center;
+  font-size: .96em;
+  padding: .3em .1em;
+  width: 100%;
+  background: #eef2ff;
+  color: #6366f1;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: 0 0 11px 11px;
+  margin-top: .2em;
+  transition: background 0.18s, color 0.18s;
+}
+body.dark .template-name {
+  background: #23233a;
+  color: #facc15;
+}
+.editor-area {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 2px 16px #6366f117;
+  margin: 1.1em .2em 0 .2em;
+  padding: .5em .2em 1em .2em;
+  position: relative;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+body.dark .editor-area {
+  background: #23233a;
+  box-shadow: 0 2px 16px #23233a55;
+}
+#memeCanvas {
+  width: 96vw !important;
+  max-width: 360px;
+  max-height: 44vh;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 24px #6366f120;
+  margin-bottom: 1.1em;
+  touch-action: none;
+  border: 1.5px solid #e0e7ff;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+body.dark #memeCanvas {
+  background: #181827;
+  box-shadow: 0 2px 32px #23233a66;
+  border: 1.5px solid #6366f1;
+}
+
+/* Editor buttons at the bottom */
+.editor-btn-bar {
+  width: 100vw;
+  max-width: 100vw;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: .7em 0 .65em 0;
+  background: #fff;
+  position: fixed;
+  left: 0; bottom: 0;
+  z-index: 20;
+  box-shadow: 0 -2px 22px #6366f126;
+  border-top: 1.5px solid #e0e7ff;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+body.dark .editor-btn-bar {
+  background: #23233a;
+  border-top: 1.5px solid #23233a;
+  box-shadow: 0 -2px 18px #23233a99;
+}
+.editor-btn {
+  background: linear-gradient(90deg,#6366f1 60%,#facc15 100%);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: .5em 1.05em;
+  font-size: 1.07em;
+  cursor: pointer;
+  font-weight: 600;
+  margin: 0 .17em;
+  box-shadow: 0 2px 10px #6366f13a;
+  transition: background 0.2s, color 0.14s, transform 0.13s, box-shadow 0.19s;
+  min-width: 0;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+.editor-btn:active,
+.editor-btn:focus {
+  background: linear-gradient(90deg,#facc15 10%,#6366f1 90%);
+  color: #23233a;
+  transform: scale(1.12);
+  box-shadow: 0 4px 14px #facc1544;
+}
+.editor-btn::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 0; height: 0;
+  background: rgba(250,204,21,0.18);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+.editor-btn:active::after {
+  width: 150%;
+  height: 150%;
+}
+@media (max-width: 600px) {
+  .editor-btn { font-size: 1em; padding: .38em 0.85em; }
+}
+.ad-area {
+  margin: 0 auto;
+  margin-top: 1.3em;
+  max-width: 95vw;
+  min-height: 70px;
+  border-radius: 14px;
+  background: linear-gradient(90deg,#facc15 0 60%,#6366f1 100%);
+  box-shadow: 0 2px 24px #6366f14a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  font-size: 1.08em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  animation: fadeInUp 0.7s;
+  position: relative;
+}
+body.dark .ad-area {
+  background: linear-gradient(90deg,#6366f1 0 60%,#23233a 100%);
+  color: #facc15;
+}
+.ad-area .close-ad {
+  position: absolute;
+  top: 7px;
+  right: 13px;
+  background: transparent;
+  border: none;
+  color: #222;
+  font-size: 1.2em;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: color 0.21s, opacity 0.18s;
+}
+.ad-area .close-ad:hover { opacity: 1; color: #dc2626;}
+.upload-label {
+  display: block;
+  margin: .7em 0 1.3em 0;
+  cursor: pointer;
+  color: #6366f1;
+  font-weight: 600;
+  background: #facc155c;
+  border-radius: 7px;
+  padding: .5em 1em;
+  text-align: center;
+  transition: background 0.17s, color 0.17s, transform 0.17s;
+  box-shadow: 0 2px 12px #6366f13a;
+}
+.upload-label:hover,
+.upload-label:focus {
+  background: #6366f1;
+  color: #fff;
+  transform: scale(1.05);
+}
+body.dark .upload-label {
+  background: #181827;
+  color: #facc15;
+}
+.modal-bg {
+  position: fixed; top:0; left:0; width:100vw; height:100vh;
+  background: rgba(30,30,50,0.37);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.5s;
+}
+.tos-modal {
+  background: #fff;
+  color: #23233a;
+  border-radius: 18px;
+  padding: 2.1em 1.5em 1.6em 1.5em;
+  max-width: 420px;
+  width: 97vw;
+  box-shadow: 0 10px 48px 0 #6366f14c;
+  position: relative;
+  text-align: left;
+  animation: popIn 0.5s;
+  font-size: 1.05em;
+  transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+}
+body.dark .tos-modal {
+  background: #23233a;
+  color: #f3f4f6;
+  box-shadow: 0 10px 36px 0 #23233a99;
+}
+.tos-modal h3 { margin-top: 0; color: #6366f1; }
+body.dark .tos-modal h3 { color: #facc15;}
+.tos-modal label { display: flex; align-items: center; margin-top: 1.2em; }
+.tos-modal input[type="checkbox"] { margin-right: .6em; accent-color: #6366f1;}
+.tos-modal button {
+  margin-top: 1.1em;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: .7em 1.7em;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.14s;
+  display: block;
+  width: 100%;
+}
+.tos-modal button:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.tos-modal .close-modal {
+  position: absolute;
+  top: 0.7em;
+  right: 1em;
+  background: none;
+  border: none;
+  font-size: 1.4em;
+  color: #6366f1;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: color 0.18s;
+}
+.tos-modal .close-modal:hover { color: #ef4444; opacity: 1; }
+@keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+@keyframes popIn { from {transform: scale(0.93); opacity:0;} to {transform: scale(1); opacity:1;} }
+@keyframes fadeInUp { from {opacity:0;transform:translateY(24px);} to {opacity:1;transform:translateY(0);} }
+footer {
+  margin-top: 2em;
+  background: rgba(99,102,241,0.07);
+  padding: 1.2em 0 1.2em 0;
+  text-align: center;
+  font-size: 1em;
+  color: #6366f1;
+  border-top: 1.5px solid #e0e7ff;
+  letter-spacing: 0.01em;
+  transition: background 0.4s, color 0.4s;
+  position: relative;
+  z-index: 11;
+}
+footer a {
+  color: #6366f1;
+  font-weight: 500;
+  margin: 0 0.6em;
+  text-decoration: underline;
+  transition: color 0.18s;
+}
+footer a:hover { color: #facc15; }
+body.dark footer {
+  background: #23233a;
+  color: #facc15;
+  border-top: 1.5px solid #23233a;
+}
+body.dark footer a {
+  color: #facc15;
+}
+body.dark footer a:hover {
+  color: #6366f1;
+}
+@media (max-width: 600px) {
+  nav, .mobile-toolbar, .mobile-content, .editor-area, .editor-btn-bar, .ad-area {
+    border-radius: 0 !important;
+  }
+  .template-grid, .sticker-grid { grid-template-columns: repeat(2, 1fr); }
+}
+  </style>
 <body>
   <nav>
-    Meme <span style="color:#facc15">Creation Studio</span>
-    <button id="themeToggle" title="Toggle theme">🌙</button>
+    <span class="nav-title">Meme Studio</span>
+    <button class="theme-toggle-btn" id="themeToggle" data-mode="🌙" title="Toggle theme">🌙</button>
+    <button class="audio-btn" id="audioBtn" title="Play/Pause Music">🎵</button>
   </nav>
-  <div class="container" id="mainApp" style="filter: blur(0); pointer-events: auto;">
-    <div class="sidebar">
-      <div class="meme-category-dropdown">
-        <label for="categorySelect">Category:</label>
-        <select id="categorySelect">
-          <option value="all">All</option>
-          <option value="human">Human</option>
-          <option value="animal">Animals</option>
-          <option value="object">Objects</option>
-          <option value="fav">Favorites</option>
-        </select>
-        <input type="text" id="templateSearch" placeholder="Search...">
-        <button class="fav-toggle" id="favToggle" title="Show only favorites">★</button>
-      </div>
-      <div id="templateGrid" class="template-grid"></div>
-      <button id="seeMoreBtn">See more</button>
-      <label class="upload-label">
-        <input type="file" id="uploadImage" accept="image/*" style="display:none;">
-        + Upload Your Own
-      </label>
-      <h2>Stickers</h2>
-      <div class="sticker-grid" id="stickers">
-        <!-- Example stickers -->
-        <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif" alt="😂" style="width:40px;cursor:pointer;">
-        <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif" alt="👍" style="width:40px;cursor:pointer;">
-        <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif" alt="🔥" style="width:40px;cursor:pointer;">
-      </div>
+  <main class="mobile-main">
+    <div class="mobile-toolbar">
+      <button class="toolbar-btn active" id="btnTemplates" onclick="showPanel('templates')">
+        <img src="https://img.icons8.com/ios-filled/50/6366f1/picture.png" alt="">Templates
+      </button>
+      <button class="toolbar-btn" id="btnEmoji" onclick="showPanel('emoji')">
+        <img src="https://img.icons8.com/ios-filled/50/6366f1/happy.png" alt="">Emoji
+      </button>
+      <button class="toolbar-btn" id="btnUpload" onclick="showPanel('upload')">
+        <img src="https://img.icons8.com/ios-filled/50/6366f1/upload.png" alt="">Upload
+      </button>
+      <button class="toolbar-btn" id="btnGift" onclick="showPanel('gift')">
+        <img src="https://img.icons8.com/ios-filled/50/6366f1/gift.png" alt="">Gift
+      </button>
     </div>
-    <div class="editor">
-      <canvas id="memeCanvas" width="500" height="500" style="background:#fff;border-radius:18px;box-shadow:0 4px 32px #6366f119;max-width:100%;margin-bottom:1.2em;"></canvas>
-      <div class="editor-tools" style="display:flex;gap:1em;flex-wrap:wrap;margin-bottom:.7em;">
-        <button id="addTextBox">+ Add Text</button>
-        <button id="undoBtn">Undo</button>
-        <button id="redoBtn">Redo</button>
-        <button id="downloadBtn">Download</button>
-        <button id="shareBtn">Share</button>
+    <section class="mobile-content">
+      <!-- Templates Panel -->
+      <div class="section-panel active" id="panel-templates">
+        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">Choose a Template</div>
+        <div id="templateGrid" class="template-grid"></div>
+        <button id="seeMoreBtn" style="margin-bottom:.5em;">See more</button>
       </div>
-      <div class="text-tools" id="textTools" style="display:none;">
-        <label>Font: <select id="fontFamily">
-          <option value="Impact">Impact</option>
-          <option value="Arial">Arial</option>
-          <option value="Comic Sans MS">Comic Sans</option>
-          <option value="Helvetica">Helvetica</option>
-        </select></label>
-        <label>Size: <input type="range" id="fontSize" min="20" max="64" value="38"></label>
-        <label>Color: <input type="color" id="fontColor" value="#ffffff"></label>
-        <label>Outline: <input type="color" id="outlineColor" value="#222222"></label>
-        <label>Opacity: <input type="range" id="opacity" min="0.2" max="1" step="0.01" value="1"></label>
-        <label><input type="checkbox" id="shadow"> Shadow</label>
-        <button id="curveText">Curved</button>
+      <!-- Emoji Panel -->
+      <div class="section-panel" id="panel-emoji">
+        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">Choose an Emoji</div>
+        <div class="sticker-grid" id="stickers">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif" alt="😂" style="width:50px;cursor:pointer;">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif" alt="👍" style="width:50px;cursor:pointer;">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif" alt="🔥" style="width:50px;cursor:pointer;">
+        </div>
       </div>
-      <div id="adArea" class="ad-area" style="display:none;margin-top:1.5em;"></div>
-    </div>
+      <!-- Upload Panel -->
+      <div class="section-panel" id="panel-upload">
+        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">Upload Your Image</div>
+        <label class="upload-label">
+          <input type="file" id="uploadImage" accept="image/*" style="display:none;">
+          + Upload Image
+        </label>
+      </div>
+      <!-- Gift Panel -->
+      <div class="section-panel" id="panel-gift">
+        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">GIF Selection</div>
+        <div class="sticker-grid" id="gifs">
+          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="gif1" style="width:60px;cursor:pointer;">
+          <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="gif2" style="width:60px;cursor:pointer;">
+          <img src="https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif" alt="gif3" style="width:60px;cursor:pointer;">
+        </div>
+      </div>
+      <!-- Editor Area (always visible) -->
+      <div class="editor-area" id="editorArea">
+        <canvas id="memeCanvas" width="360" height="360"></canvas>
+        <div id="adArea" class="ad-area" style="display:none;margin-top:.5em;"></div>
+      </div>
+    </section>
+  </main>
+  <!-- Editor buttons at the bottom -->
+  <div class="editor-btn-bar">
+    <button class="editor-btn" id="addTextBox">Text</button>
+    <button class="editor-btn" id="undoBtn">Undo</button>
+    <button class="editor-btn" id="redoBtn">Redo</button>
+    <button class="editor-btn" id="downloadBtn">Download</button>
+    <button class="editor-btn" id="shareBtn">Share</button>
   </div>
-
   <!-- Modal for Terms and Privacy acceptance -->
   <div class="modal-bg" id="tosModalBg">
     <div class="tos-modal">
@@ -475,295 +639,8 @@
     <a href="#terms" target="_blank">Terms &amp; Conditions</a> |
     <a href="#privacy" target="_blank">Privacy Policy</a>
   </footer>
+  <audio id="bgMusic" src="your-default-music.mp3" loop preload="auto"></audio>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-  <script>
-    // -- DEMO DATA --
-    const MEME_TEMPLATES = [
-      {src: "https://i.imgflip.com/1ur9b0.jpg", name: "Distracted Boyfriend", category: "human"},
-      {src: "https://i.imgflip.com/26am.jpg", name: "Grumpy Cat", category: "animal"},
-      {src: "https://i.imgflip.com/2wifvo.jpg", name: "Oprah You Get A", category: "human"},
-      {src: "https://i.imgflip.com/2fm6x.jpg", name: "Distracted Cat", category: "animal"},
-      {src: "https://i.imgflip.com/3si4.jpg", name: "One Does Not Simply", category: "human"},
-      {src: "https://i.imgflip.com/9ehk.jpg", name: "Laughing Leo", category: "human"},
-      {src: "https://i.imgflip.com/2cp1.jpg", name: "Matrix Morpheus", category: "human"},
-      {src: "https://i.imgflip.com/1bhw.jpg", name: "Drake Hotline Bling", category: "human"},
-      {src: "https://i.imgflip.com/1otk96.jpg", name: "Woman Yelling at Cat", category: "human"},
-      {src: "https://i.imgflip.com/30b1gx.jpg", name: "Expanding Brain", category: "object"},
-      {src: "https://i.imgflip.com/3tx4.jpg", name: "Ancient Aliens", category: "human"},
-      {src: "https://i.imgflip.com/3vzej.jpg", name: "Batman Slapping Robin", category: "human"},
-      {src: "https://i.imgflip.com/265k.jpg", name: "Bad Luck Brian", category: "human"},
-      {src: "https://i.imgflip.com/39t1o.jpg", name: "Futurama Fry", category: "human"},
-      {src: "https://i.imgflip.com/1g8my4.jpg", name: "Boardroom Suggestion", category: "human"},
-    ];
-    let favorites = JSON.parse(localStorage.getItem("meme_favorites")||"[]");
-    let currentCategory = "all";
-    let showAllTemplates = false;
-    const showCount = 10;
-    let currentTemplates = [];
-    // Search/filter logic
-    function getCategoryMemes(category, search="") {
-      let memes = (category==="fav")
-        ? MEME_TEMPLATES.filter(t=>favorites.includes(t.src))
-        : (category==="all" ? MEME_TEMPLATES : MEME_TEMPLATES.filter(t=>t.category===category));
-      if(search) memes = memes.filter(t=>t.name.toLowerCase().includes(search.toLowerCase()));
-      return memes;
-    }
-    function renderTemplates(category, showAll=false, search="") {
-      currentTemplates = getCategoryMemes(category, search);
-      const toShow = showAll ? currentTemplates : currentTemplates.slice(0, showCount);
-      const grid = document.getElementById("templateGrid");
-      grid.innerHTML = "";
-      toShow.forEach((tpl, i) => {
-        const div = document.createElement("div");
-        div.className = "template-select";
-        div.innerHTML = `
-          <span class="template-fav${favorites.includes(tpl.src)?" faved":""}" title="Favorite">&#9733;</span>
-          <img src="${tpl.src}" alt="${tpl.name}">
-          <div class="template-preview"><img src="${tpl.src}" alt="${tpl.name}-preview"></div>
-          <div class="template-name">${tpl.name}</div>
-        `;
-        // Favorite toggle
-        div.querySelector(".template-fav").onclick = (e) => {
-          e.stopPropagation();
-          toggleFavorite(tpl.src);
-          renderTemplates(currentCategory, showAllTemplates, document.getElementById("templateSearch").value);
-        };
-        // Select for meme editor
-        div.onclick = () => {
-          document.querySelectorAll(".template-select").forEach((el, j)=>el.classList.toggle("selected",j===i));
-          // Meme canvas logic:
-          fabric.Image.fromURL(tpl.src, function(img) {
-            img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
-            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-              scaleX: canvas.width / img.width,
-              scaleY: canvas.height / img.height
-            });
-            canvas.renderAll();
-            saveState();
-          }, { crossOrigin: "anonymous" });
-        };
-        grid.appendChild(div);
-      });
-      document.getElementById("seeMoreBtn").style.display =
-        (!showAll && currentTemplates.length > showCount) ? "" : "none";
-    }
-    document.getElementById("categorySelect").onchange = function(e) {
-      currentCategory = e.target.value;
-      showAllTemplates = false;
-      document.getElementById("templateSearch").value = "";
-      renderTemplates(currentCategory, false);
-    };
-    document.getElementById("templateSearch").oninput = function() {
-      renderTemplates(currentCategory, false, this.value);
-    };
-    document.getElementById("seeMoreBtn").onclick = function() {
-      showAllTemplates = true;
-      renderTemplates(currentCategory, true, document.getElementById("templateSearch").value);
-    };
-    document.getElementById("favToggle").onclick = function() {
-      document.getElementById("categorySelect").value = "fav";
-      currentCategory = "fav";
-      showAllTemplates = false;
-      renderTemplates("fav", false, document.getElementById("templateSearch").value);
-    };
-    function toggleFavorite(src) {
-      if(favorites.includes(src)) favorites = favorites.filter(f=>f!==src);
-      else favorites.push(src);
-      localStorage.setItem("meme_favorites", JSON.stringify(favorites));
-    }
-    renderTemplates("all", false);
-
-    // -------- FABRIC.JS MEME CANVAS (basic demo) --------
-    const canvas = new fabric.Canvas('memeCanvas', {preserveObjectStacking:true,backgroundColor:"#fff"});
-    canvas.setDimensions({width:500, height:500}, {cssOnly:true});
-    // Stickers
-    document.querySelectorAll('.sticker-grid img').forEach(img => {
-      img.onclick = function() {
-        fabric.Image.fromURL(img.src, function(sticker) {
-          sticker.set({ left:canvas.width/2, top:canvas.height/2, scaleX:0.35, scaleY:0.35, hasBorders: true, cornerColor:"#6366f1" });
-          canvas.add(sticker).setActiveObject(sticker);
-          saveState();
-        }, { crossOrigin:"anonymous" });
-      };
-    });
-
-    // Undo/Redo basic
-    let state = [], mods = 0;
-    function saveState() {
-      if (mods < state.length-1) state = state.slice(0,mods+1);
-      state.push(JSON.stringify(canvas));
-      mods = state.length-1;
-    }
-    canvas.on("object:added", saveState);
-    canvas.on("object:modified", saveState);
-    canvas.on("object:removed", saveState);
-    document.getElementById("undoBtn").onclick = function() {
-      if (mods>0) {
-        mods--;
-        canvas.loadFromJSON(state[mods], canvas.renderAll.bind(canvas));
-      }
-    };
-    document.getElementById("redoBtn").onclick = function() {
-      if (mods<state.length-1) {
-        mods++;
-        canvas.loadFromJSON(state[mods], canvas.renderAll.bind(canvas));
-      }
-    };
-
-    // Add Text Box
-    document.getElementById("addTextBox").onclick = function() {
-      const text = new fabric.IText("Edit me!", {
-        left: canvas.width/2, top: 60+Math.random()*280,
-        fill: "#fff",
-        stroke: "#222",
-        fontSize: 38,
-        fontFamily: "Impact",
-        strokeWidth: 3,
-        shadow: "",
-        opacity: 1,
-        originX: "center",
-        originY: "center",
-        editable: true,
-        fontWeight: "bold"
-      });
-      canvas.add(text).setActiveObject(text);
-      saveState();
-      showTextTools(text);
-    };
-
-    // Show text styling tools when text is selected
-    const textTools = document.getElementById("textTools");
-    canvas.on("selection:created", updateTextTools);
-    canvas.on("selection:updated", updateTextTools);
-    canvas.on("selection:cleared", ()=>textTools.style.display="none");
-    function updateTextTools(e) {
-      const obj = e.selected[0];
-      if (obj && obj.type === "i-text") showTextTools(obj);
-      else textTools.style.display="none";
-    }
-    function showTextTools(obj) {
-      textTools.style.display = "block";
-      document.getElementById("fontFamily").value = obj.fontFamily || "Impact";
-      document.getElementById("fontSize").value = obj.fontSize || 38;
-      document.getElementById("fontColor").value = obj.fill || "#fff";
-      document.getElementById("outlineColor").value = obj.stroke || "#222";
-      document.getElementById("opacity").value = obj.opacity || 1;
-      document.getElementById("shadow").checked = !!obj.shadow;
-    }
-    ["fontFamily","fontSize","fontColor","outlineColor","opacity"].forEach(id=>{
-      document.getElementById(id).oninput = function() {
-        const obj = canvas.getActiveObject();
-        if (obj && obj.type==="i-text") {
-          if (id==="fontSize") obj.fontSize = parseInt(this.value);
-          else if (id==="fontFamily") obj.fontFamily = this.value;
-          else if (id==="fontColor") obj.fill = this.value;
-          else if (id==="outlineColor") obj.stroke = this.value;
-          else if (id==="opacity") obj.opacity = parseFloat(this.value);
-          canvas.renderAll();
-          saveState();
-        }
-      };
-    });
-    document.getElementById("shadow").onchange = function() {
-      const obj = canvas.getActiveObject();
-      if (obj && obj.type==="i-text") {
-        obj.shadow = this.checked ? "rgba(0,0,0,0.55) 2px 2px 8px" : "";
-        canvas.renderAll();
-        saveState();
-      }
-    };
-    document.getElementById("curveText").onclick = function() {
-      const obj = canvas.getActiveObject();
-      if (obj && obj.type==="i-text") {
-        alert("Curved text is an advanced feature. Try using a tool like https://www.mockofun.com/tool/curved-text-generator/ and import as image for now!");
-      }
-    };
-
-    // Download meme
-    document.getElementById("downloadBtn").onclick = function() {
-      const url = canvas.toDataURL({ format: "png", quality: 1 });
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "meme.png";
-      a.click();
-      showAdArea();
-    };
-    // Share (Web Share API or fallback)
-    document.getElementById("shareBtn").onclick = function() {
-      canvas.getElement().toBlob(blob => {
-        const file = new File([blob], "meme.png", {type:"image/png"});
-        if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-          navigator.share({files:[file], title:"My Meme", text:"Check out my meme!"});
-        } else {
-          alert("Sharing not supported. Download and share manually!");
-        }
-        showAdArea();
-      });
-    };
-
-    // Upload your own image
-    document.getElementById("uploadImage").onchange = function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const url = URL.createObjectURL(file);
-      fabric.Image.fromURL(url, function(img) {
-        img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-          scaleX: canvas.width / img.width,
-          scaleY: canvas.height / img.height
-        });
-        canvas.renderAll();
-        saveState();
-      });
-    };
-
-    // Theme toggle
-    const themeToggle = document.getElementById("themeToggle");
-    themeToggle.onclick = () => {
-      document.body.classList.toggle("dark");
-      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-      themeToggle.textContent = document.body.classList.contains("dark") ? "🌞" : "🌙";
-    };
-    if(localStorage.getItem("theme")==="dark") themeToggle.onclick();
-
-    // ----- TERMS MODAL LOGIC -----
-    function showTOSModal() {
-      document.getElementById('tosModalBg').style.display = 'flex';
-      document.getElementById('mainApp').style.filter = 'blur(3px)';
-      document.getElementById('mainApp').style.pointerEvents = 'none';
-    }
-    function hideTOSModal() {
-      document.getElementById('tosModalBg').style.display = 'none';
-      document.getElementById('mainApp').style.filter = '';
-      document.getElementById('mainApp').style.pointerEvents = 'auto';
-    }
-    if (!sessionStorage.getItem('acceptedTOS')) {
-      showTOSModal();
-    } else {
-      hideTOSModal();
-    }
-    document.getElementById('acceptTOS').onchange = function() {
-      document.getElementById('acceptTOSBtn').disabled = !this.checked;
-    };
-    document.getElementById('acceptTOSBtn').onclick = function() {
-      sessionStorage.setItem('acceptedTOS', 'yes');
-      hideTOSModal();
-    };
-
-    // ----- ADS AFTER MEME CREATION (Demo) -----
-    function showAdArea() {
-      const adArea = document.getElementById("adArea");
-      adArea.innerHTML = `
-        <button class="close-ad" onclick="this.parentNode.style.display='none';return false;">×</button>
-        <div>
-          <div style="text-align:center;margin-bottom:0.5em;">Sponsored</div>
-          <div style="padding:1.2em;background:rgba(255,255,255,0.8);border-radius:10px;">
-            <span style="color:#6366f1;">AdSense</span> / <span style="color:#facc15;">AdsGram</span> Ad Here
-          </div>
-        </div>
-      `;
-      adArea.style.display = "";
-    }
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
