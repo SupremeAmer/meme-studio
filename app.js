@@ -37,27 +37,32 @@ themeToggle.onclick = () => {
 if (localStorage.getItem('theme') === 'dark') setTheme('dark');
 
 // == TOS MODAL ==
-const acceptTOS = document.getElementById('acceptTOS');
-const acceptTOSBtn = document.getElementById('acceptTOSBtn');
-const tosModalBg = document.getElementById('tosModalBg');
-acceptTOS.addEventListener('change', function() {
-  if (this.checked) {
-    acceptTOSBtn.disabled = false;
-    acceptTOSBtn.classList.add('enabled');
+document.addEventListener('DOMContentLoaded', function() {
+  const acceptTOS = document.getElementById('acceptTOS');
+  const acceptTOSBtn = document.getElementById('acceptTOSBtn');
+  const tosModalBg = document.getElementById('tosModalBg');
+
+  acceptTOS.addEventListener('change', function() {
+    if (this.checked) {
+      acceptTOSBtn.disabled = false;
+      acceptTOSBtn.classList.add('enabled');
+    } else {
+      acceptTOSBtn.disabled = true;
+      acceptTOSBtn.classList.remove('enabled');
+    }
+  });
+
+  acceptTOSBtn.onclick = function() {
+    sessionStorage.setItem('acceptedTOS', 'yes');
+    tosModalBg.style.display = 'none';
+  };
+
+  if (!sessionStorage.getItem('acceptedTOS')) {
+    tosModalBg.style.display = 'flex';
   } else {
-    acceptTOSBtn.disabled = true;
-    acceptTOSBtn.classList.remove('enabled');
+    tosModalBg.style.display = 'none';
   }
 });
-acceptTOSBtn.onclick = function() {
-  sessionStorage.setItem('acceptedTOS', 'yes');
-  tosModalBg.style.display = 'none';
-};
-if (!sessionStorage.getItem('acceptedTOS')) {
-  tosModalBg.style.display = 'flex';
-} else {
-  tosModalBg.style.display = 'none';
-}
 
 // == MUSIC ==
 const audio = document.getElementById("bgMusic"), audioBtn = document.getElementById("audioBtn");
