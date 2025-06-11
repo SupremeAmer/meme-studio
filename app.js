@@ -1,4 +1,21 @@
-// Theme Toggle
+// --- Closable Panels ---
+const openPanels = {};
+window.showPanel = function(panel) {
+  document.querySelectorAll('.modal-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+panel).classList.add('active');
+  openPanels[panel] = true;
+};
+window.closePanel = function(panel) {
+  document.getElementById('panel-'+panel).classList.remove('active');
+  openPanels[panel] = false;
+};
+// Optional: close on ESC
+document.addEventListener('keydown', e => {
+  if(e.key==="Escape"){
+    document.querySelectorAll('.modal-panel.active').forEach(p=>p.classList.remove('active'));
+  }
+});
+
 const themeToggle = document.getElementById('themeToggle');
 function setTheme(mode) {
   if (mode === 'dark') {
@@ -17,16 +34,147 @@ themeToggle.onclick = () => {
   setTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
 };
 if (localStorage.getItem('theme') === 'dark') setTheme('dark');
+// --- Video/Image Editor ---
+const memeCanvas = document.getElementById('memeCanvas');
+const videoPreview = document.getElementById('videoPreview');
+const fabricCanvas = new fabric.Canvas('memeCanvas', {preserveObjectStacking:true,backgroundColor:"#fff"});
+fabricCanvas.setDimensions({width:360, height:360}, {cssOnly:true});
+let isVideoMode = false;
+let videoURL = "";
+let state = [], mods = 0;
+function saveState() {
+  if (mods < state.length-1) state = state.slice(0,mods+1);
+  state.push(JSON.stringify(fabricCanvas));
+  mods = state.length-1;
+}
+fabricCanvas.on("object:added", saveState);
+fabricCanvas.on("object:modified", saveState);
+fabricCanvas.on("object:removed", saveState);
 
-// Responsive Mobile Section Panel Logic
-window.showPanel = function(panel) {
-  document.querySelectorAll('.toolbar-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('btn'+panel.charAt(0).toUpperCase()+panel.slice(1)).classList.add('active');
-  document.getElementById('panel-'+panel).classList.add('active');
+function drawVideoFrameOnCanvas() {
+  if (!isVideoMode || !videoPreview.src) return;
+  fabric.Image.fromURL(videoPreview.src, function(img) {
+    img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
+    fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
+      scaleX: fabricCanvas.width / videoPreview.videoWidth,
+      scaleY: fabricCanvas.height / videoPreview.videoHeight
+    });
+    fabricCanvas.renderAll();
+    saveState();
+  }, { crossOrigin: "anonymous" });
 }
 
-// MEME TEMPLATES
+document.getElementById("uploadImageVideo").onchange = function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  if (file.type.startsWith("video/")) {
+    videoPreview.src = url;
+    videoPreview.style.display = "";
+    memeCanvas.style.display = "";
+    videoPreview.onloadedmetadata = function() {
+      isVideoMode = true;
+      videoPreview.currentTime = 0;
+      drawVideoFrameOnCanvas();
+    };
+    videoPreview.onseeked = drawVideoFrameOnCanvas;
+    videoPreview.onplay = () => { setInterval(drawVideoFrameOnCanvas, 800); };
+    videoPreview.onpause = drawVideoFrameOnCanvas;
+  } else {
+    isVideoMode = false;
+    videoPreview.style.display = "none";
+    fabric.Image.fromURL(url, function(img) {
+      img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
+      fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
+        scaleX: fabricCanvas.width / img.width,
+        scaleY: fabricCanvas.height / img.height
+      });
+      fabricCanvas.renderAll();
+      saveState();
+    });
+  }
+  closePanel('upload');
+};
+
+// --- Editing Tools ---
+document.getElementById("addTextBox").onclick = function() {
+  const text = new fabric.IText("Edit me!", {
+    left: fabricCanvas.width/2, top: 60+Math.random()*180,
+    fill: "#fff", stroke: "#222", fontSize: 32, fontFamily: "Impact", strokeWidth: 3,
+    originX: "center", originY: "center", fontWeight: "bold"
+  });
+  fabricCanvas.add(text).setActiveObject(text);
+  saveState();
+};
+document.getElementById("fontBtn").onclick = function() {
+  const obj = fabricCanvas.getActiveObject();
+  if (obj && obj.type==="i-text") {
+    obj.fontFamily = obj.fontFamily==="Impact" ? "Arial" : "Impact";
+    fabricCanvas.renderAll(); saveState();
+  }
+};
+document.getElementById("fontSizeBtn").onclick = function() {
+  const obj = fabricCanvas.getActiveObject();
+  if (obj && obj.type==="i-text") {
+    obj.fontSize = (obj.fontSize||32) + 6;
+    if(obj.fontSize > 64) obj.fontSize = 18;
+    fabricCanvas.renderAll(); saveState();
+  }
+};
+document.getElementById("colorBtn").onclick = function() {
+  const obj = fabricCanvas.getActiveObject();
+  if (obj && obj.type==="i-text") {
+    obj.fill = obj.fill==="#fff" ? "#facc15" : "#fff";
+    fabricCanvas.renderAll(); saveState();
+  }
+};
+document.getElementById("boldBtn").onclick = function() {
+  const obj = fabricCanvas.getActiveObject();
+  if (obj && obj.type==="i-text") {
+    obj.fontWeight = obj.fontWeight==="bold" ? "normal" : "bold";
+    fabricCanvas.renderAll(); saveState();
+  }
+};
+document.getElementById("italicBtn").onclick = function() {
+  const obj = fabricCanvas.getActiveObject();
+  if (obj && obj.type==="i-text") {
+    obj.fontStyle = obj.fontStyle==="italic" ? "normal" : "italic";
+    fabricCanvas.renderAll(); saveState();
+  }
+};
+document.getElementById("undoBtn").onclick = function() {
+  if (mods>0) { mods--; fabricCanvas.loadFromJSON(state[mods], fabricCanvas.renderAll.bind(fabricCanvas)); }
+};
+document.getElementById("redoBtn").onclick = function() {
+  if (mods<state.length-1) { mods++; fabricCanvas.loadFromJSON(state[mods], fabricCanvas.renderAll.bind(fabricCanvas)); }
+};
+document.getElementById("deleteBtn").onclick = function() {
+  let obj = fabricCanvas.getActiveObject();
+  if(obj) { fabricCanvas.remove(obj); saveState(); }
+};
+document.getElementById("downloadBtn").onclick = function() {
+  // For video: warn user, only snapshot will be saved
+  if(isVideoMode) alert("Only a snapshot of the current video frame with overlays will be saved. Full video export is not supported in-browser.");
+  const url = fabricCanvas.toDataURL({ format: "png", quality: 1 });
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "meme.png";
+  a.click();
+  showAdArea();
+};
+document.getElementById("shareBtn").onclick = function() {
+  fabricCanvas.getElement().toBlob(blob => {
+    const file = new File([blob], "meme.png", {type:"image/png"});
+    if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+      navigator.share({files:[file], title:"My Meme", text:"Check out my meme!"});
+    } else {
+      alert("Sharing not supported. Download and share manually!");
+    }
+    showAdArea();
+  });
+};
+
+// --- Template, Emoji, GIF insertions ---
 const MEME_TEMPLATES = [
   {src: "https://i.imgflip.com/1ur9b0.jpg", name: "Distracted Boyfriend"},
   {src: "https://i.imgflip.com/26am.jpg", name: "Grumpy Cat"},
@@ -57,19 +205,15 @@ function renderTemplates(showAll=false) {
       <div class="template-name">${tpl.name}</div>
     `;
     div.onclick = () => {
-      div.animate([
-        { boxShadow: "0 0 0 0 #facc15aa", transform: "scale(1)" },
-        { boxShadow: "0 0 0 12px #facc1500", transform: "scale(1.08)" },
-        { boxShadow: "0 0 0 0 #facc1500", transform: "scale(1)" }
-      ], { duration: 400, easing: "cubic-bezier(.4,0,.2,1)" });
       fabric.Image.fromURL(tpl.src, function(img) {
         img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
-        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-          scaleX: canvas.width / img.width,
-          scaleY: canvas.height / img.height
+        fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas), {
+          scaleX: fabricCanvas.width / img.width,
+          scaleY: fabricCanvas.height / img.height
         });
-        canvas.renderAll();
+        fabricCanvas.renderAll();
         saveState();
+        closePanel('templates');
       }, { crossOrigin: "anonymous" });
     };
     grid.appendChild(div);
@@ -83,101 +227,63 @@ document.getElementById("seeMoreBtn").onclick = function() {
 };
 renderTemplates();
 
-// Stickers/Emojis and GIFs
 document.querySelectorAll('#stickers img,#gifs img').forEach(img => {
   img.onclick = function() {
-    img.animate([
-      { transform: "scale(1)", boxShadow: "0 0 0 0 #6366f180" },
-      { transform: "scale(1.13)", boxShadow: "0 0 0 8px #6366f140" },
-      { transform: "scale(1)", boxShadow: "0 0 0 0 #6366f100" }
-    ], { duration: 320 });
     fabric.Image.fromURL(img.src, function(sticker) {
-      sticker.set({ left:canvas.width/2, top:canvas.height/2, scaleX:0.35, scaleY:0.35, hasBorders: true, cornerColor:"#6366f1" });
-      canvas.add(sticker).setActiveObject(sticker);
+      sticker.set({ left:fabricCanvas.width/2, top:fabricCanvas.height/2, scaleX:0.35, scaleY:0.35, hasBorders: true, cornerColor:"#6366f1" });
+      fabricCanvas.add(sticker).setActiveObject(sticker);
       saveState();
+      closePanel('emoji');
+      closePanel('gift');
     }, { crossOrigin:"anonymous" });
   };
 });
 
-// Upload
-document.getElementById("uploadImage").onchange = function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  fabric.Image.fromURL(url, function(img) {
-    img.set({ selectable: false, evented: false, originX: "left", originY:"top" });
-    canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-      scaleX: canvas.width / img.width,
-      scaleY: canvas.height / img.height
-    });
-    canvas.renderAll();
-    saveState();
-  });
-};
+// --- TOS, Music, Ad logic as before ---
 
-// Fabric.js Editor
-const canvas = new fabric.Canvas('memeCanvas', {preserveObjectStacking:true,backgroundColor:"#fff"});
-canvas.setDimensions({width:360, height:360}, {cssOnly:true});
-let state = [], mods = 0;
-function saveState() {
-  if (mods < state.length-1) state = state.slice(0,mods+1);
-  state.push(JSON.stringify(canvas));
-  mods = state.length-1;
+// Accept TOS Modal logic
+const acceptTOS = document.getElementById('acceptTOS');
+const acceptTOSBtn = document.getElementById('acceptTOSBtn');
+acceptTOS.addEventListener('change', function() {
+  if (this.checked) {
+    acceptTOSBtn.disabled = false;
+    acceptTOSBtn.classList.add('enabled');
+  } else {
+    acceptTOSBtn.disabled = true;
+    acceptTOSBtn.classList.remove('enabled');
+  }
+});
+acceptTOSBtn.onclick = function() {
+  sessionStorage.setItem('acceptedTOS', 'yes');
+  document.getElementById('tosModalBg').style.display = 'none';
+};
+if (!sessionStorage.getItem('acceptedTOS')) {
+  document.getElementById('tosModalBg').style.display = 'flex';
+} else {
+  document.getElementById('tosModalBg').style.display = 'none';
 }
-canvas.on("object:added", saveState);
-canvas.on("object:modified", saveState);
-canvas.on("object:removed", saveState);
-document.getElementById("undoBtn").onclick = function() {
-  if (mods>0) {
-    mods--;
-    canvas.loadFromJSON(state[mods], canvas.renderAll.bind(canvas));
+
+// Theme Toggle
+const themeToggle = document.getElementById('themeToggle');
+function setTheme(mode) {
+  if (mode === 'dark') {
+    document.body.classList.add('dark');
+    themeToggle.innerHTML = "🌞";
+    themeToggle.setAttribute("data-mode", "🌞");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.body.classList.remove('dark');
+    themeToggle.innerHTML = "🌙";
+    themeToggle.setAttribute("data-mode", "🌙");
+    localStorage.setItem("theme", "light");
   }
+}
+themeToggle.onclick = () => {
+  setTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
 };
-document.getElementById("redoBtn").onclick = function() {
-  if (mods<state.length-1) {
-    mods++;
-    canvas.loadFromJSON(state[mods], canvas.renderAll.bind(canvas));
-  }
-};
-document.getElementById("addTextBox").onclick = function() {
-  const text = new fabric.IText("Edit me!", {
-    left: canvas.width/2, top: 60+Math.random()*180,
-    fill: "#fff",
-    stroke: "#222",
-    fontSize: 32,
-    fontFamily: "Impact",
-    strokeWidth: 3,
-    shadow: "",
-    opacity: 1,
-    originX: "center",
-    originY: "center",
-    editable: true,
-    fontWeight: "bold"
-  });
-  canvas.add(text).setActiveObject(text);
-  saveState();
-};
-// Download meme
-document.getElementById("downloadBtn").onclick = function() {
-  const url = canvas.toDataURL({ format: "png", quality: 1 });
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "meme.png";
-  a.click();
-  showAdArea();
-};
-document.getElementById("shareBtn").onclick = function() {
-  canvas.getElement().toBlob(blob => {
-    const file = new File([blob], "meme.png", {type:"image/png"});
-    if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-      navigator.share({files:[file], title:"My Meme", text:"Check out my meme!"});
-    } else {
-      alert("Sharing not supported. Download and share manually!");
-    }
-    showAdArea();
-  });
-};
-// Music logic
+if (localStorage.getItem('theme') === 'dark') setTheme('dark');
+
+// Music controls
 const audio = document.getElementById("bgMusic"), audioBtn = document.getElementById("audioBtn");
 let musicFiles = [
   "your-default-music.mp3"
@@ -195,30 +301,7 @@ audioBtn.onclick = function() {
 };
 audio.addEventListener('ended',()=>audio.play());
 
-// TERMS MODAL LOGIC: fix Accept button
-const acceptTOS = document.getElementById('acceptTOS');
-const acceptTOSBtn = document.getElementById('acceptTOSBtn');
-acceptTOS.addEventListener('change', function() {
-  if (this.checked) {
-    acceptTOSBtn.disabled = false;
-    acceptTOSBtn.classList.add('enabled');
-  } else {
-    acceptTOSBtn.disabled = true;
-    acceptTOSBtn.classList.remove('enabled');
-  }
-});
-acceptTOSBtn.onclick = function() {
-  sessionStorage.setItem('acceptedTOS', 'yes');
-  document.getElementById('tosModalBg').style.display = 'none';
-};
-
-if (!sessionStorage.getItem('acceptedTOS')) {
-  document.getElementById('tosModalBg').style.display = 'flex';
-} else {
-  document.getElementById('tosModalBg').style.display = 'none';
-}
-
-// ADS AFTER MEME CREATION (Demo)
+// Ad area demo
 function showAdArea() {
   const adArea = document.getElementById("adArea");
   adArea.innerHTML = `
