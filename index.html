@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <title>Meme Creation Studio</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Impact:700,Arial:400,Comic+Sans+MS:400,Helvetica:400&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-</head>
-  <style>body {
+  <style>
+body {
   margin: 0;
   background: linear-gradient(112deg, #eef2ff 0%, #c7d2fe 100%);
   font-family: 'Inter', system-ui, sans-serif;
@@ -234,6 +234,17 @@ body.dark .editor {
   touch-action: none;
   transition: box-shadow 0.19s;
   animation: fadeInUp 1.2s cubic-bezier(.4,0,.2,1);
+  max-width: 100vw;
+  width: 100%;
+  height: auto;
+}
+@media (max-width: 600px) {
+  #memeCanvas {
+    width: 96vw !important;
+    min-width: 96vw !important;
+    max-width: 96vw !important;
+    height: auto !important;
+  }
 }
 
 .editor-tools {
@@ -317,12 +328,36 @@ body.dark .text-tools { background: #23233a; color: #a5b4fc;}
   color: #222;
   transform: scale(1.05);
 }
-::-webkit-scrollbar { width: 7px; background: #f3f4f6; }
-::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 6px;}
-::-webkit-scrollbar-thumb:hover { background: #a5b4fc;}
-::selection { background: #6366f14a;}
-a, .link { color: #6366f1; cursor: pointer; transition: color .16s;}
-a:hover, .link:hover { color: #facc15; text-decoration: underline;}
+.ad-area {
+  margin: 0 auto;
+  margin-top: 2em;
+  max-width: 350px;
+  min-height: 90px;
+  border-radius: 14px;
+  background: linear-gradient(90deg,#facc15 0 60%,#6366f1 100%);
+  box-shadow: 0 2px 24px #6366f14a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  font-size: 1.15em;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  animation: fadeInUp 0.7s;
+  position: relative;
+}
+.ad-area .close-ad {
+  position: absolute;
+  top: 7px;
+  right: 13px;
+  background: transparent;
+  border: none;
+  color: #222;
+  font-size: 1.2em;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.ad-area .close-ad:hover { opacity: 1; color: #dc2626;}
 @media (max-width: 900px) {
   .container { flex-direction: column; gap: 1em; }
   .sidebar { width: 100%; display: flex; flex-wrap: wrap; gap: 1em; }
@@ -330,15 +365,112 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
 }
 @media (max-width:600px) {
   .container { padding: 0.6em 0.1em;}
-  #memeCanvas { width: 100vw; max-width: 95vw;}
+  #memeCanvas { width: 96vw !important; min-width: 96vw !important; max-width: 96vw !important; height: auto !important;}
   .text-tools label { display: block; margin-bottom: .5em;}
-}</style>
+  .ad-area { max-width: 98vw; font-size: 1em; }
+}
+::-webkit-scrollbar { width: 7px; background: #f3f4f6; }
+::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 6px;}
+::-webkit-scrollbar-thumb:hover { background: #a5b4fc;}
+::selection { background: #6366f14a;}
+a, .link { color: #6366f1; cursor: pointer; transition: color .16s;}
+a:hover, .link:hover { color: #facc15; text-decoration: underline;}
+    /* Add footer style */
+    footer {
+      margin-top: 2em;
+      background: rgba(99,102,241,0.07);
+      padding: 1.2em 0 1.2em 0;
+      text-align: center;
+      font-size: 1em;
+      color: #6366f1;
+      border-top: 1.5px solid #e0e7ff;
+      letter-spacing: 0.01em;
+      transition: background 0.4s, color 0.4s;
+    }
+    footer a {
+      color: #6366f1;
+      font-weight: 500;
+      margin: 0 0.6em;
+      text-decoration: underline;
+      transition: color 0.18s;
+    }
+    footer a:hover { color: #facc15; }
+    body.dark footer {
+      background: #23233a;
+      color: #a5b4fc;
+      border-top: 1.5px solid #23233a;
+    }
+    body.dark footer a { color: #a5b4fc; }
+    body.dark footer a:hover { color: #facc15; }
+
+    /* Modal for TOS/Privacy */
+    .modal-bg {
+      position: fixed; top:0; left:0; width:100vw; height:100vh;
+      background: rgba(30,30,50,0.37);
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s;
+    }
+    .tos-modal {
+      background: #fff;
+      color: #23233a;
+      border-radius: 18px;
+      padding: 2.1em 1.5em 1.6em 1.5em;
+      max-width: 420px;
+      width: 97vw;
+      box-shadow: 0 10px 48px 0 #6366f14c;
+      position: relative;
+      text-align: left;
+      animation: popIn 0.5s;
+      font-size: 1.05em;
+    }
+    .tos-modal h3 { margin-top: 0; color: #6366f1; }
+    .tos-modal label { display: flex; align-items: center; margin-top: 1.2em; }
+    .tos-modal input[type="checkbox"] { margin-right: .6em; accent-color: #6366f1;}
+    .tos-modal button {
+      margin-top: 1.1em;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: .7em 1.7em;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.14s;
+      display: block;
+      width: 100%;
+    }
+    .tos-modal button:disabled {
+      background: #a5b4fc;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .tos-modal .close-modal {
+      position: absolute;
+      top: 0.7em;
+      right: 1em;
+      background: none;
+      border: none;
+      font-size: 1.4em;
+      color: #6366f1;
+      cursor: pointer;
+      opacity: 0.75;
+      transition: color 0.18s;
+    }
+    .tos-modal .close-modal:hover { color: #ef4444; opacity: 1; }
+    @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+    @keyframes popIn { from {transform: scale(0.93); opacity:0;} to {transform: scale(1); opacity:1;} }
+  </style>
+</head>
 <body>
   <nav>
     Meme <span style="color:#facc15">Creation Studio</span>
     <button id="themeToggle" title="Toggle theme">🌙</button>
   </nav>
-  <div class="container">
+  <div class="container" id="mainApp" style="filter: blur(0); pointer-events: auto;">
     <div class="sidebar">
       <h2>Templates</h2>
       <input type="text" id="searchTemplates" placeholder="Search templates...">
@@ -374,8 +506,61 @@ a:hover, .link:hover { color: #facc15; text-decoration: underline;}
         <label><input type="checkbox" id="shadow"> Shadow</label>
         <button id="curveText">Curved</button>
       </div>
+      <!-- Ad area: hidden initially, shown after meme creation -->
+      <div id="adArea" class="ad-area" style="display:none;margin-top:1.5em;"></div>
     </div>
   </div>
-  <script src="app.js"></script>
+  <!-- Modal for Terms and Privacy acceptance -->
+  <div class="modal-bg" id="tosModalBg">
+    <div class="tos-modal">
+      <button class="close-modal" title="Close" onclick="if(confirm('You must accept to continue. Close anyway?')) window.location.reload()">×</button>
+      <h3>Terms & Conditions / Privacy Policy</h3>
+      <div style="max-height:38vh; overflow-y:auto;">
+        <p>Before using Meme Creation Studio, you must accept our <a href="#terms" target="_blank">Terms and Conditions</a> and <a href="#privacy" target="_blank">Privacy Policy</a>.</p>
+        <ul>
+          <li>This tool is for fun and creativity. Do not upload illegal, violent, or hateful content.</li>
+          <li>By using this app, you agree that you own the rights to any images you upload.</li>
+          <li>This site may use cookies or third-party services (e.g., ads) – see privacy policy for details.</li>
+        </ul>
+        <label>
+          <input type="checkbox" id="acceptTOS"/>
+          I have read and accept the <a href="#terms" target="_blank">Terms and Conditions</a> and <a href="#privacy" target="_blank">Privacy Policy</a>.
+        </label>
+      </div>
+      <button id="acceptTOSBtn" disabled>Accept & Continue</button>
+    </div>
+  </div>
+  <footer>
+    &copy; 2025 Meme Creation Studio &mdash;
+    <a href="#terms" target="_blank">Terms &amp; Conditions</a> |
+    <a href="#privacy" target="_blank">Privacy Policy</a>
+  </footer>
+  <script src="meme-studio.js"></script>
+  <script>
+    // Terms and Privacy Modal Logic
+    function showTOSModal() {
+      document.getElementById('tosModalBg').style.display = 'flex';
+      document.getElementById('mainApp').style.filter = 'blur(3px)';
+      document.getElementById('mainApp').style.pointerEvents = 'none';
+    }
+    function hideTOSModal() {
+      document.getElementById('tosModalBg').style.display = 'none';
+      document.getElementById('mainApp').style.filter = '';
+      document.getElementById('mainApp').style.pointerEvents = 'auto';
+    }
+    // Only show once per session
+    if (!sessionStorage.getItem('acceptedTOS')) {
+      showTOSModal();
+    } else {
+      hideTOSModal();
+    }
+    document.getElementById('acceptTOS').onchange = function() {
+      document.getElementById('acceptTOSBtn').disabled = !this.checked;
+    };
+    document.getElementById('acceptTOSBtn').onclick = function() {
+      sessionStorage.setItem('acceptedTOS', 'yes');
+      hideTOSModal();
+    };
+  </script>
 </body>
 </html>
