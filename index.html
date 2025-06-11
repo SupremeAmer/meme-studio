@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meme Studio - Mobile Optimized</title>
+  <title>Meme Studio </title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
 </head>
   <style>
-
- body {
+    body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
   color: #222;
@@ -219,7 +218,56 @@ body.dark .mobile-content {
 .section-panel.active { display: flex; }
 
 /* Template/Emoji/GIF Grids */
-.template-grid,
+.template-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin-bottom: 1.1em;
+  padding: 0.2em 0;
+  justify-content: center;
+}
+.template-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 110px;
+  background: #fff;
+  border-radius: 13px;
+  box-shadow: 0 4px 32px #6366f11a;
+  margin-bottom: 0.5em;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border 0.18s, background 0.18s;
+  border: 1.5px solid #e0e7ff;
+  padding: 0.5em 0.2em 0.7em 0.2em;
+  position: relative;
+}
+body.dark .template-select {
+  background: #23233a;
+  border: 1.5px solid #6366f1;
+}
+.template-select img {
+  width: 100%;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 0.35em;
+  background: #f0f0ff;
+}
+.template-select .template-name {
+  text-align: center;
+  font-size: .96em;
+  font-weight: 600;
+  color: #6366f1;
+  background: none;
+  margin-top: 0.1em;
+  margin-bottom: 0;
+  padding: 0 0.2em;
+  border-radius: 0;
+  letter-spacing: .01em;
+}
+body.dark .template-select .template-name {
+  color: #facc15;
+}
 .sticker-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(90px,1fr));
@@ -227,7 +275,6 @@ body.dark .mobile-content {
   margin-bottom: 1.1em;
   padding: 0.2em 0;
 }
-.template-select,
 .sticker-grid img {
   border: none;
   border-radius: 13px;
@@ -239,18 +286,15 @@ body.dark .mobile-content {
   animation: popIn 0.5s cubic-bezier(.4,0,.2,1);
   will-change: box-shadow, transform;
 }
-.template-select:active,
 .sticker-grid img:active {
   box-shadow: 0 7px 22px #6366f13a;
   transform: scale(1.05) rotate(-2deg);
   border: 2px solid #6366f1;
   background: #facc1577;
 }
-body.dark .template-select,
 body.dark .sticker-grid img {
   background: #23233a;
 }
-.template-select img,
 .sticker-grid img {
   width: 100%;
   height: 68px;
@@ -260,25 +304,8 @@ body.dark .sticker-grid img {
   pointer-events: none;
   transition: filter 0.17s;
 }
-.template-select:active img {
+.sticker-grid img:active {
   filter: drop-shadow(0 2px 8px #facc154c);
-}
-.template-name {
-  text-align: center;
-  font-size: .96em;
-  padding: .3em .1em;
-  width: 100%;
-  background: #eef2ff;
-  color: #6366f1;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  border-radius: 0 0 11px 11px;
-  margin-top: .2em;
-  transition: background 0.18s, color 0.18s;
-}
-body.dark .template-name {
-  background: #23233a;
-  color: #facc15;
 }
 .editor-area {
   flex: 1 1 0;
@@ -473,22 +500,27 @@ body.dark .tos-modal h3 { color: #facc15;}
 .tos-modal input[type="checkbox"] { margin-right: .6em; accent-color: #6366f1;}
 .tos-modal button {
   margin-top: 1.1em;
-  background: #6366f1;
+  background: #a5b4fc;
   color: #fff;
   border: none;
   border-radius: 9px;
   padding: .7em 1.7em;
   font-size: 1.1em;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.14s;
-  display: block;
-  width: 100%;
-}
-.tos-modal button:disabled {
-  background: #a5b4fc;
   cursor: not-allowed;
   opacity: 0.7;
+  transition: background 0.2s, color 0.15s, opacity 0.15s;
+}
+.tos-modal button.enabled,
+.tos-modal button:enabled {
+  background: #6366f1 !important;
+  color: #fff;
+  opacity: 1;
+  cursor: pointer;
+}
+.tos-modal button:active {
+  background: #facc15 !important;
+  color: #23233a !important;
 }
 .tos-modal .close-modal {
   position: absolute;
@@ -631,7 +663,7 @@ body.dark footer a:hover {
           I have read and accept the <a href="#terms" target="_blank">Terms and Conditions</a> and <a href="#privacy" target="_blank">Privacy Policy</a>.
         </label>
       </div>
-      <button id="acceptTOSBtn" disabled>Accept & Continue</button>
+      <button id="acceptTOSBtn" disabled class="accept-btn">Accept & Continue</button>
     </div>
   </div>
   <footer>
