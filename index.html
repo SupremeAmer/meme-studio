@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meme Studio </title>
+  <title>Meme Studio - Video & Image Meme Editor</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
 </head>
@@ -23,6 +23,7 @@ body.dark {
   background: linear-gradient(112deg, #23233a 0%, #181827 100%);
   color: #f3f4f6;
 }
+
 nav {
   background: #fff;
   font-size: 1.3em;
@@ -51,6 +52,7 @@ body.dark nav {
   letter-spacing: 0.01em;
   font-size: 1.25em;
 }
+
 .theme-toggle-btn {
   margin-right: 0.6em;
   background: linear-gradient(112deg, #6366f1 0%, #facc15 100%);
@@ -217,6 +219,49 @@ body.dark .mobile-content {
 }
 .section-panel.active { display: flex; }
 
+/* Modal Panels (Closable) */
+.modal-panel {
+  display: none;
+  position: fixed;
+  z-index: 1002;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(30, 30, 50, 0.98);
+  color: #23233a;
+  animation: fadeIn 0.2s;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+body.dark .modal-panel {
+  background: #23233a;
+  color: #f3f4f6;
+}
+.modal-panel.active { display: flex; }
+.modal-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 1.15em;
+  font-weight: 700;
+  padding: 1.2em 1.2em 0.2em 1.2em;
+  color: #6366f1;
+}
+body.dark .modal-panel-header { color: #facc15; }
+.close-modal-panel {
+  font-size: 1.5em;
+  background: none;
+  border: none;
+  color: #6366f1;
+  cursor: pointer;
+  margin-left: .6em;
+  transition: color 0.18s, transform 0.16s;
+}
+.close-modal-panel:active { color: #facc15; transform: scale(1.2) rotate(-10deg);}
+body.dark .close-modal-panel { color: #facc15; }
+body.dark .close-modal-panel:active { color: #6366f1; }
+
 /* Template/Emoji/GIF Grids */
 .template-grid {
   display: flex;
@@ -307,6 +352,18 @@ body.dark .sticker-grid img {
 .sticker-grid img:active {
   filter: drop-shadow(0 2px 8px #facc154c);
 }
+
+/* Video */
+.editor-video {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  max-height: 300px;
+  margin: 0 auto 1em auto;
+  border-radius: 18px;
+  background: #000;
+}
+
 .editor-area {
   flex: 1 1 0;
   min-height: 0;
@@ -350,6 +407,7 @@ body.dark #memeCanvas {
   width: 100vw;
   max-width: 100vw;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-around;
   align-items: center;
   padding: .7em 0 .65em 0;
@@ -570,6 +628,7 @@ body.dark footer a {
 body.dark footer a:hover {
   color: #6366f1;
 }
+
 @media (max-width: 600px) {
   nav, .mobile-toolbar, .mobile-content, .editor-area, .editor-btn-bar, .ad-area {
     border-radius: 0 !important;
@@ -585,7 +644,7 @@ body.dark footer a:hover {
   </nav>
   <main class="mobile-main">
     <div class="mobile-toolbar">
-      <button class="toolbar-btn active" id="btnTemplates" onclick="showPanel('templates')">
+      <button class="toolbar-btn" id="btnTemplates" onclick="showPanel('templates')">
         <img src="https://img.icons8.com/ios-filled/50/6366f1/picture.png" alt="">Templates
       </button>
       <button class="toolbar-btn" id="btnEmoji" onclick="showPanel('emoji')">
@@ -599,50 +658,66 @@ body.dark footer a:hover {
       </button>
     </div>
     <section class="mobile-content">
-      <!-- Templates Panel -->
-      <div class="section-panel active" id="panel-templates">
-        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">Choose a Template</div>
+      <!-- Modal Panels -->
+      <div class="modal-panel" id="panel-templates">
+        <div class="modal-panel-header">
+          <span>Choose a Template</span>
+          <button class="close-modal-panel" onclick="closePanel('templates')">&times;</button>
+        </div>
         <div id="templateGrid" class="template-grid"></div>
         <button id="seeMoreBtn" style="margin-bottom:.5em;">See more</button>
       </div>
-      <!-- Emoji Panel -->
-      <div class="section-panel" id="panel-emoji">
-        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">Choose an Emoji</div>
+      <div class="modal-panel" id="panel-emoji">
+        <div class="modal-panel-header">
+          <span>Choose an Emoji</span>
+          <button class="close-modal-panel" onclick="closePanel('emoji')">&times;</button>
+        </div>
         <div class="sticker-grid" id="stickers">
-          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif" alt="😂" style="width:50px;cursor:pointer;">
-          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif" alt="👍" style="width:50px;cursor:pointer;">
-          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif" alt="🔥" style="width:50px;cursor:pointer;">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif" alt="😂">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif" alt="👍">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif" alt="🔥">
         </div>
       </div>
-      <!-- Upload Panel -->
-      <div class="section-panel" id="panel-upload">
-        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">Upload Your Image</div>
+      <div class="modal-panel" id="panel-upload">
+        <div class="modal-panel-header">
+          <span>Upload Image or Video</span>
+          <button class="close-modal-panel" onclick="closePanel('upload')">&times;</button>
+        </div>
         <label class="upload-label">
-          <input type="file" id="uploadImage" accept="image/*" style="display:none;">
-          + Upload Image
+          <input type="file" id="uploadImageVideo" accept="image/*,video/*" style="display:none;">
+          + Upload Image/Video
         </label>
       </div>
-      <!-- Gift Panel -->
-      <div class="section-panel" id="panel-gift">
-        <div style="font-weight:700;margin-bottom:.7em;font-size:1.1em;">GIF Selection</div>
+      <div class="modal-panel" id="panel-gift">
+        <div class="modal-panel-header">
+          <span>GIF Selection</span>
+          <button class="close-modal-panel" onclick="closePanel('gift')">&times;</button>
+        </div>
         <div class="sticker-grid" id="gifs">
-          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="gif1" style="width:60px;cursor:pointer;">
-          <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="gif2" style="width:60px;cursor:pointer;">
-          <img src="https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif" alt="gif3" style="width:60px;cursor:pointer;">
+          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="gif1">
+          <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="gif2">
+          <img src="https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif" alt="gif3">
         </div>
       </div>
       <!-- Editor Area (always visible) -->
       <div class="editor-area" id="editorArea">
+        <video id="videoPreview" class="editor-video" controls style="display:none;"></video>
         <canvas id="memeCanvas" width="360" height="360"></canvas>
         <div id="adArea" class="ad-area" style="display:none;margin-top:.5em;"></div>
       </div>
     </section>
   </main>
-  <!-- Editor buttons at the bottom -->
+  <!-- Editor editing tools (bottom bar) -->
   <div class="editor-btn-bar">
     <button class="editor-btn" id="addTextBox">Text</button>
+    <button class="editor-btn" id="fontBtn">Font</button>
+    <button class="editor-btn" id="fontSizeBtn">A+</button>
+    <button class="editor-btn" id="colorBtn">Color</button>
+    <button class="editor-btn" id="boldBtn"><b>B</b></button>
+    <button class="editor-btn" id="italicBtn"><i>I</i></button>
     <button class="editor-btn" id="undoBtn">Undo</button>
     <button class="editor-btn" id="redoBtn">Redo</button>
+    <button class="editor-btn" id="deleteBtn">Delete</button>
     <button class="editor-btn" id="downloadBtn">Download</button>
     <button class="editor-btn" id="shareBtn">Share</button>
   </div>
