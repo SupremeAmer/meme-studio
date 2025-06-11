@@ -2,847 +2,285 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Meme Creation Center</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Meme Social</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,700&display=swap">
-  <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
   <style>
-    /* --- Animations and core style (add your style.css for more) --- */
-    :root {
-  --brand: #6366f1;
-  --brand-dark: #4338ca;
-  --accent: #facc15;
-  --error: #ef4444;
-  --glass-bg: rgba(255,255,255,0.82);
-  --glass-blur: blur(16px);
-  --card-radius: 18px;
-  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.12);
-  --text-main: #222;
-  --text-muted: #64748b;
-  --nav-bg: rgba(255,255,255,0.77);
-  --input-bg: rgba(248,250,255,.46);
-  --input-border: #e0e7ff;
-  --scrollbar-thumb: #c7d2fe;
-  --scrollbar-thumb-hover: #a5b4fc;
-  --selection: #6366f14a;
-  --bg-gradient: linear-gradient(112deg, #e0e7ff 0%, #c7d2fe 100%);
-  --transition: .21s cubic-bezier(.4,0,.2,1);
-}
-
-/* Dark mode overrides */
-body.dark, html.dark {
-  --brand: #818cf8;
-  --brand-dark: #6366f1;
-  --accent: #fde68a;
-  --error: #f87171;
-  --glass-bg: rgba(40,40,60,0.94);
-  --glass-blur: blur(20px);
-  --card-radius: 18px;
-  --shadow: 0 8px 32px 0 rgba(20, 20, 40, 0.27);
-  --text-main: #f3f4f6;
-  --text-muted: #a5b4fc;
-  --nav-bg: rgba(37,37,48,0.92);
-  --input-bg: #23233a;
-  --input-border: #3b3b54;
-  --scrollbar-thumb: #818cf8;
-  --scrollbar-thumb-hover: #6366f1;
-  --selection: #6366f17a;
-  --bg-gradient: linear-gradient(112deg, #23233a 0%, #181827 100%);
-}
-
-html, body {
-  background: var(--bg-gradient);
-  color: var(--text-main);
-  transition: background .45s, color .45s;
-  min-height: 100vh;
-  font-family: 'Inter', system-ui, sans-serif;
-}
-
-/* --- Logo Animation --- */
-.logo-anim {
-  animation: logoSpin 2.2s infinite alternate cubic-bezier(.8,-0.6,0.2,1.5);
-  will-change: transform;
-}
-@keyframes logoSpin {
-  0% { transform: scale(1) rotate(-5deg);}
-  40% { transform: scale(1.13) rotate(-9deg);}
-  68% { transform: scale(0.96) rotate(8deg);}
-  100% { transform: scale(1) rotate(-5deg);}
-}
-
-/* --- Card/Glassmorphism --- */
-.card {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  border-radius: var(--card-radius);
-  box-shadow: var(--shadow);
-  padding: 2.1rem 1.6rem;
-  margin: 1.2rem auto;
-  max-width: 490px;
-  width: 94%;
-  position: relative;
-  animation: fadeIn .8s cubic-bezier(.4,0,.2,1);
-  transition: background .4s, box-shadow .4s;
-}
-
-/* --- Entry, Fade, Pop --- */
-.fade-in { animation: fadeIn .8s cubic-bezier(.4,0,.2,1);}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(22px);} to { opacity: 1; transform: translateY(0);}}
-.pop-in { animation: popIn .3s cubic-bezier(.62,.01,.47,1.37);}
-@keyframes popIn { from { transform: scale(.93); opacity:0;} to { transform: scale(1); opacity:1;} }
-
-/* --- Buttons --- */
-button, input[type="submit"] {
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  padding: .6em 1.45em;
-  font-weight: 600;
-  font-size: 1.09em;
-  box-shadow: 0 2px 10px #6366f11b;
-  margin: 7px 0 0 0;
-  transition: background var(--transition), transform .16s, box-shadow .18s;
-  cursor: pointer;
-}
-button:hover, input[type="submit"]:hover {
-  background: var(--brand-dark);
-  transform: scale(1.045) translateY(-2px);
-  box-shadow: 0 8px 22px #6366f127;
-}
-button:active { background: #4f46e5; }
-.admin-btn { background: var(--error); }
-.admin-btn:hover { background: #b91c1c; }
-.notif-unseen { font-weight: bold; background: var(--accent); border-radius: 50%; padding: 2px 7px; color: #fff; }
-.hide { display: none !important; }
-.center { text-align: center; }
-
-input, textarea, select {
-  border: 1.7px solid var(--input-border);
-  background: var(--input-bg);
-  border-radius: 8px;
-  padding: .75em 1.1em;
-  margin: 0 0 1.1em 0;
-  font-size: 1rem;
-  width: 100%;
-  color: var(--text-main);
-  transition: border-color .2s, box-shadow .2s, background .4s;
-}
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 2px #6366f12c;
-}
-
-/* --- Avatar/Profile Images --- */
-.avatar {
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 2px 12px #6366f11c;
-  width: 56px; height: 56px;
-  border: 3px solid #fff;
-  margin-bottom: .3em;
-  transition: box-shadow .2s, transform .18s;
-}
-.avatar:hover { box-shadow: 0 4px 20px #6366f13a; transform: scale(1.06); }
-
-/* --- Meme Images --- */
-.meme-img {
-  border-radius: 14px;
-  box-shadow: 0 2px 16px #6366f117;
-  margin-bottom: 0.6em;
-  max-width: 100%;
-  max-height: 340px;
-  display: block;
-  margin-left: auto; margin-right: auto;
-  transition: transform .21s cubic-bezier(.4,0,.2,1), box-shadow .19s;
-  background: #f3f4f6;
-}
-body.dark .meme-img { background: #23233a; }
-.meme-img:hover { transform: scale(1.035); box-shadow: 0 8px 32px #6366f13a; }
-
-/* --- Hashtags --- */
-.hashtag {
-  color: var(--brand);
-  background: #eef2ff;
-  padding: 1.5px 7px;
-  margin: 0 1.5px;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: .98em;
-  transition: background .15s, color .15s;
-  cursor: pointer;
-}
-.hashtag:hover { background: var(--brand); color: #fff; }
-body.dark .hashtag { background: #23233a; }
-
-/* --- Responsive Nav and Cards --- */
-nav.center {
-  margin: 0 0 1.5em 0;
-  padding: 1.2em 0 .6em 0;
-  background: var(--nav-bg);
-  backdrop-filter: blur(14px);
-  border-bottom: 1.5px solid var(--input-border);
-  box-shadow: 0 4px 22px rgba(99,102,241,0.07);
-  text-align: center;
-  position: sticky;
-  top: 0; z-index: 22;
-  transition: background .4s;
-}
-nav img { margin-right: 8px; }
-
-/* --- Modern modal --- */
-.card[style*="position:fixed"] {
-  animation: popIn .32s;
-  box-shadow: 0 16px 48px #6366f13d;
-  border: 2px solid #a5b4fc;
-}
-
-/* --- Mobile/Tablet Responsive --- */
-@media (max-width: 600px) {
-  .card { max-width: 99vw; padding: 1.2rem 0.35rem;}
-  nav.center { font-size: 1.15em; }
-  .avatar { width: 44px; height: 44px; }
-  .meme-img { max-height: 220px; }
-}
-@media (max-width: 900px) {
-  .card { max-width: 98vw; }
-}
-
-/* --- Misc --- */
-::-webkit-scrollbar { width: 9px; background: #f3f4f6; }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
-::selection { background: var(--selection); }
-a, .link { color: var(--brand); cursor: pointer; transition: color .16s;}
-a:hover, .link:hover { color: var(--brand-dark); text-decoration: underline; }
+    body {
+      margin: 0; background: #e0e7ff;
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      color: #222;
+    }
+    nav {
+      background: #fff; font-size: 2rem; text-align: center;
+      padding: 1em 0 .5em 0; font-weight: bold; color: #6366f1;
+      box-shadow: 0 4px 20px #6366f119;
+      margin-bottom: 0.7em;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1.5em 1em 2em 1em;
+      background: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    }
+    h2 { font-size: 1.4em; margin-bottom: .4em;}
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+      gap: 1.1em;
+      margin-bottom: 2em;
+    }
+    .template-select {
+      border: 3px solid #e0e7ff;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border .17s;
+      box-shadow: 0 2px 8px #6366f10d;
+      background: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .template-select.selected {
+      border: 3px solid #6366f1;
+      box-shadow: 0 4px 16px #6366f140;
+    }
+    .template-select img {
+      width: 100%; display: block; height: 120px; object-fit: cover;
+      background: #e0e7ff;
+      transition: transform .14s;
+    }
+    .template-select.selected img {
+      transform: scale(1.06);
+    }
+    .template-name {
+      text-align:center;
+      font-size:.97em;
+      padding:.3em .1em;
+      width: 100%;
+      background: #eef2ff;
+      color: #6366f1;
+      font-weight: 600;
+    }
+    .editor-area {
+      display: flex; flex-wrap: wrap;
+      gap: 2em; align-items: flex-start;
+      margin-bottom: 2em;
+    }
+    .canvas-wrap {
+      background: #e0e7ff;
+      border-radius: 16px;
+      padding: 1em;
+      margin: 0 auto;
+      box-shadow: 0 2px 16px #6366f117;
+      flex: 1 1 350px;
+      max-width: 430px;
+      min-width: 260px;
+    }
+    .tools {
+      flex: 1 1 240px;
+      min-width: 220px;
+      background: #f8fafc;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px #6366f117;
+      padding: 1.2em 1em;
+      font-size: 1em;
+    }
+    .tools label { display: block; margin: .7em 0 0.24em 0;}
+    .tools input[type="color"], .tools input[type="range"] {
+      vertical-align: middle;
+    }
+    .tools input[type="range"] {
+      width: 85%;
+    }
+    .tools input[type="text"] {
+      width: 100%; padding: .6em .7em; border-radius: 7px;
+      border: 1.4px solid #e0e7ff; font-size: 1.05em; margin-bottom: .7em;
+      font-family: inherit;
+    }
+    .tools select, .tools button {
+      font-size: 1em; padding: 0.55em 1.1em; border-radius: 7px; border: none;
+      background: #6366f1; color: #fff; margin: .6em 0 .2em 0; cursor: pointer;
+      box-shadow: 0 2px 8px #6366f120;
+      transition: background .13s;
+    }
+    .tools button:hover { background: #4338ca;}
+    .canvas-controls {
+      display: flex; gap: 1em; margin-top: 1.3em; justify-content: center;
+    }
+    @media (max-width: 900px) {
+      .editor-area { flex-direction: column; gap: 1.2em;}
+      .canvas-wrap, .tools { max-width: 98vw;}
+    }
+    @media (max-width: 600px) {
+      .container { padding: 1.1em 0.2em;}
+      .canvas-wrap { padding: 0.2em;}
+      .template-grid { grid-template-columns: repeat(auto-fit,minmax(120px,1fr)); }
+    }
   </style>
 </head>
 <body>
-  <nav class="center">
-    <span style="font-size:2rem;font-weight:bold;color:#6366f1;letter-spacing:0.02em;">
-      <img src="logo.png" class="logo-anim" alt="logo" style="height:2.1em;vertical-align:middle;"/> Meme <span style="color:#facc15;">Social</span>
-   <button id="themeToggle" title="Switch theme" style="margin-left:20px;vertical-align:middle;background:transparent;border:none;color:var(--brand);font-size:1.4em;cursor:pointer;">
-  <span id="themeIcon">🌙</span>
-</button>
-    </span>
-  </nav>
-  <main>
-    <!-- Auth UI -->
-    <div id="authCard" class="card center">
-      <h2 id="authTitle">Login</h2>
-      <form id="authForm">
-        <div id="usernameRegField" class="hide"><input type="text" id="regUsername" placeholder="Username" autocomplete="username" required /></div>
-        <input type="email" id="authEmail" placeholder="Email" autocomplete="email" required />
-        <input type="password" id="authPassword" placeholder="Password" autocomplete="current-password" required />
-        <button type="submit" id="authBtn">Login</button>
-        <button id="googleSignInBtn" type="button" style="background:#fff;color:#6366f1;border:1.5px solid #6366f1;margin-top:.5em;">
-          <img src="https://unpkg.com/simple-icons@v11/icons/google.svg" alt="Google" style="width:1.3em;height:1.3em;vertical-align:middle;"> Sign in with Google
-        </button>
+  <nav>Meme <span style="color:#facc15">Creation Center</span></nav>
+  <div class="container">
+    <h2>1. Choose a Meme Template</h2>
+    <div class="template-grid" id="templates"></div>
+    <div class="editor-area" id="editorArea" style="display:none;">
+      <div class="canvas-wrap">
+        <canvas id="memeCanvas" width="420" height="420"></canvas>
+      </div>
+      <form class="tools" id="toolsForm" autocomplete="off">
+        <h2 style="margin-top:0;font-size:1.2em;">2. Add Text & Style</h2>
+        <label>Text Line 1</label>
+        <input type="text" id="text1" maxlength="80" placeholder="Top text" value="" autocomplete="off"/>
+        <label>Text Line 2</label>
+        <input type="text" id="text2" maxlength="80" placeholder="Bottom text" value="" autocomplete="off"/>
+        <label>Font</label>
+        <select id="fontFamily">
+          <option value="Impact">Impact</option>
+          <option value="Arial">Arial</option>
+          <option value="Comic Sans MS">Comic Sans</option>
+          <option value="Helvetica">Helvetica</option>
+        </select>
+        <label>Font Size</label>
+        <input type="range" id="fontSize" min="20" max="60" value="38"/>
+        <label>Text Color</label>
+        <input type="color" id="fontColor" value="#ffffff"/>
+        <label>Outline Color</label>
+        <input type="color" id="outlineColor" value="#222222"/>
+        <label>Opacity</label>
+        <input type="range" id="opacity" min="0.2" max="1" step="0.01" value="1"/>
+        <label>Text Position</label>
+        <select id="textPos">
+          <option value="top-bottom">Top & Bottom</option>
+          <option value="top">Top only</option>
+          <option value="bottom">Bottom only</option>
+          <option value="center">Center only</option>
+        </select>
+        <div class="canvas-controls">
+          <button type="button" id="downloadBtn">Download Meme</button>
+          <button type="button" id="resetBtn" style="background:#ef4444;">Reset</button>
+        </div>
       </form>
-      <div style="margin:1em 0;">
-        <button id="toggleAuthBtn" style="border:none;background:none;color:#6366f1;cursor:pointer;">Don't have an account? Register</button>
-      </div>
-      <div id="authError" style="color:#dc2626;font-weight:bold;"></div>
     </div>
-
-    <!-- Main App UI -->
-    <div id="appCard" class="card hide">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div>
-          <button id="profilePageBtn">Profile</button>
-          <button id="feedBtn">Feed</button>
-          <button id="exploreBtn">Explore</button>
-          <button id="adminBtn" class="admin-btn hide">Admin</button>
-        </div>
-        <div>
-          <button id="notifBtn">🔔 <span id="notifUnread" class="notif-unseen hide"></span></button>
-          <button id="logoutBtn" style="background:#f3f4f6;color:#6366f1;padding:0.5em 1.1em;border-radius:8px;border:none;">Logout</button>
-        </div>
-      </div>
-      <div id="mainContent"></div>
-      <!-- Notifications Modal -->
-      <div id="notifModal" class="card hide" style="position:fixed;top:10vh;left:0;right:0;max-width:470px;margin:auto;z-index:1001;">
-        <h3>Notifications <button id="notifModalClose" style="float:right;">✕</button></h3>
-        <div id="notifList"></div>
-      </div>
-      <!-- Admin Modal -->
-      <div id="adminModal" class="card hide" style="position:fixed;top:10vh;left:0;right:0;max-width:470px;margin:auto;z-index:1010;">
-        <h3>Admin Reports <button id="adminModalClose" style="float:right;">✕</button></h3>
-        <div id="adminReports"></div>
-      </div>
-    </div>
-  </main>
+  </div>
   <script>
-    // ==== CONFIG: USE YOUR APPWRITE IDs ====
-    const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
-    const APPWRITE_PROJECT = "memesocially";
-    const APPWRITE_DB = "68489a8f002c6c8feed4";
-    const APPWRITE_USERS = "68489aa6000ec0c4c78a";
-    const APPWRITE_MEMES = "68489ad1002578a5cee0";
-    const APPWRITE_BUCKET = "6848a887001c1b5556d4";
-    const APPWRITE_NOTIFS = "Memen";
-    const APPWRITE_REPORTS = "6848a69a002214bc9a60";
-    const APPWRITE_CHATS = "6848a79a001b19b8ae6f";
-    // ==== END CONFIG ====
+    // Responsive grid of meme templates
+    const MEME_TEMPLATES = [
+      {src: "https://i.imgflip.com/1ur9b0.jpg", name: "Distracted Boyfriend"},
+      {src: "https://i.imgflip.com/26am.jpg", name: "Grumpy Cat"},
+      {src: "https://i.imgflip.com/9ehk.jpg", name: "Laughing Leo"},
+      {src: "https://i.imgflip.com/3si4.jpg", name: "One Does Not Simply"},
+      {src: "https://i.imgflip.com/39t1o.jpg", name: "Futurama Fry"},
+      {src: "https://i.imgflip.com/2wifvo.jpg", name: "Oprah You Get A"},
+      {src: "https://i.imgflip.com/1bhw.jpg", name: "Drake Hotline Bling"},
+      {src: "https://i.imgflip.com/30b1gx.jpg", name: "Expanding Brain"},
+      {src: "https://i.imgflip.com/2fm6x.jpg", name: "Distracted Cat"},
+      {src: "https://i.imgflip.com/1otk96.jpg", name: "Woman Yelling at Cat"},
+      {src: "https://i.imgflip.com/3vzej.jpg", name: "Batman Slapping Robin"},
+      {src: "https://i.imgflip.com/265k.jpg", name: "Bad Luck Brian"},
+      {src: "https://i.imgflip.com/1g8my4.jpg", name: "Boardroom Suggestion"},
+      {src: "https://i.imgflip.com/3tx4.jpg", name: "Ancient Aliens"},
+      {src: "https://i.imgflip.com/2cp1.jpg", name: "Matrix Morpheus"}
+    ];
 
-    // --- Appwrite SDK setup ---
-    const client = new window.appwrite.Client();
-    client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT);
-    const account = new window.appwrite.Account(client);
-    const databases = new window.appwrite.Databases(client);
-    const storage = new window.appwrite.Storage(client);
-    const realtime = new window.appwrite.Realtime(client);
-    const ID = window.appwrite.ID;
+    const templates = document.getElementById("templates");
+    MEME_TEMPLATES.forEach((tpl, i) => {
+      const div = document.createElement("div");
+      div.className = "template-select";
+      div.innerHTML = `<img src="${tpl.src}" alt="${tpl.name}"><div class="template-name">${tpl.name}</div>`;
+      div.onclick = () => selectTemplate(i);
+      templates.appendChild(div);
+    });
 
-    // --- UI Elements ---
-    const authCard = document.getElementById("authCard");
-    const appCard = document.getElementById("appCard");
-    const mainContent = document.getElementById("mainContent");
-    const authForm = document.getElementById("authForm");
-    const toggleAuthBtn = document.getElementById("toggleAuthBtn");
-    const authTitle = document.getElementById("authTitle");
-    const authError = document.getElementById("authError");
-    const usernameRegField = document.getElementById("usernameRegField");
-    const authEmail = document.getElementById("authEmail");
-    const authPassword = document.getElementById("authPassword");
-    const regUsername = document.getElementById("regUsername");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const feedBtn = document.getElementById("feedBtn");
-    const exploreBtn = document.getElementById("exploreBtn");
-    const profilePageBtn = document.getElementById("profilePageBtn");
-    const notifBtn = document.getElementById("notifBtn");
-    const notifModal = document.getElementById("notifModal");
-    const notifModalClose = document.getElementById("notifModalClose");
-    const notifList = document.getElementById("notifList");
-    const notifUnread = document.getElementById("notifUnread");
-    const adminBtn = document.getElementById("adminBtn");
-    const adminModal = document.getElementById("adminModal");
-    const adminModalClose = document.getElementById("adminModalClose");
-    const adminReports = document.getElementById("adminReports");
-
-    // --- State ---
-    let isRegister = false;
-    let currentUser = null; // { $id, email, name, ... }
-    let currentProfile = null; // profile doc
-    let currentFeed = "all"; // or "following"
-    let allUsers = [];
-    let myNotifications = [];
-    let unseenNotif = 0;
-    let isAdmin = false;
-
-    // --- UI Navigation ---
-    function showAuth() {
-      authCard.classList.remove("hide");
-      appCard.classList.add("hide");
-      authError.textContent = "";
-      authTitle.textContent = isRegister ? "Register" : "Login";
-      authForm.querySelector('button[type="submit"]').textContent = isRegister ? "Register" : "Login";
-      usernameRegField.classList.toggle("hide", !isRegister);
-      authEmail.placeholder = isRegister ? "Email for Register" : "Email";
-    }
-
-    async function showApp() {
-      authCard.classList.add("hide");
-      appCard.classList.remove("hide");
-      await loadAllUsers();
-      await fetchProfile();
-      await fetchNotifications();
-      showFeed();
-      if (isAdmin) adminBtn.classList.remove("hide"); else adminBtn.classList.add("hide");
-    }
-
-    // --- Auth logic ---
-    toggleAuthBtn.onclick = () => { isRegister = !isRegister; showAuth(); };
-    authForm.onsubmit = async (e) => {
-      e.preventDefault();
-      authError.textContent = "";
-      const email = authEmail.value.trim();
-      const password = authPassword.value.trim();
-      const username = isRegister ? regUsername.value.trim() : "";
-      try {
-        if (isRegister) {
-          if (!username) return authError.textContent = "Username required";
-          await account.create(ID.unique(), email, password, username);
-          await account.createEmailSession(email, password);
-          // Create profile doc if not exists
-          const me = await account.get();
-          let docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`userId=${me.$id}`]);
-          if (!docs.documents.length) {
-            await databases.createDocument(APPWRITE_DB, APPWRITE_USERS, me.$id, {
-              userId: me.$id,
-              username: username,
-              bio: "",
-              avatar: null,
-              followers: [],
-              following: [],
-              createdAt: new Date().toISOString(),
-              isAdmin: false
-            });
-          }
-        } else {
-          await account.createEmailSession(email, password);
-        }
-        await initUser();
-      } catch (err) {
-        authError.textContent = err?.message || "Authentication failed";
-      }
-    };
-    document.getElementById('googleSignInBtn').onclick = async () => {
-      try {
-        account.createOAuth2Session(
-          'google',
-          window.location.origin + window.location.pathname, // success redirect
-          window.location.origin + window.location.pathname
-        );
-      } catch (err) {
-        authError.textContent = err?.message || "Google sign-in failed";
-      }
-    };
-
-    // --- Logout ---
-    logoutBtn.onclick = async () => {
-      await account.deleteSession("current");
-      currentUser = null;
-      showAuth();
-    };
-
-    // --- Initial User Check ---
-    window.addEventListener("DOMContentLoaded", async () => { await initUser(); });
-
-    async function initUser() {
-      try {
-        currentUser = await account.get();
-        await showApp();
-      } catch {
-        showAuth();
-      }
-    }
-
-    // --- Load all user profiles ---
-    async function loadAllUsers() {
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [], 100);
-      allUsers = docs.documents;
-    }
-
-    // --- Fetch my profile ---
-    async function fetchProfile() {
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`userId=${currentUser.$id}`], 1);
-      if (docs.documents.length) {
-        currentProfile = docs.documents[0];
-        isAdmin = !!currentProfile.isAdmin;
-      }
-    }
-
-    // --- FEED: Main meme feed with likes, comments, report, infinite scroll ---
-    feedBtn.onclick = showFeed;
-    async function showFeed() {
-      mainContent.innerHTML = `
-      <form id="memeForm" enctype="multipart/form-data" style="margin-bottom:1.6em;">
-        <input type="file" id="memeImage" accept="image/*" required />
-        <input type="text" id="memeCaption" placeholder="Caption (hashtags start with #)" maxlength="200" required />
-        <button type="submit" id="postMemeBtn">Post Meme</button>
-      </form>
-      <div style="margin-bottom:1em;">
-        <button id="feedAllBtn" ${currentFeed=="all"?"style='font-weight:bold'":""}>All</button>
-        <button id="feedFollowingBtn" ${currentFeed=="following"?"style='font-weight:bold'":""}>Following</button>
-        <input style="margin-left:20px;" type="text" id="searchInput" placeholder="🔎 Search users / #hashtags" />
-      </div>
-      <div id="memesFeed"></div>
-      <div id="feedLoading" class="center">Loading...</div>
-      `;
-      setTimeout(()=>{
-        document.getElementById("feedAllBtn").onclick = ()=>{currentFeed="all"; showFeed();};
-        document.getElementById("feedFollowingBtn").onclick = ()=>{currentFeed="following"; showFeed();};
-        document.getElementById("searchInput").oninput = (e)=>{searchFeed(e.target.value);};
-        document.getElementById("memeForm").onsubmit = postMeme;
-        loadMemesFeed();
-      }, 80);
-    }
-
-    // --- Infinite scroll for memes ---
-    let memesPage = 0, memesPerPage = 10, memesLoaded = [];
-    async function loadMemesFeed() {
-      memesPage = 0; memesLoaded = [];
-      document.getElementById("memesFeed").innerHTML = "";
-      document.getElementById("feedLoading").style.display = "block";
-      await appendMemesFeed();
-      window.onscroll = async () => {
-        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) await appendMemesFeed();
+    let selectedTemplate = null, imgObj = new window.Image();
+    function selectTemplate(i) {
+      selectedTemplate = MEME_TEMPLATES[i];
+      document.querySelectorAll(".template-select").forEach((el, idx) => {
+        el.classList.toggle("selected", idx===i);
+      });
+      imgObj.crossOrigin = "anonymous";
+      imgObj.src = selectedTemplate.src;
+      imgObj.onload = () => {
+        document.getElementById("editorArea").style.display = "flex";
+        drawMeme();
       };
     }
-    async function appendMemesFeed() {
-      if (document.getElementById("feedLoading").style.display=="none") return;
-      let q = ['orderDesc($createdAt)'];
-      if (currentFeed=="following") {
-        const ids = (currentProfile?.following||[]).map(f=>f.userId);
-        if (!ids.length) {document.getElementById("feedLoading").style.display="none";return;}
-        q.push(...ids.map(uid=>`userId=${uid}`));
+
+    // Meme Canvas logic
+    const canvas = document.getElementById("memeCanvas");
+    const ctx = canvas.getContext("2d");
+    function drawMeme() {
+      if (!selectedTemplate) return;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.globalAlpha = 1;
+      ctx.drawImage(imgObj, 0, 0, canvas.width, canvas.height);
+
+      // Get text properties
+      const text1 = document.getElementById("text1").value.toUpperCase();
+      const text2 = document.getElementById("text2").value.toUpperCase();
+      const font = document.getElementById("fontFamily").value;
+      const fontSize = +document.getElementById("fontSize").value;
+      const fontColor = document.getElementById("fontColor").value;
+      const outlineColor = document.getElementById("outlineColor").value;
+      const opacity = +document.getElementById("opacity").value;
+      const textPos = document.getElementById("textPos").value;
+
+      ctx.globalAlpha = opacity;
+      ctx.textAlign = "center";
+      ctx.lineJoin = "round";
+      ctx.font = `bold ${fontSize}px ${font}, Impact, Arial Black, sans-serif`;
+
+      // Draw text with outline
+      ctx.strokeStyle = outlineColor;
+      ctx.lineWidth = Math.max(Math.round(fontSize/10), 4);
+      ctx.fillStyle = fontColor;
+
+      if (textPos === "top-bottom" || textPos === "top") {
+        drawMemeText(text1, canvas.width/2, fontSize + 10);
       }
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, q, memesPerPage, memesPage*memesPerPage);
-      if (!docs.documents.length) {document.getElementById("feedLoading").style.display="none";return;}
-      memesLoaded = memesLoaded.concat(docs.documents);
-      renderMemes(memesLoaded, document.getElementById("memesFeed"));
-      memesPage++;
-    }
-
-    // --- Post Meme ---
-    async function postMeme(e) {
-      e.preventDefault();
-      const file = document.getElementById("memeImage").files[0];
-      const caption = document.getElementById("memeCaption").value;
-      const hashtags = caption.match(/#[a-zA-Z0-9_]+/g) || [];
-      try {
-        const fileUpload = await storage.createFile(APPWRITE_BUCKET, ID.unique(), file);
-        const fileId = fileUpload.$id;
-        await databases.createDocument(APPWRITE_DB, APPWRITE_MEMES, ID.unique(), {
-          image: fileId,
-          caption,
-          userId: currentUser.$id,
-          userName: currentProfile.username,
-          hashtags: hashtags.map(h=>h.toLowerCase()),
-          likes: [],
-          comments: [],
-          createdAt: new Date().toISOString(),
-          reportedBy: []
-        });
-        document.getElementById("memeForm").reset();
-        showFeed();
-      } catch (err) { alert(err?.message || "Failed to post meme."); }
-    }
-
-    // --- Render Memes with like, comment, report, hashtags, profile links ---
-    function renderMemes(memes, container) {
-      container.innerHTML = "";
-      memes.forEach(meme => {
-        const imgURL = storage.getFilePreview(APPWRITE_BUCKET, meme.image);
-        const isLiked = (meme.likes||[]).includes(currentUser.$id);
-        const memeDiv = document.createElement("div");
-        memeDiv.className = "card fade-in";
-        memeDiv.innerHTML = `
-          <div style="display:flex;align-items:center;gap:0.7em;">
-            <span class="avatar" style="background:#6366f1;color:#fff;font-weight:bold;border-radius:8px;padding:.15em .7em 0 .7em;font-size:1.05em;cursor:pointer;" onclick="showUserProfile('${meme.userId}')">${meme.userName||"anon"}</span>
-            <span style="color:#64748b;font-size:.9em;">${new Date(meme.createdAt).toLocaleString()}</span>
-          </div>
-          <img src="${imgURL}" class="meme-img fade-in"/>
-          <div style="font-weight:bold;font-size:1.15em;margin-top:.5em;">${renderCaptionHashtags(meme.caption)}</div>
-          <div style="margin:0.7em 0;">
-            <button class="likeBtn" data-id="${meme.$id}" style="color:${isLiked?'#f43f5e':'#64748b'};">♥ ${meme.likes.length}</button>
-            <button class="commentBtn" data-id="${meme.$id}">💬 ${meme.comments.length}</button>
-            <button class="reportBtn" data-id="${meme.$id}">🚩</button>
-            ${isAdmin?'<button class="deleteBtn" data-id="'+meme.$id+'">🗑️</button>':''}
-          </div>
-          <div id="comments-${meme.$id}" class="hide"></div>
-        `;
-        container.appendChild(memeDiv);
-        // Like
-        memeDiv.querySelector('.likeBtn').onclick = ()=>toggleLike(meme);
-        // Comment
-        memeDiv.querySelector('.commentBtn').onclick = ()=>toggleComments(meme);
-        // Report
-        memeDiv.querySelector('.reportBtn').onclick = ()=>reportMeme(meme);
-        // Delete (admin)
-        if (isAdmin && memeDiv.querySelector('.deleteBtn')) memeDiv.querySelector('.deleteBtn').onclick = ()=>deleteMeme(meme);
-      });
-    }
-
-    function renderCaptionHashtags(caption) {
-      return caption.replace(/#[a-zA-Z0-9_]+/g, tag=>`<span class='hashtag' onclick="hashtagExplore('${tag.toLowerCase()}')">${tag}</span>`);
-    }
-
-    // --- Like/Unlike ---
-    async function toggleLike(meme) {
-      let likes = meme.likes||[];
-      const idx = likes.indexOf(currentUser.$id);
-      if (idx === -1) {
-        likes.push(currentUser.$id);
-        await addNotification(meme.userId, "like", meme.$id, null, `${currentProfile.username} liked your meme!`);
-      } else likes.splice(idx, 1);
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id, { likes });
-      showFeed();
-    }
-
-    // --- Comments ---
-    async function toggleComments(meme) {
-      const cdiv = document.getElementById("comments-"+meme.$id);
-      if (!cdiv) return;
-      cdiv.classList.toggle("hide");
-      if (!cdiv.classList.contains("hide")) renderComments(meme, cdiv);
-    }
-    function renderComments(meme, cdiv) {
-      cdiv.innerHTML = `
-        <div>${(meme.comments||[]).map(c=>
-          `<div style="margin-bottom:0.5em;">
-            <b style="cursor:pointer;" onclick="showUserProfile('${c.userId}')">${c.userName}</b>:
-            <span>${c.text}</span>
-            <button onclick="reportComment('${meme.$id}','${c.createdAt}')" style="font-size:.95em;">🚩</button>
-            ${(isAdmin||c.userId===currentUser.$id)?`<button onclick="deleteComment('${meme.$id}','${c.createdAt}')" style="font-size:.95em;">🗑️</button>`:""}
-          </div>`
-        ).join("")}</div>
-        <form onsubmit="event.preventDefault();addComment('${meme.$id}')">
-          <input type="text" id="commentInput-${meme.$id}" placeholder="Add a comment..." maxlength="100" required style="margin-bottom:0.5em;"/>
-          <button type="submit">Post</button>
-        </form>
-      `;
-    }
-    async function addComment(memeId) {
-      const meme = await databases.getDocument(APPWRITE_DB, APPWRITE_MEMES, memeId);
-      let comments = meme.comments||[];
-      const text = document.getElementById("commentInput-"+memeId).value;
-      comments.push({userId: currentUser.$id, userName: currentProfile.username, text, createdAt: new Date().toISOString(), reportedBy: []});
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, memeId, { comments });
-      await addNotification(meme.userId, "comment", meme.$id, null, `${currentProfile.username} commented on your meme!`);
-      showFeed();
-    }
-    async function deleteComment(memeId, createdAt) {
-      const meme = await databases.getDocument(APPWRITE_DB, APPWRITE_MEMES, memeId);
-      let comments = (meme.comments||[]).filter(c=>c.createdAt!==createdAt);
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, memeId, { comments });
-      showFeed();
-    }
-
-    // --- Report meme/comment ---
-    async function reportMeme(meme) {
-      if ((meme.reportedBy||[]).includes(currentUser.$id)) return alert("Already reported");
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id, { reportedBy: (meme.reportedBy||[]).concat(currentUser.$id) });
-      await databases.createDocument(APPWRITE_DB, APPWRITE_REPORTS, ID.unique(), {
-        type: "meme", targetId: meme.$id, userId: currentUser.$id, status: "pending", createdAt: new Date().toISOString()
-      });
-      alert("Reported. Thank you!");
-    }
-    async function reportComment(memeId, createdAt) {
-      const meme = await databases.getDocument(APPWRITE_DB, APPWRITE_MEMES, memeId);
-      let comment = (meme.comments||[]).find(c=>c.createdAt===createdAt);
-      if (!comment) return;
-      if ((comment.reportedBy||[]).includes(currentUser.$id)) return alert("Already reported");
-      comment.reportedBy = (comment.reportedBy||[]).concat(currentUser.$id);
-      let comments = meme.comments.map(c=>c.createdAt===createdAt?comment:c);
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_MEMES, memeId, { comments });
-      await databases.createDocument(APPWRITE_DB, APPWRITE_REPORTS, ID.unique(), {
-        type: "comment", targetId: memeId+"|"+createdAt, userId: currentUser.$id, status: "pending", createdAt: new Date().toISOString()
-      });
-      alert("Comment reported. Thank you!");
-    }
-
-    // --- Delete meme (Admin) ---
-    async function deleteMeme(meme) {
-      await databases.deleteDocument(APPWRITE_DB, APPWRITE_MEMES, meme.$id);
-      showFeed();
-    }
-
-    // --- SEARCH ---
-    async function searchFeed(query) {
-      query = query.trim();
-      if (!query) return renderMemes(memesLoaded, document.getElementById("memesFeed"));
-      if (query[0]==="#") hashtagExplore(query);
-      else {
-        // Search users by username
-        let user = allUsers.find(u=>u.username.toLowerCase().includes(query.toLowerCase()));
-        if (user) showUserProfile(user.userId);
+      if (textPos === "top-bottom" || textPos === "bottom") {
+        drawMemeText(text2, canvas.width/2, canvas.height - 18);
+      }
+      if (textPos === "center") {
+        drawMemeText(text1, canvas.width/2, canvas.height/2 + fontSize/2);
+        drawMemeText(text2, canvas.width/2, canvas.height/2 + fontSize*1.9);
       }
     }
-
-    // --- Hashtag explore ---
-    function hashtagExplore(tag) {
-      mainContent.innerHTML = `<h2>Memes tagged ${tag}</h2><div id="exploreFeed"></div>`;
-      databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, [`hashtags=${tag.toLowerCase()}`,'orderDesc($createdAt)'], 30)
-        .then(docs=>renderMemes(docs.documents, document.getElementById("exploreFeed")));
+    function drawMemeText(text, x, y) {
+      ctx.strokeText(text, x, y);
+      ctx.fillText(text, x, y);
     }
 
-    // --- Explore trending ---
-    exploreBtn.onclick = async function() {
-      mainContent.innerHTML = `<h2>Trending Memes</h2><div id="exploreFeed"></div>`;
-      // Last 24 hours, most likes
-      const since = new Date(Date.now()-24*60*60*1000).toISOString();
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, [`orderDesc($createdAt)`], 100);
-      let trending = docs.documents.filter(m=>m.createdAt>since).sort((a,b)=>(b.likes?.length||0)-(a.likes?.length||0)).slice(0, 20);
-      renderMemes(trending, document.getElementById("exploreFeed"));
+    // Redraw on input
+    document.getElementById("toolsForm").oninput = drawMeme;
+
+    // Download meme
+    document.getElementById("downloadBtn").onclick = function() {
+      const url = canvas.toDataURL();
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "meme.png";
+      a.click();
+    };
+    // Reset meme
+    document.getElementById("resetBtn").onclick = function() {
+      document.getElementById("text1").value = "";
+      document.getElementById("text2").value = "";
+      document.getElementById("fontFamily").value = "Impact";
+      document.getElementById("fontSize").value = "38";
+      document.getElementById("fontColor").value = "#ffffff";
+      document.getElementById("outlineColor").value = "#222222";
+      document.getElementById("opacity").value = "1";
+      document.getElementById("textPos").value = "top-bottom";
+      drawMeme();
     };
 
-    // --- Profile page: own or others ---
-    profilePageBtn.onclick = ()=>showProfile(currentUser.$id);
-    window.showUserProfile = showProfile; // for dynamic links
-    async function showProfile(userId) {
-      let userDoc = allUsers.find(u=>u.userId===userId);
-      if (!userDoc) userDoc = (await databases.listDocuments(APPWRITE_DB, APPWRITE_USERS, [`userId=${userId}`],1)).documents[0];
-      const isMe = userDoc.userId === currentUser.$id;
-      mainContent.innerHTML = `
-        <div style="text-align:center;">
-          <img src="${userDoc.avatar?storage.getFilePreview(APPWRITE_BUCKET, userDoc.avatar):'https://ui-avatars.com/api/?name='+encodeURIComponent(userDoc.username)}" class="avatar" style="width:70px;height:70px;margin-bottom:.7em;">
-          <h2>${userDoc.username}</h2>
-          <div>${userDoc.bio||''}</div>
-          <div>Followers: ${(userDoc.followers||[]).length} | Following: ${(userDoc.following||[]).length}</div>
-          ${isMe?`
-            <button onclick="editProfile()">Edit Profile</button>
-            <input type="file" id="avatarUpload" style="margin-top:.5em;">
-          `:`
-            <button onclick="${isFollowing(userDoc)?'unfollowUser':'followUser'}('${userDoc.userId}')">${isFollowing(userDoc)?'Unfollow':'Follow'}</button>
-            <button onclick="startChat('${userDoc.userId}')">Message</button>
-          `}
-        </div>
-        <hr/>
-        <h3>${isMe?'Your':'User'} Memes</h3>
-        <div id="profileMemes"></div>
-      `;
-      // Avatar upload
-      setTimeout(()=>{
-        if (isMe && document.getElementById("avatarUpload")) {
-          document.getElementById("avatarUpload").onchange = async (e)=>{
-            const f = e.target.files[0];
-            if (!f) return;
-            const uploaded = await storage.createFile(APPWRITE_BUCKET, ID.unique(), f);
-            await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userId, { avatar: uploaded.$id });
-            showProfile(userId);
-          };
-        }
-      },100);
-      // Memes
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_MEMES, [`userId=${userId}`,'orderDesc($createdAt)'], 50);
-      renderMemes(docs.documents, document.getElementById("profileMemes"));
-    }
-    window.editProfile = async function() {
-      const bio = prompt("Enter new bio:", currentProfile.bio||"");
-      if (bio!==null) {
-        await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, currentProfile.$id, {bio});
-        await fetchProfile(); showProfile(currentUser.$id);
-      }
-    }
-    function isFollowing(u) { return (currentProfile.following||[]).some(f=>f.userId===u.userId);}
-    window.followUser = async function(userId) {
-      let following = currentProfile.following||[];
-      following.push({userId});
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, currentProfile.$id, {following});
-      let userDoc = allUsers.find(u=>u.userId===userId);
-      let followers = userDoc.followers||[];
-      followers.push({userId: currentProfile.userId});
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userId, {followers});
-      await addNotification(userId, "follow", null, null, `${currentProfile.username} followed you!`);
-      await fetchProfile(); showProfile(userId);
-    }
-    window.unfollowUser = async function(userId) {
-      let following = (currentProfile.following||[]).filter(f=>f.userId!==userId);
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, currentProfile.$id, {following});
-      let userDoc = allUsers.find(u=>u.userId===userId);
-      let followers = (userDoc.followers||[]).filter(f=>f.userId!==currentProfile.userId);
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_USERS, userId, {followers});
-      await fetchProfile(); showProfile(userId);
-    }
-
-    // --- NOTIFICATIONS ---
-    notifBtn.onclick = ()=>notifModal.classList.remove("hide");
-    notifModalClose.onclick = ()=>notifModal.classList.add("hide");
-    async function fetchNotifications() {
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_NOTIFS, [`userId=${currentUser.$id}`,'orderDesc($createdAt)'], 30);
-      myNotifications = docs.documents;
-      unseenNotif = myNotifications.filter(n=>!n.seen).length;
-      notifUnread.textContent = unseenNotif;
-      notifUnread.classList.toggle("hide", unseenNotif===0);
-      notifList.innerHTML = myNotifications.map(n=>`
-        <div style="padding:0.5em;${n.seen?'':'background:#fef9c3'}">${n.message}
-        <span style="float:right;">${new Date(n.createdAt).toLocaleTimeString()}</span></div>
-      `).join("")||"<em>No notifications</em>";
-      // Mark as seen
-      myNotifications.filter(n=>!n.seen).forEach(async n=>await databases.updateDocument(APPWRITE_DB, APPWRITE_NOTIFS, n.$id, {seen:true}));
-    }
-    async function addNotification(userId, type, memeId, commentId, msg) {
-      await databases.createDocument(APPWRITE_DB, APPWRITE_NOTIFS, ID.unique(), {
-        userId, type, memeId, commentId, message: msg, seen: false, createdAt: new Date().toISOString()
-      });
-    }
-
-    // --- ADMIN REPORT MODAL ---
-    adminBtn.onclick = ()=>showAdmin();
-    adminModalClose.onclick = ()=>adminModal.classList.add("hide");
-    async function showAdmin() {
-      adminModal.classList.remove("hide");
-      const docs = await databases.listDocuments(APPWRITE_DB, APPWRITE_REPORTS, [`status=pending`,'orderDesc($createdAt)'], 40);
-      adminReports.innerHTML = docs.documents.map(r=>`
-        <div style="margin-bottom:1em;">
-          <b>${r.type}</b> | ${r.targetId} <br/>
-          <button onclick="approveReport('${r.$id}','${r.type}','${r.targetId}')">Approve/Delete</button>
-          <button onclick="rejectReport('${r.$id}')">Reject</button>
-        </div>
-      `).join("")||"<em>No pending reports</em>";
-    }
-    window.approveReport = async function(reportId, type, targetId) {
-      if (type=="meme") await databases.deleteDocument(APPWRITE_DB, APPWRITE_MEMES, targetId);
-      // For comment, parse targetId as "memeId|createdAt"
-      if (type=="comment") {
-        let [memeId, createdAt] = targetId.split("|");
-        await deleteComment(memeId, createdAt);
-      }
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_REPORTS, reportId, {status:"approved"});
-      showAdmin();
-    }
-    window.rejectReport = async function(reportId) {
-      await databases.updateDocument(APPWRITE_DB, APPWRITE_REPORTS, reportId, {status:"rejected"});
-      showAdmin();
-    }
-
-    // --- DIRECT MESSAGING / CHAT ---
-    window.startChat = async function(otherUserId) {
-      const chatId = [currentUser.$id, otherUserId].sort().join("_");
-      mainContent.innerHTML = `
-        <h3>Chat with ${allUsers.find(u=>u.userId===otherUserId)?.username||'User'}</h3>
-        <div id="chatMessages" style="height:220px;overflow-y:auto;background:#f3f4f6;border-radius:10px;padding:.7em;margin-bottom:.7em;"></div>
-        <form id="chatForm">
-          <input type="text" id="chatInput" placeholder="Type your message..." maxlength="200" required />
-          <button type="submit">Send</button>
-        </form>
-      `;
-      // Load messages
-      async function loadChat() {
-        try {
-          const chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
-          const messages = chatDoc.messages||[];
-          document.getElementById("chatMessages").innerHTML =
-            messages.map(m=>`<div style="text-align:${m.from===currentUser.$id?'right':'left'};margin-bottom:.3em;">
-              <span style="display:inline-block;background:${m.from===currentUser.$id?'#6366f1':'#e0e7ff'};color:${m.from===currentUser.$id?'#fff':'#222'};border-radius:8px;padding:3px 12px;">${m.text}</span>
-              <span style="font-size:.8em;color:#64748b;">${new Date(m.createdAt).toLocaleTimeString()}</span>
-            </div>`).join("");
-          document.getElementById("chatMessages").scrollTop = 99999;
-        } catch {
-          document.getElementById("chatMessages").innerHTML = "<em style='color:#64748b;'>No messages.</em>";
-        }
-      }
-      await loadChat();
-      document.getElementById("chatForm").onsubmit = async (e)=>{
-        e.preventDefault();
-        let chatDoc;
-        try {
-          chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
-        } catch {
-          await databases.createDocument(APPWRITE_DB, APPWRITE_CHATS, chatId, {
-            members: [currentUser.$id, otherUserId],
-            messages: []
-          });
-          chatDoc = await databases.getDocument(APPWRITE_DB, APPWRITE_CHATS, chatId);
-        }
-        let messages = chatDoc.messages||[];
-        messages.push({from: currentUser.$id, text: document.getElementById("chatInput").value, createdAt: new Date().toISOString()});
-        await databases.updateDocument(APPWRITE_DB, APPWRITE_CHATS, chatId, {messages});
-        document.getElementById("chatInput").value = '';
-        await loadChat();
-      };
-      // Subscribe for real-time chat updates
-      realtime.subscribe(`databases.${APPWRITE_DB}.collections.${APPWRITE_CHATS}.documents.${chatId}`, loadChat);
-    };
-    // Modern dark/light theme toggle with smooth transitions
-const themeToggle = document.getElementById("themeToggle");
-const themeIcon = document.getElementById("themeIcon");
-function setTheme(dark) {
-  document.body.classList.toggle('dark', dark);
-  document.documentElement.classList.toggle('dark', dark);
-  localStorage.setItem('theme', dark ? 'dark' : 'light');
-  themeIcon.textContent = dark ? "🌞" : "🌙";
-}
-themeToggle.onclick = () => setTheme(!document.body.classList.contains('dark'));
-(function() {
-  const userPref = localStorage.getItem('theme');
-  const systemPref = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  setTheme(userPref === 'dark' || (!userPref && systemPref));
-})();
+    // Optional: auto-select first template for demo
+    window.onload = () => { selectTemplate(0); };
   </script>
 </body>
 </html>
