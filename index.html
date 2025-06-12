@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Meme Studio </title>
+  <title>Meme Studio - Video & Image Meme Editor</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:700,400&display=swap">
-  <style>
-    /* === BASE === */
-body {
+<style>
+  body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
   color: #222;
@@ -27,13 +26,13 @@ nav {
   background: #fff;
   font-size: 1.3em;
   text-align: center;
-  padding: .7em 0 .7em 0;
+  padding: .7em 0;
   font-weight: bold;
   color: #6366f1;
   box-shadow: 0 2px 12px #6366f12a;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   border-bottom: 1px solid #e0e7ff;
   position: sticky;
   top: 0;
@@ -52,11 +51,7 @@ body.dark nav {
   font-size: 1.25em;
 }
 
-.theme-toggle-btn,
-.audio-btn,
-#feedbackBtn,
-#leaderboardBtn,
-#profileBtn {
+.theme-toggle-btn, .audio-btn {
   margin-right: 0.6em;
   background: linear-gradient(112deg, #6366f1 0%, #facc15 100%);
   border-radius: 50%;
@@ -74,21 +69,14 @@ body.dark nav {
 }
 .theme-toggle-btn:active,
 .theme-toggle-btn:focus,
-.audio-btn:active,
-.audio-btn.playing,
-#feedbackBtn:active,
-#leaderboardBtn:active,
-#profileBtn:active {
+.audio-btn:active, .audio-btn.playing {
   background: linear-gradient(112deg, #facc15 0%, #6366f1 100%);
   color: #23233a;
   transform: scale(1.13) rotate(-7deg);
   box-shadow: 0 6px 24px #facc1599;
 }
 body.dark .theme-toggle-btn,
-body.dark .audio-btn,
-body.dark #feedbackBtn,
-body.dark #leaderboardBtn,
-body.dark #profileBtn {
+body.dark .audio-btn {
   background: linear-gradient(112deg, #181827 0%, #6366f1 100%);
   color: #facc15;
 }
@@ -101,7 +89,6 @@ body.dark #profileBtn {
   transition: color 0.22s, opacity 0.22s;
 }
 
-/* ==== TOOLBAR ==== */
 .mobile-main {
   flex: 1 1 0%;
   display: flex;
@@ -176,7 +163,37 @@ body.dark .toolbar-btn:active {
   filter: drop-shadow(0 2px 4px #6366f14c);
 }
 
-/* ==== MODAL PANELS ==== */
+.mobile-content {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  background: #f0f4ff;
+  position: relative;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 2px 16px #6366f11a;
+  margin-bottom: 68px;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+body.dark .mobile-content {
+  background: #181827;
+  box-shadow: 0 2px 24px #23233a44;
+}
+.section-panel {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1em 1.1em 0 1.1em;
+  animation: fadeInUp 0.4s cubic-bezier(.4,0,.2,1);
+  background: transparent;
+  z-index: 2;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+.section-panel.active { display: flex; }
+
 .modal-panel {
   display: none;
   position: fixed;
@@ -219,9 +236,7 @@ body.dark .modal-panel-header { color: #facc15; }
 body.dark .close-modal-panel { color: #facc15; }
 body.dark .close-modal-panel:active { color: #6366f1; }
 
-/* ==== GRID PANELS ==== */
-.template-grid,
-.sticker-grid {
+.template-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
@@ -229,33 +244,23 @@ body.dark .close-modal-panel:active { color: #6366f1; }
   padding: 0.2em 0;
   justify-content: center;
 }
-.sticker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(90px,1fr));
-}
-.template-select,
-.sticker-grid img {
-  border-radius: 13px;
-  box-shadow: 0 4px 32px #6366f11a;
-  cursor: pointer;
-  transition: box-shadow 0.18s, transform 0.18s, border 0.18s, background 0.18s;
-  background: #fff;
-}
-body.dark .template-select,
-body.dark .sticker-grid img {
-  background: #23233a;
-}
 .template-select {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 110px;
+  background: #fff;
+  border-radius: 13px;
+  box-shadow: 0 4px 32px #6366f11a;
+  margin-bottom: 0.5em;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border 0.18s, background 0.18s;
   border: 1.5px solid #e0e7ff;
   padding: 0.5em 0.2em 0.7em 0.2em;
-  margin-bottom: 0.5em;
   position: relative;
 }
 body.dark .template-select {
+  background: #23233a;
   border: 1.5px solid #6366f1;
 }
 .template-select img {
@@ -281,6 +286,33 @@ body.dark .template-select {
 body.dark .template-select .template-name {
   color: #facc15;
 }
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px,1fr));
+  gap: 1em;
+  margin-bottom: 1.1em;
+  padding: 0.2em 0;
+}
+.sticker-grid img {
+  border: none;
+  border-radius: 13px;
+  background: #fff;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.18s, border 0.18s, background 0.18s;
+  box-shadow: 0 4px 32px #6366f11a;
+  position: relative;
+  animation: popIn 0.5s cubic-bezier(.4,0,.2,1);
+  will-change: box-shadow, transform;
+}
+.sticker-grid img:active {
+  box-shadow: 0 7px 22px #6366f13a;
+  transform: scale(1.05) rotate(-2deg);
+  border: 2px solid #6366f1;
+  background: #facc1577;
+}
+body.dark .sticker-grid img {
+  background: #23233a;
+}
 .sticker-grid img {
   width: 100%;
   height: 68px;
@@ -292,13 +324,18 @@ body.dark .template-select .template-name {
 }
 .sticker-grid img:active {
   filter: drop-shadow(0 2px 8px #facc154c);
-  box-shadow: 0 7px 22px #6366f13a;
-  transform: scale(1.05) rotate(-2deg);
-  border: 2px solid #6366f1;
-  background: #facc1577;
 }
 
-/* ==== EDITOR AREA ==== */
+.editor-video {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  max-height: 300px;
+  margin: 0 auto 1em auto;
+  border-radius: 18px;
+  background: #000;
+}
+
 .editor-area {
   flex: 1 1 0;
   min-height: 0;
@@ -336,81 +373,7 @@ body.dark #memeCanvas {
   box-shadow: 0 2px 32px #23233a66;
   border: 1.5px solid #6366f1;
 }
-.editor-video {
-  display: block;
-  width: 100%;
-  max-width: 360px;
-  max-height: 300px;
-  margin: 0 auto 1em auto;
-  border-radius: 18px;
-  background: #000;
-}
 
-/* ==== ADVANCED TOOLBARS ==== */
-.advanced-toolbar,
-.image-filters-toolbar,
-.timeline-toolbar {
-  display: flex;
-  gap: 0.7em;
-  margin-bottom: 0.5em;
-  justify-content: center;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.advanced-toolbar label,
-.image-filters-toolbar span,
-.timeline-toolbar span {
-  font-weight: 600;
-  color: #6366f1;
-}
-.advanced-toolbar button,
-.image-filters-toolbar button {
-  font-size: 1em;
-  border: none;
-  border-radius: 7px;
-  padding: 0.36em 1em;
-  background: #6366f1;
-  color: #fff;
-  cursor: pointer;
-  margin: 0 0.1em;
-  transition: background 0.18s, color 0.12s, transform 0.13s;
-}
-.advanced-toolbar button:active,
-.image-filters-toolbar button:active {
-  background: #facc15;
-  color: #23233a;
-}
-.timeline-toolbar {
-  padding: 0.3em 0;
-  background: #f0f4ff;
-  border-radius: 8px;
-  margin: 0.3em 0 0.5em 0;
-}
-body.dark .timeline-toolbar {
-  background: #181827;
-}
-#historySteps {
-  display: flex;
-  gap: 0.3em;
-  overflow-x: auto;
-  align-items: center;
-}
-#historySteps button {
-  border: 1px solid #6366f1;
-  background: #fff;
-  color: #6366f1;
-  border-radius: 4px;
-  padding: 0.1em 0.5em;
-  font-size: 0.9em;
-  cursor: pointer;
-  margin-right: .1em;
-}
-#historySteps button.selected {
-  background: #6366f1;
-  color: #fff;
-}
-
-/* ==== EDITOR BUTTON BAR ==== */
 .editor-btn-bar {
   width: 100vw;
   max-width: 100vw;
@@ -474,8 +437,6 @@ body.dark .editor-btn-bar {
 @media (max-width: 600px) {
   .editor-btn { font-size: 1em; padding: .38em 0.85em; }
 }
-
-/* ==== AD AREA ==== */
 .ad-area {
   margin: 0 auto;
   margin-top: 1.3em;
@@ -511,8 +472,6 @@ body.dark .ad-area {
   transition: color 0.21s, opacity 0.18s;
 }
 .ad-area .close-ad:hover { opacity: 1; color: #dc2626;}
-
-/* ==== UPLOAD ==== */
 .upload-label {
   display: block;
   margin: .7em 0 1.3em 0;
@@ -536,8 +495,6 @@ body.dark .upload-label {
   background: #181827;
   color: #facc15;
 }
-
-/* ==== MODAL BG ==== */
 .modal-bg {
   position: fixed; top:0; left:0; width:100vw; height:100vh;
   background: rgba(30,30,50,0.37);
@@ -607,35 +564,9 @@ body.dark .tos-modal h3 { color: #facc15;}
   transition: color 0.18s;
 }
 .tos-modal .close-modal:hover { color: #ef4444; opacity: 1; }
-
-/* ==== FEEDBACK FORM ==== */
-#feedbackForm {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8em;
-  margin: 1em 0 1em 0;
-}
-#feedbackForm textarea {
-  width: 100%;
-  border-radius: 7px;
-  border: 1.2px solid #6366f1;
-  padding: 0.5em;
-  font-size: 1em;
-  font-family: inherit;
-}
-#feedbackForm button {
-  align-self: flex-end;
-}
-
-/* ==== ACCESSIBILITY ==== */
-[aria-live] { outline: none; }
-[tabindex="0"]:focus { outline: 2px solid #facc15; }
-
 @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
 @keyframes popIn { from {transform: scale(0.93); opacity:0;} to {transform: scale(1); opacity:1;} }
 @keyframes fadeInUp { from {opacity:0;transform:translateY(24px);} to {opacity:1;transform:translateY(0);} }
-
-/* ==== FOOTER ==== */
 footer {
   margin-top: 2em;
   background: rgba(99,102,241,0.07);
@@ -669,47 +600,37 @@ body.dark footer a:hover {
   color: #6366f1;
 }
 
-/* ==== MOBILE ==== */
 @media (max-width: 600px) {
   nav, .mobile-toolbar, .mobile-content, .editor-area, .editor-btn-bar, .ad-area {
     border-radius: 0 !important;
   }
   .template-grid, .sticker-grid { grid-template-columns: repeat(2, 1fr); }
 }
-  </style>
-  </head>
+</style>
+</head>
 <body>
   <nav>
     <span class="nav-title">Meme Studio</span>
-    <button class="theme-toggle-btn" id="themeToggle" data-mode="" title="Toggle theme">🌙</button>
+    <button class="theme-toggle-btn" id="themeToggle" data-mode="🌙" title="Toggle theme">🌙</button>
     <button class="audio-btn" id="audioBtn" title="Play/Pause Music">🎵</button>
-    <button id="feedbackBtn" title="Feedback" aria-label="Feedback">💬</button>
-    <button id="leaderboardBtn" aria-label="Leaderboard" title="Trending Memes">🏆</button>
-    <button id="profileBtn" aria-label="Profile" title="Profile/Sign In">👤</button>
   </nav>
-  <main class="mobile-main" id="mainContent" tabindex="0">
+  <main class="mobile-main" id="mainContent">
     <div class="mobile-toolbar">
-      <button class="toolbar-btn" id="btnTemplates" onclick="showPanel('templates')">
+      <button class="toolbar-btn" onclick="showPanel('templates')">
         <img src="https://img.icons8.com/ios-filled/50/6366f1/picture.png" alt="">Templates
       </button>
-      <button class="toolbar-btn" id="btnEmoji" onclick="showPanel('emoji')">
+      <button class="toolbar-btn" onclick="showPanel('emoji')">
         <img src="https://img.icons8.com/ios-filled/50/6366f1/happy.png" alt="">Emoji
       </button>
-      <button class="toolbar-btn" id="btnUpload" onclick="showPanel('upload')">
+      <button class="toolbar-btn" onclick="showPanel('upload')">
         <img src="https://img.icons8.com/ios-filled/50/6366f1/upload.png" alt="">Upload
       </button>
-      <button class="toolbar-btn" id="btnGift" onclick="showPanel('gift')">
+      <button class="toolbar-btn" onclick="showPanel('gift')">
         <img src="https://img.icons8.com/ios-filled/50/6366f1/gift.png" alt="">Gift
-      </button>
-      <button class="toolbar-btn" id="btnCollage" onclick="showPanel('collage')">
-        <img src="https://img.icons8.com/ios-filled/50/6366f1/collage.png" alt="">Collage
-      </button>
-      <button class="toolbar-btn" id="btnBatch" onclick="showPanel('batch')">
-        <img src="https://img.icons8.com/ios-filled/50/6366f1/multiple-pages.png" alt="">Batch
       </button>
     </div>
     <section class="mobile-content">
-      <!-- Panels -->
+      <!-- Modal Panels -->
       <div class="modal-panel" id="panel-templates">
         <div class="modal-panel-header">
           <span>Choose a Template</span>
@@ -717,15 +638,17 @@ body.dark footer a:hover {
         </div>
         <div id="templateGrid" class="template-grid"></div>
         <button id="seeMoreBtn" style="margin-bottom:.5em;">See more</button>
-        <button id="uploadTemplateBtn">Upload Template</button>
       </div>
       <div class="modal-panel" id="panel-emoji">
         <div class="modal-panel-header">
           <span>Choose an Emoji</span>
           <button class="close-modal-panel" onclick="closePanel('emoji')">&times;</button>
         </div>
-        <div class="sticker-grid" id="stickers"></div>
-        <button id="uploadStickerBtn">Upload Sticker</button>
+        <div class="sticker-grid" id="stickers">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif" alt="😂">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif" alt="👍">
+          <img src="https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif" alt="🔥">
+        </div>
       </div>
       <div class="modal-panel" id="panel-upload">
         <div class="modal-panel-header">
@@ -736,120 +659,42 @@ body.dark footer a:hover {
           <input type="file" id="uploadImageVideo" accept="image/*,video/*" style="display:none;">
           + Upload Image/Video
         </label>
-        <label class="upload-label">
-          <input type="file" id="uploadAudio" accept="audio/*" style="display:none;">
-          + Upload Audio
-        </label>
-        <button id="recordAudioBtn">🎤 Record Audio</button>
       </div>
       <div class="modal-panel" id="panel-gift">
         <div class="modal-panel-header">
           <span>GIF Selection</span>
           <button class="close-modal-panel" onclick="closePanel('gift')">&times;</button>
         </div>
-        <div class="sticker-grid" id="gifs"></div>
-        <button id="uploadGifBtn">Upload GIF</button>
-      </div>
-      <div class="modal-panel" id="panel-collage">
-        <div class="modal-panel-header">
-          <span>Start a Collage</span>
-          <button class="close-modal-panel" onclick="closePanel('collage')">&times;</button>
+        <div class="sticker-grid" id="gifs">
+          <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="gif1">
+          <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="gif2">
+          <img src="https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif" alt="gif3">
         </div>
-        <div id="collageGrid" class="template-grid"></div>
-      </div>
-      <div class="modal-panel" id="panel-batch">
-        <div class="modal-panel-header">
-          <span>Batch Meme Creation</span>
-          <button class="close-modal-panel" onclick="closePanel('batch')">&times;</button>
-        </div>
-        <label class="upload-label">
-          <input type="file" id="batchUpload" accept="image/*,video/*" multiple style="display:none;">
-          + Upload Images/Videos for Batch
-        </label>
-        <button id="batchMemeBtn">Apply Meme to All</button>
-      </div>
-      <div class="modal-panel" id="panel-leaderboard">
-        <div class="modal-panel-header">
-          <span>Trending Memes</span>
-          <button class="close-modal-panel" onclick="closePanel('leaderboard')">&times;</button>
-        </div>
-        <div id="leaderboardList"></div>
-      </div>
-      <div class="modal-panel" id="panel-feedback">
-        <div class="modal-panel-header">
-          <span>Feedback & Suggestions</span>
-          <button class="close-modal-panel" onclick="closePanel('feedback')">&times;</button>
-        </div>
-        <form id="feedbackForm">
-          <label for="feedbackText">Your feedback:</label>
-          <textarea id="feedbackText" rows="4" aria-label="Feedback"></textarea>
-          <button type="submit">Send</button>
-        </form>
-      </div>
-      <div class="modal-panel" id="panel-profile">
-        <div class="modal-panel-header">
-          <span>User Profile / Sign In</span>
-          <button class="close-modal-panel" onclick="closePanel('profile')">&times;</button>
-        </div>
-        <div id="profileArea"></div>
       </div>
       <!-- Editor Area (always visible) -->
       <div class="editor-area" id="editorArea">
-        <video id="videoPreview" class="editor-video" controls style="display:none;" aria-label="Video Preview"></video>
-        <canvas id="memeCanvas" width="360" height="360" aria-label="Meme Canvas"></canvas>
-        <audio id="audioPreview" controls style="display:none;" aria-label="Audio Preview"></audio>
-        <div class="advanced-toolbar" id="advancedToolbar">
-          <label>Font:
-            <select id="fontSelect">
-              <option value="Impact">Impact</option>
-              <option value="Arial">Arial</option>
-              <option value="Comic Sans MS">Comic Sans</option>
-              <option value="Georgia">Georgia</option>
-              <option value="Courier New">Courier</option>
-              <option value="Times New Roman">Times</option>
-            </select>
-            <input type="file" id="customFontUpload" accept=".ttf,.otf">
-          </label>
-          <button id="shadowBtn">Shadow</button>
-          <button id="outlineBtn">Outline</button>
-          <button id="gradientBtn">Gradient</button>
-          <button id="animateTextBtn">Animate</button>
-          <button id="removeEffectBtn">Remove FX</button>
-          <button id="addWatermarkBtn">Watermark</button>
-          <button id="addQRCodeBtn">QR/Link</button>
-        </div>
-        <div class="image-filters-toolbar" id="imageFiltersToolbar">
-          <span>Image Filters:</span>
-          <button data-filter="brightness">Brightness</button>
-          <button data-filter="contrast">Contrast</button>
-          <button data-filter="grayscale">Grayscale</button>
-          <button data-filter="sepia">Sepia</button>
-          <button data-filter="invert">Invert</button>
-          <button data-filter="blur">Blur</button>
-          <button data-filter="pixelate">Pixelate</button>
-          <button data-filter="deepfry">Deepfry</button>
-          <button data-filter="clear">Clear</button>
-        </div>
-        <!-- Timeline/Undo/Redo Panel -->
-        <div class="timeline-toolbar" id="timelineToolbar">
-          <span>History:</span>
-          <div id="historySteps"></div>
-        </div>
+        <input type="text" id="aiImagePrompt" placeholder="Describe your meme background..." style="max-width:220px;margin:0.5em;">
+        <video id="videoPreview" class="editor-video" controls style="display:none;"></video>
+        <canvas id="memeCanvas" width="360" height="360"></canvas>
         <div id="adArea" class="ad-area" style="display:none;margin-top:.5em;"></div>
-        <div id="autoSaveStatus" aria-live="polite"></div>
       </div>
     </section>
   </main>
   <!-- Editor editing tools (bottom bar) -->
   <div class="editor-btn-bar">
     <button class="editor-btn" id="addTextBox">Text</button>
+    <button class="editor-btn" id="fontBtn">Font</button>
+    <button class="editor-btn" id="fontSizeBtn">A+</button>
+    <button class="editor-btn" id="colorBtn">Color</button>
+    <button class="editor-btn" id="boldBtn"><b>B</b></button>
+    <button class="editor-btn" id="italicBtn"><i>I</i></button>
     <button class="editor-btn" id="undoBtn">Undo</button>
     <button class="editor-btn" id="redoBtn">Redo</button>
     <button class="editor-btn" id="deleteBtn">Delete</button>
     <button class="editor-btn" id="downloadBtn">Download</button>
     <button class="editor-btn" id="shareBtn">Share</button>
-    <button class="editor-btn" id="aiSuggestBtn">AI Suggest</button>
-    <button class="editor-btn" id="ttsBtn">🔊</button>
+    <button class="editor-btn" id="aiGenImageBtn">AI Generate Image</button>
+    <button class="editor-btn" id="ttsBtn">Speak Caption</button>
   </div>
   <!-- Modal for Terms and Privacy acceptance -->
   <div class="modal-bg" id="tosModalBg">
@@ -878,7 +723,6 @@ body.dark footer a:hover {
   </footer>
   <audio id="bgMusic" src="your-default-music.mp3" loop preload="auto"></audio>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
