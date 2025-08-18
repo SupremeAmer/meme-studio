@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Meme Studio Pro - Advanced Video & Image Meme Editor</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700&display=swap">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meme Studio Pro - Advanced Video Editor</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <style>
@@ -36,37 +35,34 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, sans-serif;
     }
 
     body {
       margin: 0;
-      font-family: 'Inter', system-ui, sans-serif;
       color: var(--text-light);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       height: 100dvh;
       overflow: hidden;
-      background: linear-gradient(112deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
+      background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
       transition: var(--transition);
     }
     
     body.dark {
-      background: linear-gradient(112deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
+      background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
       color: var(--text-dark);
     }
 
-    nav {
-      background: var(--card-bg-light);
-      font-size: 1.3em;
-      text-align: center;
-      padding: 0.7em 0;
-      font-weight: 700;
-      color: var(--primary);
-      box-shadow: 0 2px 12px var(--shadow-light);
+    /* Header */
+    .app-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      background: var(--card-bg-light);
+      padding: 12px 20px;
+      box-shadow: 0 2px 15px var(--shadow-light);
       border-bottom: 1px solid var(--border-light);
       position: sticky;
       top: 0;
@@ -74,506 +70,325 @@
       transition: var(--transition);
     }
     
-    body.dark nav {
+    body.dark .app-header {
       background: var(--dark-bg);
+      box-shadow: 0 2px 15px var(--shadow-dark);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--primary);
+    }
+    
+    .logo i {
       color: var(--accent);
-      box-shadow: 0 2px 12px var(--shadow-dark);
+    }
+    
+    .header-controls {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .header-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      transition: var(--transition);
+    }
+    
+    .header-btn:hover {
+      transform: scale(1.08) rotate(8deg);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    body.dark .header-btn {
+      background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--primary) 100%);
     }
 
-    .nav-title {
-      flex: 1;
-      text-align: center;
-      letter-spacing: 0.01em;
-      font-size: 1.3em;
+    /* Main Container */
+    .editor-container {
       display: flex;
+      flex: 1;
+      overflow: hidden;
+      padding: 15px;
+      gap: 15px;
+    }
+    
+    /* Left Sidebar */
+    .tools-panel {
+      width: 280px;
+      background: var(--card-bg-light);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 4px 25px var(--shadow-light);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+    
+    body.dark .tools-panel {
+      background: var(--card-bg-dark);
+      box-shadow: 0 4px 25px var(--shadow-dark);
+    }
+    
+    .panel-section {
+      background: rgba(99, 102, 241, 0.05);
+      border-radius: 14px;
+      padding: 15px;
+      transition: var(--transition);
+    }
+    
+    body.dark .panel-section {
+      background: rgba(35, 35, 58, 0.3);
+    }
+    
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
+    
+    body.dark .section-title {
+      color: var(--accent);
+    }
+    
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 12px;
+    }
+    
+    .tool-item {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 8px;
-    }
-
-    .nav-title i {
-      font-size: 1.2em;
-      color: var(--accent);
-    }
-
-    .theme-toggle-btn, .audio-btn {
-      margin: 0 0.6em;
-      background: linear-gradient(112deg, var(--primary) 0%, var(--accent) 100%);
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: none;
-      cursor: pointer;
-      font-size: 1.4em;
-      color: #fff;
-      box-shadow: 0 2px 10px rgba(250, 204, 21, 0.3);
-      transition: var(--transition);
-      outline: none;
-    }
-    
-    .theme-toggle-btn:active,
-    .theme-toggle-btn:focus,
-    .audio-btn:active, 
-    .audio-btn.playing {
-      background: linear-gradient(112deg, var(--accent) 0%, var(--primary) 100%);
-      color: var(--dark-bg);
-      transform: scale(1.13) rotate(-7deg);
-      box-shadow: 0 6px 24px rgba(250, 204, 21, 0.6);
-    }
-    
-    body.dark .theme-toggle-btn,
-    body.dark .audio-btn {
-      background: linear-gradient(112deg, var(--dark-bg-secondary) 0%, var(--primary) 100%);
-      color: var(--accent);
-    }
-
-    .mobile-main {
-      flex: 1 1 0%;
-      display: flex;
-      flex-direction: column;
-      height: 0;
-      min-height: 0;
-      min-width: 0;
-      background: transparent;
-    }
-
-    .mobile-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      padding: 12px 8px;
       background: var(--card-bg-light);
-      border-bottom: 1px solid var(--border-light);
-      padding: 0.2em 0;
-      z-index: 90;
-      box-shadow: 0 1px 8px rgba(99, 102, 241, 0.05);
-      position: sticky;
-      top: 54px;
+      border-radius: 12px;
+      cursor: pointer;
       transition: var(--transition);
+      border: 1px solid var(--border-light);
     }
     
-    body.dark .mobile-toolbar {
-      background: var(--card-bg-dark);
-      border-bottom: 1px solid var(--border-dark);
-      box-shadow: 0 1px 12px rgba(35, 35, 58, 0.5);
+    .tool-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.2);
+      border-color: var(--primary);
     }
-
-    .toolbar-btn {
-      flex: 1 1 0;
-      border: none;
-      background: none;
-      font-size: 0.95em;
-      color: var(--primary);
-      font-weight: 600;
-      padding: 0.8em 0 0.6em 0;
-      cursor: pointer;
-      border-radius: 10px 10px 0 0;
-      border-right: 1px solid var(--border-light);
+    
+    body.dark .tool-item {
+      background: var(--dark-bg);
+      border-color: var(--border-dark);
+    }
+    
+    .tool-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      border-radius: 10px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.19em;
-      min-width: 0;
-      box-shadow: none;
-      position: relative;
-      transition: var(--transition);
-      outline: none;
-      user-select: none;
+      color: white;
+      font-size: 1.1rem;
     }
     
-    .toolbar-btn:last-child {
-      border-right: none;
+    .tool-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-align: center;
+      color: var(--text-light);
     }
     
-    .toolbar-btn.active, 
-    .toolbar-btn:active,
-    .toolbar-btn:focus {
-      background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
-      color: #fff;
-      box-shadow: 0 2px 14px rgba(250, 204, 21, 0.2);
-      transform: scale(1.04) translateY(-1px);
-    }
-    
-    body.dark .toolbar-btn.active,
-    body.dark .toolbar-btn:active {
-      background: linear-gradient(90deg, var(--dark-bg) 60%, var(--primary) 100%);
-      color: var(--accent);
-    }
-    
-    .toolbar-btn i {
-      font-size: 1.45em;
-      margin-bottom: 0.1em;
-      transition: var(--transition);
-    }
-    
-    .toolbar-btn:active i,
-    .toolbar-btn.active i {
-      filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
-    }
-
-    .mobile-content {
-      flex: 1 1 0;
-      min-height: 0;
-      min-width: 0;
-      overflow: auto;
-      background: var(--light-bg);
-      position: relative;
-      border-radius: 18px 18px 0 0;
-      box-shadow: 0 2px 16px var(--shadow-light);
-      margin-bottom: 68px;
-      transition: var(--transition);
-    }
-    
-    body.dark .mobile-content {
-      background: var(--dark-bg-secondary);
-      box-shadow: 0 2px 24px var(--shadow-dark);
-    }
-
-    .section-panel {
-      display: none;
-      flex-direction: column;
-      height: 100%;
-      min-height: 0;
-      overflow-y: auto;
-      padding: 1em 1.1em 0 1.1em;
-      animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      background: transparent;
-      z-index: 80;
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-    }
-    
-    .section-panel.active {
-      display: flex;
-    }
-
-    .modal-panel {
-      display: none;
-      position: fixed;
-      z-index: 200;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(30, 30, 50, 0.98);
-      color: var(--dark-bg);
-      animation: fadeIn 0.2s;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-y: auto;
-    }
-    
-    body.dark .modal-panel {
-      background: var(--dark-bg);
+    body.dark .tool-name {
       color: var(--text-dark);
     }
     
-    .modal-panel.active {
-      display: flex;
-    }
-    
-    .modal-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      font-size: 1.15em;
-      font-weight: 700;
-      padding: 1.2em 1.2em 0.2em 1.2em;
-      color: var(--primary);
-    }
-    
-    body.dark .modal-panel-header {
-      color: var(--accent);
-    }
-    
-    .close-modal-panel {
-      font-size: 1.5em;
-      background: none;
-      border: none;
-      color: var(--primary);
-      cursor: pointer;
-      margin-left: 0.6em;
-      transition: var(--transition);
-      outline: none;
-    }
-    
-    .close-modal-panel:active {
-      color: var(--accent);
-      transform: scale(1.2) rotate(-10deg);
-    }
-    
-    body.dark .close-modal-panel {
-      color: var(--accent);
-    }
-    
-    body.dark .close-modal-panel:active {
-      color: var(--primary);
-    }
-
-    .template-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 1.2em;
-      margin-bottom: 1.1em;
-      padding: 0.5em 0.5em 0 0.5em;
-      justify-content: center;
-    }
-    
-    .template-select {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--card-bg-light);
-      border-radius: 13px;
-      box-shadow: 0 4px 32px var(--shadow-light);
-      margin-bottom: 0.5em;
-      cursor: pointer;
-      transition: var(--transition);
-      border: 1.5px solid var(--border-light);
-      padding: 0.5em 0.2em 0.7em 0.2em;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    body.dark .template-select {
-      background: var(--card-bg-dark);
-      border: 1.5px solid var(--primary);
-    }
-    
-    .template-select:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
-    }
-    
-    .template-select img {
-      width: 100%;
-      height: 90px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 0.35em;
-      background: #f0f0ff;
-      transition: var(--transition);
-    }
-    
-    .template-select .template-name {
-      text-align: center;
-      font-size: 0.9em;
-      font-weight: 600;
-      color: var(--primary);
-      background: none;
-      margin-top: 0.1em;
-      margin-bottom: 0;
-      padding: 0 0.2em;
-      border-radius: 0;
-      letter-spacing: 0.01em;
-    }
-    
-    body.dark .template-select .template-name {
-      color: var(--accent);
-    }
-
-    .sticker-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 1.2em;
-      margin-bottom: 1.1em;
-      padding: 0.5em 0.5em 0 0.5em;
-    }
-    
-    .sticker-item {
-      border: none;
-      border-radius: 13px;
-      background: var(--card-bg-light);
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: 0 4px 32px var(--shadow-light);
-      position: relative;
-      animation: popIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      will-change: box-shadow, transform;
-      overflow: hidden;
-      aspect-ratio: 1/1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .sticker-item:hover {
-      transform: scale(1.05);
-    }
-    
-    .sticker-item:active {
-      box-shadow: 0 7px 22px rgba(99, 102, 241, 0.3);
-      transform: scale(1.08) rotate(-2deg);
-      border: 2px solid var(--primary);
-      background: rgba(250, 204, 21, 0.3);
-    }
-    
-    body.dark .sticker-item {
-      background: var(--card-bg-dark);
-    }
-    
-    .sticker-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 13px;
-      display: block;
-      pointer-events: none;
-      transition: var(--transition);
-      padding: 8px;
-    }
-    
-    .sticker-item:active img {
-      filter: drop-shadow(0 2px 8px rgba(250, 204, 21, 0.3));
-    }
-
+    /* Editor Area */
     .editor-area {
-      flex: 1 1 0;
-      min-height: 0;
-      min-width: 0;
+      flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: var(--card-bg-light);
-      border-radius: 22px;
-      box-shadow: 0 2px 16px var(--shadow-light);
-      margin: 1.1em 0.2em 0 0.2em;
-      padding: 1em 0.5em;
-      position: relative;
-      transition: var(--transition);
+      gap: 15px;
     }
     
-    body.dark .editor-area {
+    .preview-container {
+      flex: 1;
+      background: var(--card-bg-light);
+      border-radius: 18px;
+      box-shadow: 0 4px 25px var(--shadow-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    body.dark .preview-container {
       background: var(--card-bg-dark);
-      box-shadow: 0 2px 16px var(--shadow-dark);
+      box-shadow: 0 4px 25px var(--shadow-dark);
     }
     
     #memeCanvas {
-      width: 96% !important;
-      max-width: 360px;
-      max-height: 44vh;
-      background: var(--card-bg-light);
-      border-radius: 18px;
-      box-shadow: 0 2px 24px var(--shadow-light);
-      margin-bottom: 1.1em;
+      width: 100%;
+      max-width: 600px;
+      height: 70vh;
+      max-height: 70vh;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
       touch-action: none;
-      border: 1.5px solid var(--border-light);
+      border: 1px solid var(--border-light);
       transition: var(--transition);
     }
     
     body.dark #memeCanvas {
-      background: var(--dark-bg-secondary);
-      box-shadow: 0 2px 32px var(--shadow-dark);
-      border: 1.5px solid var(--primary);
+      background: #1a1a2e;
+      border: 1px solid var(--primary);
     }
     
-    .editor-controls {
-      width: 100%;
-      max-width: 360px;
+    .preview-controls {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
       justify-content: center;
-      margin-top: 10px;
-    }
-    
-    .editor-controls input,
-    .editor-controls select {
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-light);
+      gap: 15px;
+      padding: 15px;
       background: var(--card-bg-light);
-      color: var(--text-light);
-      font-family: 'Inter', sans-serif;
+      border-radius: 18px;
+      box-shadow: 0 4px 25px var(--shadow-light);
       transition: var(--transition);
     }
     
-    body.dark .editor-controls input,
-    body.dark .editor-controls select {
+    body.dark .preview-controls {
       background: var(--card-bg-dark);
-      color: var(--text-dark);
-      border: 1px solid var(--border-dark);
+      box-shadow: 0 4px 25px var(--shadow-dark);
     }
     
-    .editor-controls input:focus,
-    .editor-controls select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    .preview-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
     }
-
+    
+    .preview-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
     /* Timeline */
     .timeline-container {
-      position: fixed;
-      bottom: 60px;
-      left: 0;
-      right: 0;
       background: var(--card-bg-light);
-      padding: 10px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      z-index: 90;
+      border-radius: 18px;
+      padding: 15px;
+      box-shadow: 0 4px 25px var(--shadow-light);
       transition: var(--transition);
-      display: none;
+      margin-top: 10px;
     }
     
     body.dark .timeline-container {
       background: var(--card-bg-dark);
+      box-shadow: 0 4px 25px var(--shadow-dark);
     }
     
     .timeline-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      font-weight: 600;
+      margin-bottom: 15px;
       color: var(--primary);
+      font-weight: 600;
     }
     
     .timeline-track {
-      height: 50px;
+      height: 70px;
       background: rgba(99, 102, 241, 0.1);
       border-radius: 8px;
       position: relative;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 5px;
+      display: flex;
+      gap: 5px;
     }
     
     .playhead {
       position: absolute;
       top: 0;
-      width: 2px;
+      width: 3px;
       height: 100%;
       background: var(--danger);
       z-index: 5;
+      left: 30%;
     }
     
     .timeline-clip {
-      position: absolute;
       height: 100%;
+      min-width: 100px;
       background: var(--primary);
       border-radius: 6px;
-      cursor: move;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 0.8em;
-      padding: 0 5px;
+      font-size: 0.8rem;
+      padding: 0 10px;
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .timeline-clip:hover {
+      transform: scale(1.03);
+    }
+    
+    .timeline-clip.video {
+      background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+    }
+    
+    .timeline-clip.audio {
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    }
+    
+    .timeline-clip.text {
+      background: linear-gradient(135deg, var(--accent) 0%, #ea580c 100%);
     }
     
     .timeline-ruler {
       display: flex;
       justify-content: space-between;
-      padding: 0 10px;
-      font-size: 0.7em;
+      padding: 5px 10px;
+      font-size: 0.8rem;
       color: var(--text-light);
       opacity: 0.7;
     }
@@ -581,1154 +396,725 @@
     body.dark .timeline-ruler {
       color: var(--text-dark);
     }
-
-    /* Keyframe Editor */
-    .keyframe-editor {
-      position: fixed;
-      bottom: 150px;
-      right: 20px;
+    
+    /* Right Sidebar */
+    .properties-panel {
+      width: 320px;
       background: var(--card-bg-light);
-      border-radius: 12px;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 4px 25px var(--shadow-light);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+    
+    body.dark .properties-panel {
+      background: var(--card-bg-dark);
+      box-shadow: 0 4px 25px var(--shadow-dark);
+    }
+    
+    .property-group {
+      background: rgba(99, 102, 241, 0.05);
+      border-radius: 14px;
       padding: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      z-index: 100;
-      width: 250px;
-      display: none;
       transition: var(--transition);
     }
     
-    body.dark .keyframe-editor {
-      background: var(--card-bg-dark);
+    body.dark .property-group {
+      background: rgba(35, 35, 58, 0.3);
     }
     
-    .keyframe-header {
+    .property-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-      color: var(--primary);
-      font-weight: 600;
+      margin: 12px 0;
     }
     
-    .keyframe-properties {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    
-    .keyframe-property {
+    .property-label {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
     }
     
-    .keyframe-property label {
-      font-size: 0.8em;
-      margin-bottom: 5px;
-      opacity: 0.8;
+    .property-control {
+      width: 60%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      background: var(--card-bg-light);
+      color: var(--text-light);
+      transition: var(--transition);
     }
     
-    .keyframe-property input {
-      width: 100%;
-      padding: 6px;
+    body.dark .property-control {
+      background: var(--card-bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+    
+    .color-preview {
+      width: 30px;
+      height: 30px;
       border-radius: 6px;
+      background: var(--primary);
+      cursor: pointer;
+    }
+    
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+    
+    .slider-container input {
+      flex: 1;
+    }
+    
+    .slider-value {
+      min-width: 30px;
+      text-align: center;
+    }
+    
+    /* Footer */
+    .editor-footer {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: var(--card-bg-light);
+      box-shadow: 0 -2px 15px var(--shadow-light);
+      border-top: 1px solid var(--border-light);
+      transition: var(--transition);
+    }
+    
+    body.dark .editor-footer {
+      background: var(--dark-bg);
+      box-shadow: 0 -2px 15px var(--shadow-dark);
+    }
+    
+    .action-btn {
+      padding: 12px 25px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: var(--transition);
+      border: none;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      color: white;
+    }
+    
+    .action-btn.secondary {
+      background: var(--card-bg-light);
+      color: var(--primary);
       border: 1px solid var(--border-light);
     }
     
-    .keyframe-actions {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 15px;
-    }
-    
-    /* Trimmer */
-    .trimmer-container {
-      position: fixed;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--card-bg-light);
-      border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      z-index: 100;
-      width: 300px;
-      display: none;
-    }
-    
-    body.dark .trimmer-container {
+    body.dark .action-btn.secondary {
       background: var(--card-bg-dark);
-    }
-    
-    .trimmer-track {
-      height: var(--track-height);
-      background: rgba(99, 102, 241, 0.2);
-      border-radius: 4px;
-      position: relative;
-      margin: 15px 0;
-      cursor: pointer;
-    }
-    
-    .trimmer-handle {
-      position: absolute;
-      top: -5px;
-      width: 16px;
-      height: calc(var(--track-height) + 10px);
-      background: var(--primary);
-      border-radius: 8px;
-      cursor: ew-resize;
-      z-index: 10;
-    }
-    
-    .trimmer-handle.start {
-      left: 0;
-    }
-    
-    .trimmer-handle.end {
-      right: 0;
-    }
-    
-    .trimmer-range {
-      position: absolute;
-      top: 0;
-      height: 100%;
-      background: var(--primary);
-      border-radius: 4px;
-    }
-    
-    .trimmer-time {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8em;
-      color: var(--text-light);
-    }
-    
-    body.dark .trimmer-time {
-      color: var(--text-dark);
-    }
-
-    .editor-btn-bar {
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      padding: 0.7em 0.5em;
-      background: var(--card-bg-light);
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      z-index: 100;
-      box-shadow: 0 -2px 22px var(--shadow-light);
-      border-top: 1.5px solid var(--border-light);
-      transition: var(--transition);
-      gap: 6px;
-    }
-    
-    body.dark .editor-btn-bar {
-      background: var(--card-bg-dark);
-      border-top: 1.5px solid var(--border-dark);
-      box-shadow: 0 -2px 18px var(--shadow-dark);
-    }
-    
-    .editor-btn {
-      background: linear-gradient(90deg, var(--primary) 60%, var(--accent) 100%);
-      color: #fff;
-      border: none;
-      border-radius: 9px;
-      padding: 0.5em 0.8em;
-      font-size: 0.95em;
-      cursor: pointer;
-      font-weight: 600;
-      box-shadow: 0 2px 10px var(--shadow-light);
-      transition: var(--transition);
-      min-width: 0;
-      outline: none;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    
-    .editor-btn i {
-      font-size: 1.1em;
-    }
-    
-    .editor-btn:active,
-    .editor-btn:focus {
-      background: linear-gradient(90deg, var(--accent) 10%, var(--primary) 90%);
-      color: var(--dark-bg);
-      transform: scale(1.12);
-      box-shadow: 0 4px 14px rgba(250, 204, 21, 0.3);
-    }
-    
-    .editor-btn::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(250, 204, 21, 0.18);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s, height 0.3s;
-    }
-    
-    .editor-btn:active::after {
-      width: 150%;
-      height: 150%;
-    }
-    
-    .editor-btn.danger {
-      background: linear-gradient(90deg, var(--danger) 0%, #dc2626 100%);
-    }
-    
-    .editor-btn.success {
-      background: linear-gradient(90deg, var(--success) 0%, #059669 100%);
-    }
-    
-    .editor-btn.secondary {
-      background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
-    }
-    
-    .editor-btn.info {
-      background: linear-gradient(90deg, var(--info) 0%, #2563eb 100%);
-    }
-
-    .ad-area {
-      margin: 0 auto;
-      margin-top: 1.3em;
-      max-width: 95vw;
-      min-height: 70px;
-      border-radius: 14px;
-      background: linear-gradient(90deg, var(--accent) 0 60%, var(--primary) 100%);
-      box-shadow: 0 2px 24px rgba(99, 102, 241, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-light);
-      font-size: 1.08em;
-      font-weight: 600;
-      letter-spacing: 0.01em;
-      animation: fadeInUp 0.7s;
-      position: relative;
-      padding: 15px;
-      text-align: center;
-    }
-    
-    body.dark .ad-area {
-      background: linear-gradient(90deg, var(--primary) 0 60%, var(--dark-bg-secondary) 100%);
-      color: var(--accent);
-    }
-    
-    .ad-area .close-ad {
-      position: absolute;
-      top: 7px;
-      right: 13px;
-      background: transparent;
-      border: none;
-      color: var(--text-light);
-      font-size: 1.2em;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: var(--transition);
-    }
-    
-    .ad-area .close-ad:hover {
-      opacity: 1;
-      color: var(--danger);
-    }
-
-    .upload-label {
-      display: block;
-      margin: 1.5em auto;
-      cursor: pointer;
-      color: var(--primary);
-      font-weight: 600;
-      background: rgba(250, 204, 21, 0.2);
-      border-radius: 7px;
-      padding: 0.8em 1.5em;
-      text-align: center;
-      transition: var(--transition);
-      box-shadow: 0 2px 12px var(--shadow-light);
-      max-width: 300px;
-      border: 2px dashed var(--border-light);
-    }
-    
-    .upload-label:hover,
-    .upload-label:focus {
-      background: var(--primary);
-      color: #fff;
-      transform: scale(1.05);
-      border-color: var(--primary);
-    }
-    
-    body.dark .upload-label {
-      background: var(--dark-bg-secondary);
-      color: var(--accent);
       border-color: var(--border-dark);
     }
     
-    .upload-label i {
-      margin-right: 8px;
-      font-size: 1.2em;
-    }
-
-    .modal-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(30, 30, 50, 0.85);
-      z-index: 300;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.5s;
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     
-    .tos-modal {
-      background: var(--card-bg-light);
-      color: var(--text-light);
-      border-radius: 18px;
-      padding: 2.1em 1.5em 1.6em 1.5em;
-      max-width: 420px;
-      width: 95vw;
-      box-shadow: 0 10px 48px 0 var(--shadow-light);
-      position: relative;
-      text-align: left;
-      animation: popIn 0.5s;
-      font-size: 1.05em;
-      transition: var(--transition);
-    }
-    
-    body.dark .tos-modal {
-      background: var(--card-bg-dark);
-      color: var(--text-dark);
-      box-shadow: 0 10px 36px 0 var(--shadow-dark);
-    }
-    
-    .tos-modal h3 {
-      margin-top: 0;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    body.dark .tos-modal h3 {
-      color: var(--accent);
-    }
-    
-    .tos-modal label {
-      display: flex;
-      align-items: flex-start;
-      margin-top: 1.2em;
-      line-height: 1.5;
-    }
-    
-    .tos-modal input[type="checkbox"] {
-      margin-right: 0.6em;
-      margin-top: 4px;
-      accent-color: var(--primary);
-    }
-    
-    .tos-modal button {
-      margin-top: 1.1em;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 9px;
-      padding: 0.7em 1.7em;
-      font-size: 1.1em;
-      font-weight: 600;
-      cursor: not-allowed;
-      opacity: 0.7;
-      transition: var(--transition);
-      display: block;
-      width: 100%;
-    }
-    
-    .tos-modal button.enabled,
-    .tos-modal button:enabled {
-      background: var(--primary) !important;
-      color: #fff;
-      opacity: 1;
-      cursor: pointer;
-    }
-    
-    .tos-modal button:active {
-      background: var(--accent) !important;
-      color: var(--dark-bg) !important;
-      transform: scale(0.98);
-    }
-    
-    .tos-modal .close-modal {
-      position: absolute;
-      top: 0.7em;
-      right: 1em;
-      background: none;
-      border: none;
-      font-size: 1.4em;
-      color: var(--primary);
-      cursor: pointer;
-      opacity: 0.75;
-      transition: var(--transition);
-    }
-    
-    .tos-modal .close-modal:hover {
-      color: var(--danger);
-      opacity: 1;
-    }
-
-    .loading-indicator {
-      display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px 30px;
-      border-radius: 12px;
-      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
-    
-    body.dark .loading-indicator {
-      background: rgba(35, 35, 58, 0.9);
-    }
-    
-    .loading-indicator.active {
-      display: block;
-    }
-    
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid var(--border-light);
-      border-top: 5px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 15px;
-    }
-    
-    body.dark .spinner {
-      border-color: var(--border-dark);
-      border-top-color: var(--accent);
-    }
-
-    footer {
-      margin-top: auto;
-      background: rgba(99, 102, 241, 0.07);
-      padding: 1.2em 0;
-      text-align: center;
-      font-size: 0.95em;
-      color: var(--primary);
-      border-top: 1.5px solid var(--border-light);
-      letter-spacing: 0.01em;
-      transition: var(--transition);
-      position: relative;
-      z-index: 90;
-    }
-    
-    footer a {
-      color: var(--primary);
-      font-weight: 500;
-      margin: 0 0.6em;
-      text-decoration: none;
-      transition: var(--transition);
-      display: inline-block;
-      position: relative;
-    }
-    
-    footer a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: -2px;
-      left: 0;
-      background-color: var(--accent);
-      transition: width 0.3s;
-    }
-    
-    footer a:hover::after {
-      width: 100%;
-    }
-    
-    footer a:hover {
-      color: var(--accent);
-    }
-    
-    body.dark footer {
-      background: var(--dark-bg);
-      color: var(--accent);
-      border-top: 1.5px solid var(--border-dark);
-    }
-    
-    body.dark footer a {
-      color: var(--accent);
-    }
-    
-    body.dark footer a:hover {
-      color: var(--primary);
-    }
-
+    /* Animations */
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .tools-panel, .properties-panel {
+        width: 240px;
       }
     }
     
-    @keyframes popIn {
-      from {
-        transform: scale(0.93);
-        opacity: 0;
+    @media (max-width: 992px) {
+      .editor-container {
+        flex-direction: column;
       }
-      to {
-        transform: scale(1);
-        opacity: 1;
+      
+      .tools-panel, .properties-panel {
+        width: 100%;
       }
-    }
-    
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      
+      .preview-container {
+        min-height: 400px;
       }
     }
     
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
     @media (max-width: 768px) {
-      .template-grid {
-        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-      }
-      
-      .sticker-grid {
-        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-      }
-      
-      .editor-btn-bar {
-        padding: 0.7em 0.3em;
-        gap: 4px;
-      }
-      
-      .editor-btn {
-        padding: 0.4em 0.7em;
-        font-size: 0.85em;
-      }
-      
-      .editor-btn i {
-        font-size: 1em;
-      }
-      
-      .nav-title {
-        font-size: 1.15em;
-      }
-      
-      .keyframe-editor, .trimmer-container {
-        width: 90%;
-        right: 5%;
-        left: 5%;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .editor-btn span {
+      .logo span {
         display: none;
       }
       
-      .editor-btn i {
-        font-size: 1.2em;
+      .tools-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      }
+      
+      .action-btn span {
+        display: none;
+      }
+      
+      .action-btn i {
         margin: 0;
-      }
-      
-      .toolbar-btn {
-        font-size: 0.85em;
-        padding: 0.6em 0 0.4em 0;
-      }
-      
-      .template-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.8em;
-      }
-      
-      .sticker-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.8em;
-      }
-      
-      .mobile-content {
-        margin-bottom: 60px;
       }
     }
   </style>
 </head>
 <body>
-  <nav>
-    <span class="nav-title"><i class="fas fa-camera-retro"></i> Meme Studio Pro</span>
-    <button class="theme-toggle-btn" id="themeToggle" title="Toggle theme">
-      <i class="fas fa-moon"></i>
-    </button>
-    <button class="audio-btn" id="audioBtn" title="Play/Pause Music">
-      <i class="fas fa-music"></i>
-    </button>
-  </nav>
-  
-  <main class="mobile-main" id="mainContent">
-    <div class="mobile-toolbar">
-      <button class="toolbar-btn" onclick="showPanel('templates')">
-        <i class="fas fa-images"></i>Templates
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <i class="fas fa-film"></i>
+      <span>Meme Studio Pro</span>
+    </div>
+    <div class="header-controls">
+      <button class="header-btn" id="themeToggle" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
       </button>
-      <button class="toolbar-btn" onclick="showPanel('emoji')">
-        <i class="fas fa-smile"></i>Emoji
+      <button class="header-btn" id="helpBtn" title="Help">
+        <i class="fas fa-question"></i>
       </button>
-      <button class="toolbar-btn" onclick="showPanel('upload')">
-        <i class="fas fa-upload"></i>Upload
-      </button>
-      <button class="toolbar-btn" onclick="showPanel('gift')">
-        <i class="fas fa-gift"></i>GIFs
-      </button>
-      <button class="toolbar-btn" onclick="showPanel('effects')">
-        <i class="fas fa-magic"></i>Effects
+      <button class="header-btn" id="exportBtn" title="Export Project">
+        <i class="fas fa-file-export"></i>
       </button>
     </div>
+  </header>
+
+  <!-- Main Editor -->
+  <div class="editor-container">
+    <!-- Left Tools Panel -->
+    <div class="tools-panel">
+      <div class="panel-section">
+        <div class="section-title">
+          <i class="fas fa-sliders-h"></i>
+          <span>Adjustments</span>
+        </div>
+        <div class="tools-grid">
+          <div class="tool-item" data-tool="brightness">
+            <div class="tool-icon">
+              <i class="fas fa-sun"></i>
+            </div>
+            <div class="tool-name">Brightness</div>
+          </div>
+          <div class="tool-item" data-tool="contrast">
+            <div class="tool-icon">
+              <i class="fas fa-adjust"></i>
+            </div>
+            <div class="tool-name">Contrast</div>
+          </div>
+          <div class="tool-item" data-tool="saturation">
+            <div class="tool-icon">
+              <i class="fas fa-tint"></i>
+            </div>
+            <div class="tool-name">Saturation</div>
+          </div>
+          <div class="tool-item" data-tool="temperature">
+            <div class="tool-icon">
+              <i class="fas fa-thermometer-half"></i>
+            </div>
+            <div class="tool-name">Temperature</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel-section">
+        <div class="section-title">
+          <i class="fas fa-magic"></i>
+          <span>Effects</span>
+        </div>
+        <div class="tools-grid">
+          <div class="tool-item" data-tool="blur">
+            <div class="tool-icon">
+              <i class="fas fa-droplet"></i>
+            </div>
+            <div class="tool-name">Blur</div>
+          </div>
+          <div class="tool-item" data-tool="vintage">
+            <div class="tool-icon">
+              <i class="fas fa-camera-retro"></i>
+            </div>
+            <div class="tool-name">Vintage</div>
+          </div>
+          <div class="tool-item" data-tool="glitch">
+            <div class="tool-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="tool-name">Glitch</div>
+          </div>
+          <div class="tool-item" data-tool="pixelate">
+            <div class="tool-icon">
+              <i class="fas fa-border-all"></i>
+            </div>
+            <div class="tool-name">Pixelate</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel-section">
+        <div class="section-title">
+          <i class="fas fa-text-height"></i>
+          <span>Text & Titles</span>
+        </div>
+        <div class="tools-grid">
+          <div class="tool-item" data-tool="add-text">
+            <div class="tool-icon">
+              <i class="fas fa-font"></i>
+            </div>
+            <div class="tool-name">Add Text</div>
+          </div>
+          <div class="tool-item" data-tool="titles">
+            <div class="tool-icon">
+              <i class="fas fa-heading"></i>
+            </div>
+            <div class="tool-name">Titles</div>
+          </div>
+          <div class="tool-item" data-tool="subtitles">
+            <div class="tool-icon">
+              <i class="fas fa-closed-captioning"></i>
+            </div>
+            <div class="tool-name">Subtitles</div>
+          </div>
+          <div class="tool-item" data-tool="text-animation">
+            <div class="tool-icon">
+              <i class="fas fa-running"></i>
+            </div>
+            <div class="tool-name">Text Anim</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel-section">
+        <div class="section-title">
+          <i class="fas fa-music"></i>
+          <span>Audio</span>
+        </div>
+        <div class="tools-grid">
+          <div class="tool-item" data-tool="add-music">
+            <div class="tool-icon">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="tool-name">Add Music</div>
+          </div>
+          <div class="tool-item" data-tool="voiceover">
+            <div class="tool-icon">
+              <i class="fas fa-microphone"></i>
+            </div>
+            <div class="tool-name">Voiceover</div>
+          </div>
+          <div class="tool-item" data-tool="sound-effects">
+            <div class="tool-icon">
+              <i class="fas fa-volume-up"></i>
+            </div>
+            <div class="tool-name">Sound FX</div>
+          </div>
+          <div class="tool-item" data-tool="audio-mixer">
+            <div class="tool-icon">
+              <i class="fas fa-sliders-h"></i>
+            </div>
+            <div class="tool-name">Audio Mixer</div>
+          </div>
+        </div>
+      </div>
+    </div>
     
-    <section class="mobile-content">
-      <!-- Modal Panels -->
-      <div class="modal-panel" id="panel-templates">
-        <div class="modal-panel-header">
-          <span>Choose a Template</span>
-          <button class="close-modal-panel" onclick="closePanel('templates')">&times;</button>
-        </div>
-        <div id="templateGrid" class="template-grid"></div>
-        <button class="editor-btn" id="seeMoreBtn" style="margin:0 auto 1em;">Load More Templates</button>
+    <!-- Editor Area -->
+    <div class="editor-area">
+      <div class="preview-container">
+        <canvas id="memeCanvas" width="800" height="450"></canvas>
       </div>
       
-      <div class="modal-panel" id="panel-emoji">
-        <div class="modal-panel-header">
-          <span>Choose an Emoji</span>
-          <button class="close-modal-panel" onclick="closePanel('emoji')">&times;</button>
-        </div>
-        <div class="sticker-grid" id="stickers"></div>
+      <div class="preview-controls">
+        <button class="preview-btn">
+          <i class="fas fa-play"></i> Play Preview
+        </button>
+        <button class="preview-btn">
+          <i class="fas fa-redo"></i> Reset
+        </button>
+        <button class="preview-btn">
+          <i class="fas fa-undo"></i> Undo
+        </button>
+        <button class="preview-btn">
+          <i class="fas fa-save"></i> Save Project
+        </button>
       </div>
       
-      <div class="modal-panel" id="panel-upload">
-        <div class="modal-panel-header">
-          <span>Upload Image or Video</span>
-          <button class="close-modal-panel" onclick="closePanel('upload')">&times;</button>
+      <div class="timeline-container">
+        <div class="timeline-header">
+          <span><i class="fas fa-timeline"></i> Timeline</span>
+          <button class="preview-btn">
+            <i class="fas fa-plus"></i> Add Track
+          </button>
         </div>
-        <label class="upload-label">
-          <input type="file" id="uploadImageVideo" accept="image/*,video/*" style="display:none;">
-          <i class="fas fa-cloud-upload-alt"></i> Upload Image/Video
-        </label>
-        <div class="ad-area">
-          <p>Upgrade to Pro for unlimited uploads!</p>
-          <button class="close-ad" title="Close ad">&times;</button>
+        <div class="timeline-track">
+          <div class="playhead"></div>
+          <div class="timeline-clip video">
+            <i class="fas fa-video"></i> Intro Video
+          </div>
+          <div class="timeline-clip text">
+            <i class="fas fa-text"></i> Title
+          </div>
+          <div class="timeline-clip video">
+            <i class="fas fa-video"></i> Main Clip
+          </div>
+          <div class="timeline-clip audio">
+            <i class="fas fa-music"></i> Background Music
+          </div>
+          <div class="timeline-clip text">
+            <i class="fas fa-text"></i> Outro Text
+          </div>
+        </div>
+        <div class="timeline-ruler">
+          <span>0:00</span>
+          <span>0:05</span>
+          <span>0:10</span>
+          <span>0:15</span>
+          <span>0:20</span>
+          <span>0:25</span>
+          <span>0:30</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Properties Panel -->
+    <div class="properties-panel">
+      <div class="property-group">
+        <div class="section-title">
+          <i class="fas fa-cog"></i>
+          <span>Transform</span>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-arrows-alt"></i>
+            <span>Position</span>
+          </div>
+          <div class="property-control">
+            <input type="text" value="320, 180" class="property-control">
+          </div>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-expand"></i>
+            <span>Scale</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" min="0" max="200" value="100">
+            <div class="slider-value">100%</div>
+          </div>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-sync"></i>
+            <span>Rotation</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" min="0" max="360" value="0">
+            <div class="slider-value">0°</div>
+          </div>
         </div>
       </div>
       
-      <div class="modal-panel" id="panel-gift">
-        <div class="modal-panel-header">
-          <span>GIF Selection</span>
-          <button class="close-modal-panel" onclick="closePanel('gift')">&times;</button>
+      <div class="property-group">
+        <div class="section-title">
+          <i class="fas fa-paint-brush"></i>
+          <span>Appearance</span>
         </div>
-        <div class="sticker-grid" id="gifs"></div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-fill"></i>
+            <span>Fill Color</span>
+          </div>
+          <div class="color-preview" style="background: #ffffff;"></div>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-border-style"></i>
+            <span>Stroke Color</span>
+          </div>
+          <div class="color-preview" style="background: #000000;"></div>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-text-height"></i>
+            <span>Font Size</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" min="10" max="120" value="48">
+            <div class="slider-value">48px</div>
+          </div>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-font"></i>
+            <span>Font Family</span>
+          </div>
+          <select class="property-control">
+            <option>Impact</option>
+            <option selected>Arial</option>
+            <option>Comic Sans</option>
+            <option>Times New Roman</option>
+          </select>
+        </div>
       </div>
       
-      <div class="modal-panel" id="panel-effects">
-        <div class="modal-panel-header">
-          <span>Effects & Filters</span>
-          <button class="close-modal-panel" onclick="closePanel('effects')">&times;</button>
+      <div class="property-group">
+        <div class="section-title">
+          <i class="fas fa-film"></i>
+          <span>Video Effects</span>
         </div>
-        <div class="sticker-grid">
-          <div class="sticker-item" data-effect="blur">
-            <i class="fas fa-droplet" style="font-size:2em;color:#6366f1;"></i>
-            <span>Blur</span>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-sun"></i>
+            <span>Brightness</span>
           </div>
-          <div class="sticker-item" data-effect="vintage">
-            <i class="fas fa-camera-retro" style="font-size:2em;color:#facc15;"></i>
-            <span>Vintage</span>
+          <div class="slider-container">
+            <input type="range" min="0" max="200" value="100">
+            <div class="slider-value">100%</div>
           </div>
-          <div class="sticker-item" data-effect="blackwhite">
-            <i class="fas fa-moon" style="font-size:2em;color:#333;"></i>
-            <span>B&W</span>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-adjust"></i>
+            <span>Contrast</span>
           </div>
-          <div class="sticker-item" data-effect="glitch">
-            <i class="fas fa-bolt" style="font-size:2em;color:#ef4444;"></i>
-            <span>Glitch</span>
+          <div class="slider-container">
+            <input type="range" min="0" max="200" value="100">
+            <div class="slider-value">100%</div>
           </div>
-          <div class="sticker-item" data-effect="pixelate">
-            <i class="fas fa-border-all" style="font-size:2em;color:#10b981;"></i>
-            <span>Pixelate</span>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-tint"></i>
+            <span>Saturation</span>
           </div>
-          <div class="sticker-item" data-effect="sharpen">
-            <i class="fas fa-sun" style="font-size:2em;color:#facc15;"></i>
-            <span>Sharpen</span>
+          <div class="slider-container">
+            <input type="range" min="0" max="200" value="100">
+            <div class="slider-value">100%</div>
           </div>
         </div>
       </div>
       
-      <!-- Editor Area -->
-      <div class="editor-area" id="editorArea">
-        <div class="editor-controls">
-          <input type="text" id="aiImagePrompt" placeholder="Describe your meme background...">
-          <select id="fontSelect">
-            <option value="Arial">Arial</option>
-            <option value="Impact">Impact</option>
-            <option value="Comic Sans MS">Comic Sans</option>
-            <option value="Times New Roman">Times New Roman</option>
+      <div class="property-group">
+        <div class="section-title">
+          <i class="fas fa-running"></i>
+          <span>Animation</span>
+        </div>
+        
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-play"></i>
+            <span>Animation Type</span>
+          </div>
+          <select class="property-control">
+            <option>None</option>
+            <option selected>Fade In</option>
+            <option>Slide In</option>
+            <option>Bounce</option>
+            <option>Zoom</option>
           </select>
         </div>
         
-        <div class="loading-indicator" id="loadingIndicator">
-          <div class="spinner"></div>
-          <p>Generating your meme...</p>
+        <div class="property-row">
+          <div class="property-label">
+            <i class="fas fa-clock"></i>
+            <span>Duration</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" min="0" max="5" value="1" step="0.1">
+            <div class="slider-value">1.0s</div>
+          </div>
         </div>
-        
-        <video id="videoPreview" class="editor-video" controls style="display:none;"></video>
-        <canvas id="memeCanvas" width="360" height="360"></canvas>
       </div>
-    </section>
-  </main>
-  
-  <!-- Timeline -->
-  <div class="timeline-container" id="timelineContainer">
-    <div class="timeline-header">
-      <span>Timeline</span>
-      <button class="editor-btn secondary" id="addTrackBtn"><i class="fas fa-plus"></i> Track</button>
-    </div>
-    <div class="timeline-track" id="timelineTrack">
-      <div class="playhead" id="playhead"></div>
-      <div class="timeline-clip" style="left:10%; width:30%;">Video</div>
-      <div class="timeline-clip" style="left:45%; width:20%;">Text</div>
-      <div class="timeline-clip" style="left:70%; width:15%;">Sticker</div>
-    </div>
-    <div class="timeline-ruler">
-      <span>0s</span>
-      <span>5s</span>
-      <span>10s</span>
-      <span>15s</span>
     </div>
   </div>
   
-  <!-- Keyframe Editor -->
-  <div class="keyframe-editor" id="keyframeEditor">
-    <div class="keyframe-header">
-      <span><i class="fas fa-key"></i> Keyframe Editor</span>
-      <button class="editor-btn info" id="addKeyframeBtn"><i class="fas fa-plus"></i> Add</button>
-    </div>
-    <div class="keyframe-properties">
-      <div class="keyframe-property">
-        <label>Position X</label>
-        <input type="range" min="0" max="360" value="180">
-      </div>
-      <div class="keyframe-property">
-        <label>Position Y</label>
-        <input type="range" min="0" max="360" value="180">
-      </div>
-      <div class="keyframe-property">
-        <label>Scale</label>
-        <input type="range" min="10" max="200" value="100">
-      </div>
-      <div class="keyframe-property">
-        <label>Rotation</label>
-        <input type="range" min="0" max="360" value="0">
-      </div>
-    </div>
-    <div class="keyframe-actions">
-      <button class="editor-btn secondary"><i class="fas fa-trash"></i> Delete</button>
-      <button class="editor-btn success"><i class="fas fa-save"></i> Apply</button>
-    </div>
-  </div>
-  
-  <!-- Trimmer -->
-  <div class="trimmer-container" id="trimmerContainer">
-    <div class="timeline-header">
-      <span><i class="fas fa-cut"></i> Video Trimmer</span>
-    </div>
-    <div class="trimmer-track" id="trimmerTrack">
-      <div class="trimmer-handle start"></div>
-      <div class="trimmer-handle end"></div>
-      <div class="trimmer-range" style="left:20%; width:60%;"></div>
-    </div>
-    <div class="trimmer-time">
-      <span>0:02</span>
-      <span>0:08</span>
-    </div>
-  </div>
-  
-  <!-- Editor editing tools (bottom bar) -->
-  <div class="editor-btn-bar">
-    <button class="editor-btn" id="addTextBox"><i class="fas fa-font"></i><span>Text</span></button>
-    <button class="editor-btn" id="fontBtn"><i class="fas fa-text-height"></i><span>Font</span></button>
-    <button class="editor-btn" id="fontSizeBtn"><i class="fas fa-search-plus"></i><span>Size</span></button>
-    <button class="editor-btn" id="colorBtn"><i class="fas fa-palette"></i><span>Color</span></button>
-    <button class="editor-btn" id="boldBtn"><i class="fas fa-bold"></i><span>Bold</span></button>
-    <button class="editor-btn" id="italicBtn"><i class="fas fa-italic"></i><span>Italic</span></button>
-    <button class="editor-btn" id="timelineBtn"><i class="fas fa-timeline"></i><span>Timeline</span></button>
-    <button class="editor-btn" id="keyframeBtn"><i class="fas fa-key"></i><span>Keyframes</span></button>
-    <button class="editor-btn" id="trimBtn"><i class="fas fa-cut"></i><span>Trim</span></button>
-    <button class="editor-btn danger" id="deleteBtn"><i class="fas fa-trash"></i><span>Delete</span></button>
-    <button class="editor-btn success" id="downloadBtn"><i class="fas fa-download"></i><span>Download</span></button>
-    <button class="editor-btn" id="shareBtn"><i class="fas fa-share-alt"></i><span>Share</span></button>
-  </div>
-  
-  <!-- Modal for Terms and Privacy acceptance -->
-  <div class="modal-bg" id="tosModalBg">
-    <div class="tos-modal">
-      <button class="close-modal" title="Close" onclick="closeTOSModal()">×</button>
-      <h3><i class="fas fa-file-contract"></i> Terms & Conditions / Privacy Policy</h3>
-      <div style="max-height:38vh; overflow-y:auto;">
-        <p>Before using Meme Creation Studio Pro, you must accept our <a href="#terms" target="_blank">Terms and Conditions</a> and <a href="#privacy" target="_blank">Privacy Policy</a>.</p>
-        <ul style="margin: 15px 0 15px 20px;">
-          <li>This tool is for fun and creativity. Do not upload illegal, violent, or hateful content.</li>
-          <li>By using this app, you agree that you own the rights to any images you upload.</li>
-          <li>This site may use cookies or third-party services (e.g., ads) – see privacy policy for details.</li>
-          <li>AI-generated content is for personal use only and may not be used commercially.</li>
-        </ul>
-        <label>
-          <input type="checkbox" id="acceptTOS"/>
-          I have read and accept the <a href="#terms" target="_blank">Terms and Conditions</a> and <a href="#privacy" target="_blank">Privacy Policy</a>.
-        </label>
-      </div>
-      <button id="acceptTOSBtn" disabled class="accept-btn">Accept & Continue</button>
-    </div>
-  </div>
-  
-  <footer>
-    &copy; 2025 Meme Studio Pro &mdash;
-    <a href="#terms" target="_blank">Terms &amp; Conditions</a> |
-    <a href="#privacy" target="_blank">Privacy Policy</a> |
-    <a href="#contact" target="_blank">Contact Us</a>
+  <!-- Footer -->
+  <footer class="editor-footer">
+    <button class="action-btn secondary">
+      <i class="fas fa-times"></i>
+      <span>Cancel</span>
+    </button>
+    <button class="action-btn primary">
+      <i class="fas fa-download"></i>
+      <span>Export Video</span>
+    </button>
   </footer>
 
   <script>
     // Initialize variables
     let darkMode = false;
-    let musicPlaying = false;
-    let tosAccepted = false;
-    let timelineVisible = false;
-    let keyframeEditorVisible = false;
-    let trimmerVisible = false;
     const canvas = new fabric.Canvas('memeCanvas');
     
-    // DOM Elements
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const audioBtn = document.getElementById('audioBtn');
-    const tosModalBg = document.getElementById('tosModalBg');
-    const acceptTOS = document.getElementById('acceptTOS');
-    const acceptTOSBtn = document.getElementById('acceptTOSBtn');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const timelineContainer = document.getElementById('timelineContainer');
-    const keyframeEditor = document.getElementById('keyframeEditor');
-    const trimmerContainer = document.getElementById('trimmerContainer');
-    const timelineBtn = document.getElementById('timelineBtn');
-    const keyframeBtn = document.getElementById('keyframeBtn');
-    const trimBtn = document.getElementById('trimBtn');
+    // Initialize the canvas with sample content
+    function initCanvas() {
+      // Set canvas dimensions
+      canvas.setWidth(800);
+      canvas.setHeight(450);
+      canvas.backgroundColor = '#f0f4ff';
+      
+      // Add sample text
+      const text = new fabric.IText('Create Amazing Memes', {
+        left: 150,
+        top: 180,
+        fontFamily: 'Impact',
+        fontSize: 56,
+        fill: '#ffffff',
+        stroke: '#000000',
+        strokeWidth: 3,
+        shadow: 'rgba(0,0,0,0.5) 5px 5px 10px'
+      });
+      
+      // Add sample rectangle
+      const rect = new fabric.Rect({
+        left: 100,
+        top: 100,
+        width: 600,
+        height: 250,
+        fill: 'rgba(99, 102, 241, 0.2)',
+        stroke: '#6366f1',
+        strokeWidth: 2,
+        rx: 20,
+        ry: 20,
+        selectable: false
+      });
+      
+      // Add sample image
+      fabric.Image.fromURL('https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80', function(img) {
+        img.scaleToWidth(200);
+        img.left = 50;
+        img.top = 50;
+        img.set({
+          shadow: 'rgba(0,0,0,0.3) 5px 5px 15px',
+          cornerStyle: 'circle',
+          cornerColor: '#6366f1',
+          cornerSize: 12
+        });
+        canvas.add(img);
+      });
+      
+      canvas.add(rect, text);
+      
+      // Make canvas responsive
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+    }
     
-    // Initialize meme templates
-    const memeTemplates = [
-      { id: 1, name: "Drake Hotline", url: "https://i.imgflip.com/30b1gx.jpg" },
-      { id: 2, name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
-      { id: 3, name: "Distracted BF", url: "https://i.imgflip.com/1ur9b0.jpg" },
-      { id: 4, name: "Running Away", url: "https://i.imgflip.com/261o3j.jpg" },
-      { id: 5, name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
-      { id: 6, name: "Left Exit 12", url: "https://i.imgflip.com/22bdq6.jpg" },
-      { id: 7, name: "Buff Doge", url: "https://i.imgflip.com/345v97.jpg" },
-      { id: 8, name: "Woman Yelling", url: "https://i.imgflip.com/1otk96.jpg" }
-    ];
-    
-    // Initialize emojis
-    const emojis = [
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-with-tears-of-joy_1f602.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/thumbs-up_1f44d.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/fire_1f525.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/rolling-on-the-floor-laughing_1f923.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/smiling-face-with-heart-eyes_1f60d.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/face-screaming-in-fear_1f631.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/smiling-face-with-sunglasses_1f60e.gif",
-      "https://em-content.zobj.net/source/animated-noto-color-emoji/356/thinking-face_1f914.gif"
-    ];
-    
-    // Initialize GIFs
-    const gifs = [
-      "https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif",
-      "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
-      "https://media.giphy.com/media/3oKIPwoeGErMmaI43C/giphy.gif",
-      "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif",
-      "https://media.giphy.com/media/3o7aCTPPm4OHfRLSH6/giphy.gif",
-      "https://media.giphy.com/media/3o7TKwxYkeW0ZvTqsU/giphy.gif",
-      "https://media.giphy.com/media/3o7TKr5Jyx2cG5eIxi/giphy.gif",
-      "https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif"
-    ];
-    
-    // Initialize the app
-    function initApp() {
-      // Check if TOS has been accepted
-      const accepted = localStorage.getItem('tosAccepted');
-      if (accepted === 'true') {
-        tosAccepted = true;
-        tosModalBg.style.display = 'none';
+    // Resize canvas to fit container
+    function resizeCanvas() {
+      const container = document.querySelector('.preview-container');
+      const aspectRatio = 800 / 450;
+      
+      let newWidth = container.clientWidth - 40;
+      let newHeight = newWidth / aspectRatio;
+      
+      if (newHeight > container.clientHeight - 40) {
+        newHeight = container.clientHeight - 40;
+        newWidth = newHeight * aspectRatio;
       }
       
-      // Load dark mode preference
-      const darkModePref = localStorage.getItem('darkMode');
-      if (darkModePref === 'true') {
-        toggleDarkMode();
-      }
-      
-      // Render templates
-      renderTemplates();
-      
-      // Render emojis
-      renderEmojis();
-      
-      // Render GIFs
-      renderGIFs();
-      
-      // Setup event listeners
-      setupEventListeners();
-      
-      // Setup canvas
-      setupCanvas();
-    }
-    
-    // Render meme templates
-    function renderTemplates() {
-      const templateGrid = document.getElementById('templateGrid');
-      templateGrid.innerHTML = '';
-      
-      memeTemplates.forEach(template => {
-        const templateEl = document.createElement('div');
-        templateEl.className = 'template-select';
-        templateEl.innerHTML = `
-          <img src="${template.url}" alt="${template.name} template">
-          <div class="template-name">${template.name}</div>
-        `;
-        templateEl.onclick = () => loadTemplate(template.url);
-        templateGrid.appendChild(templateEl);
-      });
-    }
-    
-    // Render emojis
-    function renderEmojis() {
-      const stickersGrid = document.getElementById('stickers');
-      stickersGrid.innerHTML = '';
-      
-      emojis.forEach(emoji => {
-        const stickerEl = document.createElement('div');
-        stickerEl.className = 'sticker-item';
-        stickerEl.innerHTML = `<img src="${emoji}" alt="Emoji">`;
-        stickerEl.onclick = () => addSticker(emoji);
-        stickersGrid.appendChild(stickerEl);
-      });
-    }
-    
-    // Render GIFs
-    function renderGIFs() {
-      const gifsGrid = document.getElementById('gifs');
-      gifsGrid.innerHTML = '';
-      
-      gifs.forEach(gif => {
-        const gifEl = document.createElement('div');
-        gifEl.className = 'sticker-item';
-        gifEl.innerHTML = `<img src="${gif}" alt="GIF">`;
-        gifEl.onclick = () => addSticker(gif);
-        gifsGrid.appendChild(gifEl);
-      });
-    }
-    
-    // Setup event listeners
-    function setupEventListeners() {
-      // Theme toggle
-      themeToggleBtn.addEventListener('click', toggleDarkMode);
-      
-      // Audio toggle
-      audioBtn.addEventListener('click', toggleMusic);
-      
-      // TOS acceptance
-      acceptTOS.addEventListener('change', function() {
-        acceptTOSBtn.disabled = !this.checked;
-      });
-      
-      acceptTOSBtn.addEventListener('click', function() {
-        localStorage.setItem('tosAccepted', 'true');
-        tosModalBg.style.display = 'none';
-        tosAccepted = true;
-      });
-      
-      // Editor buttons
-      document.getElementById('addTextBox').addEventListener('click', addText);
-      document.getElementById('downloadBtn').addEventListener('click', downloadMeme);
-      
-      // CapCut-like features
-      timelineBtn.addEventListener('click', toggleTimeline);
-      keyframeBtn.addEventListener('click', toggleKeyframeEditor);
-      trimBtn.addEventListener('click', toggleTrimmer);
-    }
-    
-    // Toggle timeline visibility
-    function toggleTimeline() {
-      timelineVisible = !timelineVisible;
-      timelineContainer.style.display = timelineVisible ? 'block' : 'none';
-    }
-    
-    // Toggle keyframe editor
-    function toggleKeyframeEditor() {
-      keyframeEditorVisible = !keyframeEditorVisible;
-      keyframeEditor.style.display = keyframeEditorVisible ? 'block' : 'none';
-    }
-    
-    // Toggle trimmer
-    function toggleTrimmer() {
-      trimmerVisible = !trimmerVisible;
-      trimmerContainer.style.display = trimmerVisible ? 'block' : 'none';
+      canvas.setWidth(newWidth);
+      canvas.setHeight(newHeight);
+      canvas.renderAll();
     }
     
     // Toggle dark mode
     function toggleDarkMode() {
       darkMode = !darkMode;
       document.body.classList.toggle('dark', darkMode);
-      localStorage.setItem('darkMode', darkMode);
       
       // Update theme button icon
-      const icon = themeToggleBtn.querySelector('i');
+      const icon = document.querySelector('#themeToggle i');
       icon.className = darkMode ? 'fas fa-sun' : 'fas fa-moon';
-    }
-    
-    // Toggle music
-    function toggleMusic() {
-      musicPlaying = !musicPlaying;
-      audioBtn.classList.toggle('playing', musicPlaying);
       
-      const icon = audioBtn.querySelector('i');
-      if (musicPlaying) {
-        icon.className = 'fas fa-volume-up';
-        // In a real app, you would play audio here
-      } else {
-        icon.className = 'fas fa-music';
-      }
+      // Update canvas background
+      canvas.backgroundColor = darkMode ? '#1a1a2e' : '#f0f4ff';
+      canvas.renderAll();
     }
     
-    // Show panel
-    function showPanel(panelId) {
-      // Hide all panels
-      document.querySelectorAll('.modal-panel').forEach(panel => {
-        panel.classList.remove('active');
-      });
+    // Initialize the app
+    function initApp() {
+      initCanvas();
       
-      // Show requested panel
-      document.getElementById(`panel-${panelId}`).classList.add('active');
-    }
-    
-    // Close panel
-    function closePanel(panelId) {
-      document.getElementById(`panel-${panelId}`).classList.remove('active');
-    }
-    
-    // Close TOS modal
-    function closeTOSModal() {
-      if (confirm('You must accept the Terms to continue. Close anyway?')) {
-        tosModalBg.style.display = 'none';
-      }
-    }
-    
-    // Load template
-    function loadTemplate(url) {
-      showLoading();
+      // Set up event listeners
+      document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
       
-      // Simulate loading delay
-      setTimeout(() => {
-        const img = new Image();
-        img.onload = function() {
-          canvas.setBackgroundImage(url, canvas.renderAll.bind(canvas), {
-            scaleX: canvas.width / img.width,
-            scaleY: canvas.height / img.height
+      // Tool selection
+      document.querySelectorAll('.tool-item').forEach(tool => {
+        tool.addEventListener('click', function() {
+          // Remove active class from all tools
+          document.querySelectorAll('.tool-item').forEach(t => {
+            t.style.border = '1px solid var(--border-light)';
+            if (darkMode) t.style.borderColor = 'var(--border-dark)';
           });
-          hideLoading();
-          closePanel('templates');
-        };
-        img.src = url;
-      }, 800);
-    }
-    
-    // Add sticker
-    function addSticker(url) {
-      fabric.Image.fromURL(url, function(img) {
-        img.scale(0.5);
-        canvas.add(img);
+          
+          // Add active state to selected tool
+          this.style.border = '2px solid var(--primary)';
+          this.style.transform = 'scale(1.05)';
+          
+          // Show tooltip
+          const toolName = this.querySelector('.tool-name').textContent;
+          showTooltip(`Selected: ${toolName}`);
+        });
       });
     }
     
-    // Add text
-    function addText() {
-      const text = new fabric.IText('Your text here', {
-        left: 100,
-        top: 100,
-        fontFamily: 'Impact',
-        fontSize: 40,
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 2
-      });
-      canvas.add(text);
-    }
-    
-    // Download meme
-    function downloadMeme() {
-      const link = document.createElement('a');
-      link.download = 'meme-studio-creation.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-    
-    // Setup canvas
-    function setupCanvas() {
-      canvas.setWidth(360);
-      canvas.setHeight(360);
-      canvas.backgroundColor = '#ffffff';
+    // Show tooltip notification
+    function showTooltip(message) {
+      const tooltip = document.createElement('div');
+      tooltip.textContent = message;
+      tooltip.style.position = 'fixed';
+      tooltip.style.bottom = '100px';
+      tooltip.style.left = '50%';
+      tooltip.style.transform = 'translateX(-50%)';
+      tooltip.style.backgroundColor = 'rgba(0,0,0,0.8)';
+      tooltip.style.color = 'white';
+      tooltip.style.padding = '10px 20px';
+      tooltip.style.borderRadius = '30px';
+      tooltip.style.zIndex = '1000';
+      tooltip.style.fontSize = '14px';
+      tooltip.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+      tooltip.style.animation = 'slideUp 0.3s ease-out';
       
-      // Add sample text
-      const text = new fabric.IText('Add your text here', {
-        left: 50,
-        top: 50,
-        fontFamily: 'Impact',
-        fontSize: 40,
-        fill: '#ffffff',
-        stroke: '#000000',
-        strokeWidth: 2
-      });
-      canvas.add(text);
-    }
-    
-    // Show loading indicator
-    function showLoading() {
-      loadingIndicator.classList.add('active');
-    }
-    
-    // Hide loading indicator
-    function hideLoading() {
-      loadingIndicator.classList.remove('active');
+      document.body.appendChild(tooltip);
+      
+      setTimeout(() => {
+        tooltip.style.opacity = '0';
+        tooltip.style.transform = 'translateX(-50%) translateY(-10px)';
+        setTimeout(() => {
+          document.body.removeChild(tooltip);
+        }, 300);
+      }, 2000);
     }
     
     // Initialize the app when DOM is loaded
