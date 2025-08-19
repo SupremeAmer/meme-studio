@@ -3,502 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meme Studio Pro - Advanced Video Editor</title>
+  <title>Meme Studio Pro | Premium Meme Creation</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
     :root {
       --primary: #6366f1;
       --primary-dark: #4f46e5;
       --accent: #facc15;
       --accent-dark: #eab308;
-      --light-bg: #eef2ff;
-      --light-bg-secondary: #c7d2fe;
-      --dark-bg: #23233a;
-      --dark-bg-secondary: #181827;
-      --text-light: #222;
-      --text-dark: #f3f4f6;
-      --card-bg-light: #fff;
-      --card-bg-dark: #1e1e2d;
-      --border-light: #e0e7ff;
-      --border-dark: #2d2d42;
+      --light-bg: #f8fafc;
+      --dark-bg: #0f172a;
+      --card-light: #ffffff;
+      --card-dark: #1e293b;
+      --text-light: #334155;
+      --text-dark: #f1f5f9;
       --success: #10b981;
       --danger: #ef4444;
       --info: #3b82f6;
-      --shadow-light: rgba(99, 102, 241, 0.1);
-      --shadow-dark: rgba(35, 35, 58, 0.3);
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      --track-height: 8px;
+      --border: #e2e8f0;
+      --border-dark: #334155;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --shadow-dark: rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s ease;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-
+    
     body {
-      margin: 0;
+      background: linear-gradient(135deg, var(--light-bg) 0%, #e0e7ff 100%);
       color: var(--text-light);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-      overflow: hidden;
-      background: linear-gradient(135deg, var(--light-bg) 0%, var(--light-bg-secondary) 100%);
+      padding: 20px;
       transition: var(--transition);
     }
     
     body.dark {
-      background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-secondary) 100%);
+      background: linear-gradient(135deg, var(--dark-bg) 0%, #1e293b 100%);
       color: var(--text-dark);
     }
-
-    /* Header */
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--card-bg-light);
-      padding: 12px 20px;
-      box-shadow: 0 2px 15px var(--shadow-light);
-      border-bottom: 1px solid var(--border-light);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      transition: var(--transition);
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
     }
     
-    body.dark .app-header {
-      background: var(--dark-bg);
-      box-shadow: 0 2px 15px var(--shadow-dark);
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      margin-bottom: 25px;
     }
     
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      font-size: 1.8rem;
       font-weight: 700;
-      font-size: 1.4rem;
       color: var(--primary);
     }
     
     .logo i {
       color: var(--accent);
+      font-size: 2.2rem;
     }
     
     .header-controls {
       display: flex;
-      gap: 12px;
+      gap: 15px;
+      align-items: center;
     }
     
-    .header-btn {
-      width: 42px;
-      height: 42px;
+    .theme-toggle, .user-menu {
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: none;
-      cursor: pointer;
       font-size: 1.2rem;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-      transition: var(--transition);
-    }
-    
-    .header-btn:hover {
-      transform: scale(1.08) rotate(8deg);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    body.dark .header-btn {
-      background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--primary) 100%);
-    }
-
-    /* Main Container */
-    .editor-container {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-      padding: 15px;
-      gap: 15px;
-    }
-    
-    /* Left Sidebar */
-    .tools-panel {
-      width: 280px;
-      background: var(--card-bg-light);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 4px 25px var(--shadow-light);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      transition: var(--transition);
-      overflow-y: auto;
-    }
-    
-    body.dark .tools-panel {
-      background: var(--card-bg-dark);
-      box-shadow: 0 4px 25px var(--shadow-dark);
-    }
-    
-    .panel-section {
-      background: rgba(99, 102, 241, 0.05);
-      border-radius: 14px;
-      padding: 15px;
-      transition: var(--transition);
-    }
-    
-    body.dark .panel-section {
-      background: rgba(35, 35, 58, 0.3);
-    }
-    
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 15px;
-      font-weight: 600;
-      color: var(--primary);
-      font-size: 1.1rem;
-    }
-    
-    body.dark .section-title {
-      color: var(--accent);
-    }
-    
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-      gap: 12px;
-    }
-    
-    .tool-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 8px;
-      background: var(--card-bg-light);
-      border-radius: 12px;
       cursor: pointer;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
       transition: var(--transition);
-      border: 1px solid var(--border-light);
+      border: none;
     }
     
-    .tool-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(99, 102, 241, 0.2);
-      border-color: var(--primary);
+    .theme-toggle:hover, .user-menu:hover {
+      transform: scale(1.08) rotate(8deg);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
     }
     
-    body.dark .tool-item {
-      background: var(--dark-bg);
-      border-color: var(--border-dark);
+    .user-menu {
+      background: linear-gradient(135deg, var(--info) 0%, var(--primary) 100%);
     }
     
-    .tool-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      border-radius: 10px;
+    .upgrade-btn {
+      padding: 12px 25px;
+      background: linear-gradient(135deg, var(--accent) 0%, #ea580c 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.1rem;
+      gap: 10px;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
     }
     
-    .tool-name {
-      font-size: 0.85rem;
-      font-weight: 500;
-      text-align: center;
-      color: var(--text-light);
+    .upgrade-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(250, 204, 21, 0.4);
     }
     
-    body.dark .tool-name {
-      color: var(--text-dark);
+    /* Main Editor */
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 25px;
+      height: calc(100vh - 150px);
     }
     
     /* Editor Area */
     .editor-area {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 25px;
     }
     
     .preview-container {
       flex: 1;
-      background: var(--card-bg-light);
+      background: var(--card-light);
       border-radius: 18px;
-      box-shadow: 0 4px 25px var(--shadow-light);
+      box-shadow: 0 8px 30px var(--shadow);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 25px;
       transition: var(--transition);
-      position: relative;
-      overflow: hidden;
     }
     
     body.dark .preview-container {
-      background: var(--card-bg-dark);
-      box-shadow: 0 4px 25px var(--shadow-dark);
+      background: var(--card-dark);
+      box-shadow: 0 8px 30px var(--shadow-dark);
     }
     
     #memeCanvas {
       width: 100%;
-      max-width: 600px;
-      height: 70vh;
+      height: 100%;
       max-height: 70vh;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-      touch-action: none;
-      border: 1px solid var(--border-light);
-      transition: var(--transition);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     }
     
     body.dark #memeCanvas {
       background: #1a1a2e;
-      border: 1px solid var(--primary);
     }
     
     .preview-controls {
       display: flex;
       justify-content: center;
       gap: 15px;
-      padding: 15px;
-      background: var(--card-bg-light);
+      padding: 18px;
+      background: var(--card-light);
       border-radius: 18px;
-      box-shadow: 0 4px 25px var(--shadow-light);
+      box-shadow: 0 8px 30px var(--shadow);
       transition: var(--transition);
     }
     
     body.dark .preview-controls {
-      background: var(--card-bg-dark);
-      box-shadow: 0 4px 25px var(--shadow-dark);
+      background: var(--card-dark);
+      box-shadow: 0 8px 30px var(--shadow-dark);
     }
     
     .preview-btn {
-      padding: 10px 20px;
+      padding: 12px 25px;
       background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
       color: white;
       border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-    }
-    
-    .preview-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    /* Timeline */
-    .timeline-container {
-      background: var(--card-bg-light);
-      border-radius: 18px;
-      padding: 15px;
-      box-shadow: 0 4px 25px var(--shadow-light);
-      transition: var(--transition);
-      margin-top: 10px;
-    }
-    
-    body.dark .timeline-container {
-      background: var(--card-bg-dark);
-      box-shadow: 0 4px 25px var(--shadow-dark);
-    }
-    
-    .timeline-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      color: var(--primary);
-      font-weight: 600;
-    }
-    
-    .timeline-track {
-      height: 70px;
-      background: rgba(99, 102, 241, 0.1);
-      border-radius: 8px;
-      position: relative;
-      overflow-x: auto;
-      overflow-y: hidden;
-      padding: 5px;
-      display: flex;
-      gap: 5px;
-    }
-    
-    .playhead {
-      position: absolute;
-      top: 0;
-      width: 3px;
-      height: 100%;
-      background: var(--danger);
-      z-index: 5;
-      left: 30%;
-    }
-    
-    .timeline-clip {
-      height: 100%;
-      min-width: 100px;
-      background: var(--primary);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 0.8rem;
-      padding: 0 10px;
-      position: relative;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    
-    .timeline-clip:hover {
-      transform: scale(1.03);
-    }
-    
-    .timeline-clip.video {
-      background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-    }
-    
-    .timeline-clip.audio {
-      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-    }
-    
-    .timeline-clip.text {
-      background: linear-gradient(135deg, var(--accent) 0%, #ea580c 100%);
-    }
-    
-    .timeline-ruler {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 10px;
-      font-size: 0.8rem;
-      color: var(--text-light);
-      opacity: 0.7;
-    }
-    
-    body.dark .timeline-ruler {
-      color: var(--text-dark);
-    }
-    
-    /* Right Sidebar */
-    .properties-panel {
-      width: 320px;
-      background: var(--card-bg-light);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 4px 25px var(--shadow-light);
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      transition: var(--transition);
-      overflow-y: auto;
-    }
-    
-    body.dark .properties-panel {
-      background: var(--card-bg-dark);
-      box-shadow: 0 4px 25px var(--shadow-dark);
-    }
-    
-    .property-group {
-      background: rgba(99, 102, 241, 0.05);
-      border-radius: 14px;
-      padding: 15px;
-      transition: var(--transition);
-    }
-    
-    body.dark .property-group {
-      background: rgba(35, 35, 58, 0.3);
-    }
-    
-    .property-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 12px 0;
-    }
-    
-    .property-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-    }
-    
-    .property-control {
-      width: 60%;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-light);
-      background: var(--card-bg-light);
-      color: var(--text-light);
-      transition: var(--transition);
-    }
-    
-    body.dark .property-control {
-      background: var(--card-bg-dark);
-      color: var(--text-dark);
-      border-color: var(--border-dark);
-    }
-    
-    .color-preview {
-      width: 30px;
-      height: 30px;
-      border-radius: 6px;
-      background: var(--primary);
-      cursor: pointer;
-    }
-    
-    .slider-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-    }
-    
-    .slider-container input {
-      flex: 1;
-    }
-    
-    .slider-value {
-      min-width: 30px;
-      text-align: center;
-    }
-    
-    /* Footer */
-    .editor-footer {
-      display: flex;
-      justify-content: space-between;
-      padding: 15px 20px;
-      background: var(--card-bg-light);
-      box-shadow: 0 -2px 15px var(--shadow-light);
-      border-top: 1px solid var(--border-light);
-      transition: var(--transition);
-    }
-    
-    body.dark .editor-footer {
-      background: var(--dark-bg);
-      box-shadow: 0 -2px 15px var(--shadow-dark);
-    }
-    
-    .action-btn {
-      padding: 12px 25px;
       border-radius: 12px;
       font-weight: 600;
       cursor: pointer;
@@ -506,470 +200,509 @@
       align-items: center;
       gap: 10px;
       transition: var(--transition);
-      border: none;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     }
     
-    .action-btn.primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-      color: white;
+    .preview-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
     }
     
-    .action-btn.secondary {
-      background: var(--card-bg-light);
+    /* Premium Plans */
+    .plans-container {
+      background: var(--card-light);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 8px 30px var(--shadow);
+      transition: var(--transition);
+      overflow-y: auto;
+    }
+    
+    body.dark .plans-container {
+      background: var(--card-dark);
+      box-shadow: 0 8px 30px var(--shadow-dark);
+    }
+    
+    .plans-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .plans-header h2 {
+      font-size: 1.8rem;
       color: var(--primary);
-      border: 1px solid var(--border-light);
+      margin-bottom: 10px;
     }
     
-    body.dark .action-btn.secondary {
-      background: var(--card-bg-dark);
+    body.dark .plans-header h2 {
+      color: var(--accent);
+    }
+    
+    .plans-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    
+    .plan-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(250, 204, 21, 0.1) 100%);
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    body.dark .plan-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(30, 41, 59, 0.5) 100%);
       border-color: var(--border-dark);
     }
     
-    .action-btn:hover {
+    .plan-card.featured {
+      border: 2px solid var(--accent);
+      transform: scale(1.02);
+      box-shadow: 0 10px 25px rgba(250, 204, 21, 0.2);
+    }
+    
+    .plan-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+    
+    body.dark .plan-name {
+      color: var(--accent);
+    }
+    
+    .plan-price {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: var(--text-light);
+    }
+    
+    body.dark .plan-price {
+      color: var(--text-dark);
+    }
+    
+    .plan-price span {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+    
+    .plan-features {
+      list-style: none;
+      margin: 20px 0;
+      padding: 0;
+    }
+    
+    .plan-features li {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    body.dark .plan-features li {
+      border-bottom: 1px dashed var(--border-dark);
+    }
+    
+    .plan-features li i {
+      color: var(--success);
+    }
+    
+    .plan-payment {
+      margin-top: 25px;
+      padding: 20px;
+      background: rgba(99, 102, 241, 0.08);
+      border-radius: 12px;
+      text-align: center;
+    }
+    
+    .payment-option {
+      margin-bottom: 20px;
+    }
+    
+    .payment-option h4 {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .crypto-address {
+      font-family: monospace;
+      font-size: 0.85rem;
+      background: rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      word-break: break-all;
+    }
+    
+    body.dark .crypto-address {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px auto;
+      transition: var(--transition);
+    }
+    
+    .copy-btn:hover {
+      background: var(--primary-dark);
+    }
+    
+    /* Upgrade Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .upgrade-modal {
+      background: var(--card-light);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .upgrade-modal {
+      transform: translateY(0);
+    }
+    
+    body.dark .upgrade-modal {
+      background: var(--card-dark);
+    }
+    
+    .modal-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+    
+    .modal-header h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    
+    .modal-body {
+      padding: 30px;
+    }
+    
+    .benefits-list {
+      margin: 20px 0;
+      padding-left: 20px;
+    }
+    
+    .benefits-list li {
+      margin: 12px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .benefits-list i {
+      color: var(--success);
+      font-size: 1.2rem;
+      margin-top: 3px;
+    }
+    
+    .payment-details {
+      background: rgba(99, 102, 241, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      text-align: center;
+    }
+    
+    .modal-footer {
+      padding: 0 30px 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .modal-btn {
+      padding: 12px 30px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+    
+    .close-btn {
+      background: #e2e8f0;
+      color: #334155;
+    }
+    
+    body.dark .close-btn {
+      background: #334155;
+      color: #e2e8f0;
+    }
+    
+    .upgrade-btn-modal {
+      background: linear-gradient(135deg, var(--accent) 0%, #ea580c 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+    }
+    
+    .upgrade-btn-modal:hover {
       transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    
-    /* Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    @keyframes slideUp {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      box-shadow: 0 6px 16px rgba(250, 204, 21, 0.4);
     }
     
     /* Responsive */
-    @media (max-width: 1200px) {
-      .tools-panel, .properties-panel {
-        width: 240px;
-      }
-    }
-    
-    @media (max-width: 992px) {
+    @media (max-width: 1100px) {
       .editor-container {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
       }
       
-      .tools-panel, .properties-panel {
-        width: 100%;
-      }
-      
-      .preview-container {
-        min-height: 400px;
+      .plans-container {
+        order: -1;
+        margin-bottom: 30px;
       }
     }
     
     @media (max-width: 768px) {
-      .logo span {
+      .preview-controls {
+        flex-wrap: wrap;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .plans-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .preview-btn span {
         display: none;
       }
       
-      .tools-grid {
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      }
-      
-      .action-btn span {
-        display: none;
-      }
-      
-      .action-btn i {
-        margin: 0;
+      .preview-btn {
+        padding: 12px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="app-header">
-    <div class="logo">
-      <i class="fas fa-film"></i>
-      <span>Meme Studio Pro</span>
-    </div>
-    <div class="header-controls">
-      <button class="header-btn" id="themeToggle" title="Toggle Theme">
-        <i class="fas fa-moon"></i>
-      </button>
-      <button class="header-btn" id="helpBtn" title="Help">
-        <i class="fas fa-question"></i>
-      </button>
-      <button class="header-btn" id="exportBtn" title="Export Project">
-        <i class="fas fa-file-export"></i>
-      </button>
-    </div>
-  </header>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <i class="fas fa-camera-retro"></i>
+        <span>Meme Studio Pro</span>
+      </div>
+      <div class="header-controls">
+        <button class="theme-toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+        </button>
+        <button class="user-menu" id="userMenu">
+          <i class="fas fa-user"></i>
+        </button>
+        <button class="upgrade-btn" id="upgradeBtn">
+          <i class="fas fa-crown"></i>
+          <span>Upgrade to Premium</span>
+        </button>
+      </div>
+    </header>
 
-  <!-- Main Editor -->
-  <div class="editor-container">
-    <!-- Left Tools Panel -->
-    <div class="tools-panel">
-      <div class="panel-section">
-        <div class="section-title">
-          <i class="fas fa-sliders-h"></i>
-          <span>Adjustments</span>
+    <!-- Main Editor -->
+    <div class="editor-container">
+      <!-- Editor Area -->
+      <div class="editor-area">
+        <div class="preview-container">
+          <canvas id="memeCanvas" width="800" height="450"></canvas>
         </div>
-        <div class="tools-grid">
-          <div class="tool-item" data-tool="brightness">
-            <div class="tool-icon">
-              <i class="fas fa-sun"></i>
-            </div>
-            <div class="tool-name">Brightness</div>
-          </div>
-          <div class="tool-item" data-tool="contrast">
-            <div class="tool-icon">
-              <i class="fas fa-adjust"></i>
-            </div>
-            <div class="tool-name">Contrast</div>
-          </div>
-          <div class="tool-item" data-tool="saturation">
-            <div class="tool-icon">
-              <i class="fas fa-tint"></i>
-            </div>
-            <div class="tool-name">Saturation</div>
-          </div>
-          <div class="tool-item" data-tool="temperature">
-            <div class="tool-icon">
-              <i class="fas fa-thermometer-half"></i>
-            </div>
-            <div class="tool-name">Temperature</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="panel-section">
-        <div class="section-title">
-          <i class="fas fa-magic"></i>
-          <span>Effects</span>
-        </div>
-        <div class="tools-grid">
-          <div class="tool-item" data-tool="blur">
-            <div class="tool-icon">
-              <i class="fas fa-droplet"></i>
-            </div>
-            <div class="tool-name">Blur</div>
-          </div>
-          <div class="tool-item" data-tool="vintage">
-            <div class="tool-icon">
-              <i class="fas fa-camera-retro"></i>
-            </div>
-            <div class="tool-name">Vintage</div>
-          </div>
-          <div class="tool-item" data-tool="glitch">
-            <div class="tool-icon">
-              <i class="fas fa-bolt"></i>
-            </div>
-            <div class="tool-name">Glitch</div>
-          </div>
-          <div class="tool-item" data-tool="pixelate">
-            <div class="tool-icon">
-              <i class="fas fa-border-all"></i>
-            </div>
-            <div class="tool-name">Pixelate</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="panel-section">
-        <div class="section-title">
-          <i class="fas fa-text-height"></i>
-          <span>Text & Titles</span>
-        </div>
-        <div class="tools-grid">
-          <div class="tool-item" data-tool="add-text">
-            <div class="tool-icon">
-              <i class="fas fa-font"></i>
-            </div>
-            <div class="tool-name">Add Text</div>
-          </div>
-          <div class="tool-item" data-tool="titles">
-            <div class="tool-icon">
-              <i class="fas fa-heading"></i>
-            </div>
-            <div class="tool-name">Titles</div>
-          </div>
-          <div class="tool-item" data-tool="subtitles">
-            <div class="tool-icon">
-              <i class="fas fa-closed-captioning"></i>
-            </div>
-            <div class="tool-name">Subtitles</div>
-          </div>
-          <div class="tool-item" data-tool="text-animation">
-            <div class="tool-icon">
-              <i class="fas fa-running"></i>
-            </div>
-            <div class="tool-name">Text Anim</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="panel-section">
-        <div class="section-title">
-          <i class="fas fa-music"></i>
-          <span>Audio</span>
-        </div>
-        <div class="tools-grid">
-          <div class="tool-item" data-tool="add-music">
-            <div class="tool-icon">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="tool-name">Add Music</div>
-          </div>
-          <div class="tool-item" data-tool="voiceover">
-            <div class="tool-icon">
-              <i class="fas fa-microphone"></i>
-            </div>
-            <div class="tool-name">Voiceover</div>
-          </div>
-          <div class="tool-item" data-tool="sound-effects">
-            <div class="tool-icon">
-              <i class="fas fa-volume-up"></i>
-            </div>
-            <div class="tool-name">Sound FX</div>
-          </div>
-          <div class="tool-item" data-tool="audio-mixer">
-            <div class="tool-icon">
-              <i class="fas fa-sliders-h"></i>
-            </div>
-            <div class="tool-name">Audio Mixer</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Editor Area -->
-    <div class="editor-area">
-      <div class="preview-container">
-        <canvas id="memeCanvas" width="800" height="450"></canvas>
-      </div>
-      
-      <div class="preview-controls">
-        <button class="preview-btn">
-          <i class="fas fa-play"></i> Play Preview
-        </button>
-        <button class="preview-btn">
-          <i class="fas fa-redo"></i> Reset
-        </button>
-        <button class="preview-btn">
-          <i class="fas fa-undo"></i> Undo
-        </button>
-        <button class="preview-btn">
-          <i class="fas fa-save"></i> Save Project
-        </button>
-      </div>
-      
-      <div class="timeline-container">
-        <div class="timeline-header">
-          <span><i class="fas fa-timeline"></i> Timeline</span>
+        
+        <div class="preview-controls">
           <button class="preview-btn">
-            <i class="fas fa-plus"></i> Add Track
+            <i class="fas fa-play"></i>
+            <span>Play Preview</span>
+          </button>
+          <button class="preview-btn">
+            <i class="fas fa-redo"></i>
+            <span>Reset</span>
+          </button>
+          <button class="preview-btn">
+            <i class="fas fa-undo"></i>
+            <span>Undo</span>
+          </button>
+          <button class="preview-btn">
+            <i class="fas fa-download"></i>
+            <span>Export</span>
           </button>
         </div>
-        <div class="timeline-track">
-          <div class="playhead"></div>
-          <div class="timeline-clip video">
-            <i class="fas fa-video"></i> Intro Video
-          </div>
-          <div class="timeline-clip text">
-            <i class="fas fa-text"></i> Title
-          </div>
-          <div class="timeline-clip video">
-            <i class="fas fa-video"></i> Main Clip
-          </div>
-          <div class="timeline-clip audio">
-            <i class="fas fa-music"></i> Background Music
-          </div>
-          <div class="timeline-clip text">
-            <i class="fas fa-text"></i> Outro Text
-          </div>
-        </div>
-        <div class="timeline-ruler">
-          <span>0:00</span>
-          <span>0:05</span>
-          <span>0:10</span>
-          <span>0:15</span>
-          <span>0:20</span>
-          <span>0:25</span>
-          <span>0:30</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Right Properties Panel -->
-    <div class="properties-panel">
-      <div class="property-group">
-        <div class="section-title">
-          <i class="fas fa-cog"></i>
-          <span>Transform</span>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-arrows-alt"></i>
-            <span>Position</span>
-          </div>
-          <div class="property-control">
-            <input type="text" value="320, 180" class="property-control">
-          </div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-expand"></i>
-            <span>Scale</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="0" max="200" value="100">
-            <div class="slider-value">100%</div>
-          </div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-sync"></i>
-            <span>Rotation</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="0" max="360" value="0">
-            <div class="slider-value">0°</div>
-          </div>
-        </div>
       </div>
       
-      <div class="property-group">
-        <div class="section-title">
-          <i class="fas fa-paint-brush"></i>
-          <span>Appearance</span>
+      <!-- Premium Plans -->
+      <div class="plans-container">
+        <div class="plans-header">
+          <h2>Premium Subscription Plans</h2>
+          <p>Unlock advanced features and remove limitations</p>
         </div>
         
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-fill"></i>
-            <span>Fill Color</span>
+        <div class="plans-grid">
+          <div class="plan-card">
+            <div class="plan-name">Basic Plan</div>
+            <div class="plan-price">$3 <span>/2 months</span></div>
+            <ul class="plan-features">
+              <li><i class="fas fa-check"></i> HD Video Export</li>
+              <li><i class="fas fa-check"></i> Premium Templates</li>
+              <li><i class="fas fa-check"></i> 50GB Cloud Storage</li>
+              <li><i class="fas fa-check"></i> Basic Support</li>
+              <li><i class="fas fa-times"></i> Watermark Removal</li>
+              <li><i class="fas fa-times"></i> Commercial License</li>
+            </ul>
+            
+            <div class="plan-payment">
+              <div class="payment-option">
+                <h4><i class="fab fa-usd"></i> Pay with USDT</h4>
+                <p>Send exactly 3 USDT to:</p>
+                <div class="crypto-address" id="usdtAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
+                <button class="copy-btn" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e" data-amount="3" data-currency="USDT">
+                  <i class="fas fa-copy"></i> Copy Address
+                </button>
+              </div>
+              
+              <div class="payment-option">
+                <h4><i class="fab fa-btc"></i> Pay with BNB</h4>
+                <p>Send exactly 0.01 BNB to:</p>
+                <div class="crypto-address" id="bnbAddress">bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp</div>
+                <button class="copy-btn" data-address="bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp" data-amount="0.01" data-currency="BNB">
+                  <i class="fas fa-copy"></i> Copy Address
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="color-preview" style="background: #ffffff;"></div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-border-style"></i>
-            <span>Stroke Color</span>
-          </div>
-          <div class="color-preview" style="background: #000000;"></div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-text-height"></i>
-            <span>Font Size</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="10" max="120" value="48">
-            <div class="slider-value">48px</div>
-          </div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-font"></i>
-            <span>Font Family</span>
-          </div>
-          <select class="property-control">
-            <option>Impact</option>
-            <option selected>Arial</option>
-            <option>Comic Sans</option>
-            <option>Times New Roman</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="property-group">
-        <div class="section-title">
-          <i class="fas fa-film"></i>
-          <span>Video Effects</span>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-sun"></i>
-            <span>Brightness</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="0" max="200" value="100">
-            <div class="slider-value">100%</div>
-          </div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-adjust"></i>
-            <span>Contrast</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="0" max="200" value="100">
-            <div class="slider-value">100%</div>
-          </div>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-tint"></i>
-            <span>Saturation</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="0" max="200" value="100">
-            <div class="slider-value">100%</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="property-group">
-        <div class="section-title">
-          <i class="fas fa-running"></i>
-          <span>Animation</span>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-play"></i>
-            <span>Animation Type</span>
-          </div>
-          <select class="property-control">
-            <option>None</option>
-            <option selected>Fade In</option>
-            <option>Slide In</option>
-            <option>Bounce</option>
-            <option>Zoom</option>
-          </select>
-        </div>
-        
-        <div class="property-row">
-          <div class="property-label">
-            <i class="fas fa-clock"></i>
-            <span>Duration</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" min="0" max="5" value="1" step="0.1">
-            <div class="slider-value">1.0s</div>
+          
+          <div class="plan-card featured">
+            <div class="plan-name">Pro Plan</div>
+            <div class="plan-price">$15 <span>/year</span></div>
+            <ul class="plan-features">
+              <li><i class="fas fa-check"></i> 4K Video Export</li>
+              <li><i class="fas fa-check"></i> All Premium Templates</li>
+              <li><i class="fas fa-check"></i> 500GB Cloud Storage</li>
+              <li><i class="fas fa-check"></i> Priority Support</li>
+              <li><i class="fas fa-check"></i> Watermark Removal</li>
+              <li><i class="fas fa-check"></i> Commercial License</li>
+            </ul>
+            
+            <div class="plan-payment">
+              <div class="payment-option">
+                <h4><i class="fab fa-usd"></i> Pay with USDT</h4>
+                <p>Send exactly 15 USDT to:</p>
+                <div class="crypto-address" id="usdtProAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
+                <button class="copy-btn" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e" data-amount="15" data-currency="USDT">
+                  <i class="fas fa-copy"></i> Copy Address
+                </button>
+              </div>
+              
+              <div class="payment-option">
+                <h4><i class="fab fa-btc"></i> Pay with BNB</h4>
+                <p>Send exactly 0.05 BNB to:</p>
+                <div class="crypto-address" id="bnbProAddress">bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp</div>
+                <button class="copy-btn" data-address="bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp" data-amount="0.05" data-currency="BNB">
+                  <i class="fas fa-copy"></i> Copy Address
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  
-  <!-- Footer -->
-  <footer class="editor-footer">
-    <button class="action-btn secondary">
-      <i class="fas fa-times"></i>
-      <span>Cancel</span>
-    </button>
-    <button class="action-btn primary">
-      <i class="fas fa-download"></i>
-      <span>Export Video</span>
-    </button>
-  </footer>
+
+  <!-- Upgrade Modal -->
+  <div class="modal-overlay" id="upgradeModal">
+    <div class="upgrade-modal">
+      <div class="modal-header">
+        <h2>Upgrade to Premium</h2>
+        <p>Unlock all features and remove limitations</p>
+      </div>
+      <div class="modal-body">
+        <h3>Premium Benefits</h3>
+        <ul class="benefits-list">
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Unlimited HD/4K video exports</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Remove all watermarks</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Access to premium templates</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Advanced AI effects and filters</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Priority customer support</span>
+          </li>
+          <li>
+            <i class="fas fa-check-circle"></i>
+            <span>Commercial usage rights</span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn close-btn" id="closeModalBtn">Cancel</button>
+        <button class="modal-btn upgrade-btn-modal">
+          <i class="fas fa-lock"></i>
+          View Payment Options
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Initialize variables
@@ -1024,28 +757,6 @@
       });
       
       canvas.add(rect, text);
-      
-      // Make canvas responsive
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-    }
-    
-    // Resize canvas to fit container
-    function resizeCanvas() {
-      const container = document.querySelector('.preview-container');
-      const aspectRatio = 800 / 450;
-      
-      let newWidth = container.clientWidth - 40;
-      let newHeight = newWidth / aspectRatio;
-      
-      if (newHeight > container.clientHeight - 40) {
-        newHeight = container.clientHeight - 40;
-        newWidth = newHeight * aspectRatio;
-      }
-      
-      canvas.setWidth(newWidth);
-      canvas.setHeight(newHeight);
-      canvas.renderAll();
     }
     
     // Toggle dark mode
@@ -1062,63 +773,98 @@
       canvas.renderAll();
     }
     
+    // Upgrade modal functions
+    function showUpgradeModal() {
+      document.getElementById('upgradeModal').classList.add('active');
+    }
+    
+    function hideUpgradeModal() {
+      document.getElementById('upgradeModal').classList.remove('active');
+    }
+    
+    // Copy crypto address with amount
+    function copyCryptoAddress(btn) {
+      const address = btn.getAttribute('data-address');
+      const amount = btn.getAttribute('data-amount');
+      const currency = btn.getAttribute('data-currency');
+      
+      const text = `Send exactly ${amount} ${currency} to: ${address}`;
+      navigator.clipboard.writeText(text);
+      
+      // Show copied feedback
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+      }, 2000);
+      
+      // Show notification
+      showNotification(`Copied ${currency} payment details to clipboard!`);
+    }
+    
+    // Show notification
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.position = 'fixed';
+      notification.style.bottom = '30px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.backgroundColor = 'rgba(0,0,0,0.8)';
+      notification.style.color = 'white';
+      notification.style.padding = '15px 30px';
+      notification.style.borderRadius = '30px';
+      notification.style.zIndex = '1000';
+      notification.style.fontSize = '14px';
+      notification.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+      notification.style.animation = 'fadeIn 0.3s ease-out';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(-50%) translateY(10px)';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+    
     // Initialize the app
     function initApp() {
       initCanvas();
       
       // Set up event listeners
       document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
+      document.getElementById('upgradeBtn').addEventListener('click', showUpgradeModal);
+      document.getElementById('closeModalBtn').addEventListener('click', hideUpgradeModal);
       
-      // Tool selection
-      document.querySelectorAll('.tool-item').forEach(tool => {
-        tool.addEventListener('click', function() {
-          // Remove active class from all tools
-          document.querySelectorAll('.tool-item').forEach(t => {
-            t.style.border = '1px solid var(--border-light)';
-            if (darkMode) t.style.borderColor = 'var(--border-dark)';
-          });
-          
-          // Add active state to selected tool
-          this.style.border = '2px solid var(--primary)';
-          this.style.transform = 'scale(1.05)';
-          
-          // Show tooltip
-          const toolName = this.querySelector('.tool-name').textContent;
-          showTooltip(`Selected: ${toolName}`);
-        });
+      // Add copy functionality to all copy buttons
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => copyCryptoAddress(btn));
       });
-    }
-    
-    // Show tooltip notification
-    function showTooltip(message) {
-      const tooltip = document.createElement('div');
-      tooltip.textContent = message;
-      tooltip.style.position = 'fixed';
-      tooltip.style.bottom = '100px';
-      tooltip.style.left = '50%';
-      tooltip.style.transform = 'translateX(-50%)';
-      tooltip.style.backgroundColor = 'rgba(0,0,0,0.8)';
-      tooltip.style.color = 'white';
-      tooltip.style.padding = '10px 20px';
-      tooltip.style.borderRadius = '30px';
-      tooltip.style.zIndex = '1000';
-      tooltip.style.fontSize = '14px';
-      tooltip.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-      tooltip.style.animation = 'slideUp 0.3s ease-out';
       
-      document.body.appendChild(tooltip);
-      
-      setTimeout(() => {
-        tooltip.style.opacity = '0';
-        tooltip.style.transform = 'translateX(-50%) translateY(-10px)';
-        setTimeout(() => {
-          document.body.removeChild(tooltip);
-        }, 300);
-      }, 2000);
+      // Close modal when clicking outside
+      document.querySelector('.modal-overlay').addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+          hideUpgradeModal();
+        }
+      });
     }
     
     // Initialize the app when DOM is loaded
     document.addEventListener('DOMContentLoaded', initApp);
+    
+    // Add keyframe animation
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
