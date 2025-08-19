@@ -151,7 +151,7 @@
       align-items: center;
       justify-content: center;
       padding: 25px;
-      transition: var(--transition);
+      transition: var(--transition;
     }
     
     body.dark .preview-container {
@@ -208,43 +208,73 @@
       box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
     }
     
-    /* Premium Plans */
-    .plans-container {
+    /* Premium Upgrade Panel */
+    .upgrade-panel {
       background: var(--card-light);
       border-radius: 18px;
       padding: 25px;
       box-shadow: 0 8px 30px var(--shadow);
       transition: var(--transition);
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     
-    body.dark .plans-container {
+    body.dark .upgrade-panel {
       background: var(--card-dark);
       box-shadow: 0 8px 30px var(--shadow-dark);
     }
     
-    .plans-header {
+    .panel-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
     }
     
-    .plans-header h2 {
+    .panel-header h2 {
       font-size: 1.8rem;
       color: var(--primary);
       margin-bottom: 10px;
     }
     
-    body.dark .plans-header h2 {
+    body.dark .panel-header h2 {
       color: var(--accent);
     }
     
-    .plans-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
+    .panel-header p {
+      color: var(--text-light);
+      font-size: 1.1rem;
     }
     
-    .plan-card {
+    body.dark .panel-header p {
+      color: var(--text-dark);
+    }
+    
+    .benefits-list {
+      list-style: none;
+      margin: 20px 0;
+      padding: 0;
+    }
+    
+    .benefits-list li {
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1rem;
+    }
+    
+    body.dark .benefits-list li {
+      border-bottom: 1px dashed var(--border-dark);
+    }
+    
+    .benefits-list li i {
+      color: var(--success);
+      font-size: 1.2rem;
+    }
+    
+    .pricing-card {
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(250, 204, 21, 0.1) 100%);
       border-radius: 16px;
       padding: 25px;
@@ -255,21 +285,28 @@
       overflow: hidden;
     }
     
-    body.dark .plan-card {
+    body.dark .pricing-card {
       background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(30, 41, 59, 0.5) 100%);
       border-color: var(--border-dark);
     }
     
-    .plan-card.featured {
-      border: 2px solid var(--accent);
-      transform: scale(1.02);
-      box-shadow: 0 10px 25px rgba(250, 204, 21, 0.2);
+    .pricing-card::before {
+      content: 'ONE-TIME PAYMENT';
+      position: absolute;
+      top: 10px;
+      right: -30px;
+      background: var(--accent);
+      color: #333;
+      padding: 5px 35px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transform: rotate(45deg);
     }
     
     .plan-name {
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin: 15px 0;
       color: var(--primary);
     }
     
@@ -278,10 +315,14 @@
     }
     
     .plan-price {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       font-weight: 800;
       margin-bottom: 20px;
       color: var(--text-light);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 5px;
     }
     
     body.dark .plan-price {
@@ -289,35 +330,13 @@
     }
     
     .plan-price span {
-      font-size: 1rem;
+      font-size: 1.2rem;
       font-weight: 600;
       color: #64748b;
+      margin-top: 10px;
     }
     
-    .plan-features {
-      list-style: none;
-      margin: 20px 0;
-      padding: 0;
-    }
-    
-    .plan-features li {
-      padding: 10px 0;
-      border-bottom: 1px dashed var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    body.dark .plan-features li {
-      border-bottom: 1px dashed var(--border-dark);
-    }
-    
-    .plan-features li i {
-      color: var(--success);
-    }
-    
-    .plan-payment {
+    .payment-options {
       margin-top: 25px;
       padding: 20px;
       background: rgba(99, 102, 241, 0.08);
@@ -427,32 +446,6 @@
       padding: 30px;
     }
     
-    .benefits-list {
-      margin: 20px 0;
-      padding-left: 20px;
-    }
-    
-    .benefits-list li {
-      margin: 12px 0;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    
-    .benefits-list i {
-      color: var(--success);
-      font-size: 1.2rem;
-      margin-top: 3px;
-    }
-    
-    .payment-details {
-      background: rgba(99, 102, 241, 0.08);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 25px 0;
-      text-align: center;
-    }
-    
     .modal-footer {
       padding: 0 30px 30px;
       display: flex;
@@ -498,7 +491,7 @@
         height: auto;
       }
       
-      .plans-container {
+      .upgrade-panel {
         order: -1;
         margin-bottom: 30px;
       }
@@ -513,10 +506,6 @@
         flex-direction: column;
         gap: 20px;
       }
-      
-      .plans-grid {
-        grid-template-columns: 1fr;
-      }
     }
     
     @media (max-width: 480px) {
@@ -526,6 +515,11 @@
       
       .preview-btn {
         padding: 12px;
+      }
+      
+      .pricing-card::before {
+        font-size: 0.7rem;
+        right: -40px;
       }
     }
   </style>
@@ -544,10 +538,6 @@
         </button>
         <button class="user-menu" id="userMenu">
           <i class="fas fa-user"></i>
-        </button>
-        <button class="upgrade-btn" id="upgradeBtn">
-          <i class="fas fa-crown"></i>
-          <span>Upgrade to Premium</span>
         </button>
       </div>
     </header>
@@ -580,79 +570,50 @@
         </div>
       </div>
       
-      <!-- Premium Plans -->
-      <div class="plans-container">
-        <div class="plans-header">
-          <h2>Premium Subscription Plans</h2>
-          <p>Unlock advanced features and remove limitations</p>
+      <!-- Premium Upgrade Panel -->
+      <div class="upgrade-panel">
+        <div class="panel-header">
+          <h2>Unlock Premium Features</h2>
+          <p>One-time payment for lifetime access</p>
         </div>
         
-        <div class="plans-grid">
-          <div class="plan-card">
-            <div class="plan-name">Basic Plan</div>
-            <div class="plan-price">$3 <span>/2 months</span></div>
-            <ul class="plan-features">
-              <li><i class="fas fa-check"></i> HD Video Export</li>
-              <li><i class="fas fa-check"></i> Premium Templates</li>
-              <li><i class="fas fa-check"></i> 50GB Cloud Storage</li>
-              <li><i class="fas fa-check"></i> Basic Support</li>
-              <li><i class="fas fa-times"></i> Watermark Removal</li>
-              <li><i class="fas fa-times"></i> Commercial License</li>
-            </ul>
-            
-            <div class="plan-payment">
-              <div class="payment-option">
-                <h4><i class="fab fa-usd"></i> Pay with USDT</h4>
-                <p>Send exactly 3 USDT to:</p>
-                <div class="crypto-address" id="usdtAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
-                <button class="copy-btn" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e" data-amount="3" data-currency="USDT">
-                  <i class="fas fa-copy"></i> Copy Address
-                </button>
-              </div>
-              
-              <div class="payment-option">
-                <h4><i class="fab fa-btc"></i> Pay with BNB</h4>
-                <p>Send exactly 0.01 BNB to:</p>
-                <div class="crypto-address" id="bnbAddress">bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp</div>
-                <button class="copy-btn" data-address="bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp" data-amount="0.01" data-currency="BNB">
-                  <i class="fas fa-copy"></i> Copy Address
-                </button>
-              </div>
-            </div>
-          </div>
+        <div class="pricing-card">
+          <div class="plan-name">Premium Edition</div>
+          <div class="plan-price">$20 <span>ONE-TIME</span></div>
           
-          <div class="plan-card featured">
-            <div class="plan-name">Pro Plan</div>
-            <div class="plan-price">$15 <span>/year</span></div>
-            <ul class="plan-features">
-              <li><i class="fas fa-check"></i> 4K Video Export</li>
-              <li><i class="fas fa-check"></i> All Premium Templates</li>
-              <li><i class="fas fa-check"></i> 500GB Cloud Storage</li>
-              <li><i class="fas fa-check"></i> Priority Support</li>
-              <li><i class="fas fa-check"></i> Watermark Removal</li>
-              <li><i class="fas fa-check"></i> Commercial License</li>
-            </ul>
+          <ul class="benefits-list">
+            <li><i class="fas fa-check"></i> Full access to all premium features</li>
+            <li><i class="fas fa-check"></i> 4K video exports</li>
+            <li><i class="fas fa-check"></i> Remove all watermarks</li>
+            <li><i class="fas fa-check"></i> Commercial usage license</li>
+            <li><i class="fas fa-check"></i> Premium templates & assets</li>
+            <li><i class="fas fa-check"></i> Priority customer support</li>
+            <li><i class="fas fa-check"></i> Lifetime updates</li>
+          </ul>
+          
+          <div class="payment-options">
+            <div class="payment-option">
+              <h4><i class="fab fa-usd"></i> Pay with USDT</h4>
+              <p>Send exactly 20 USDT to:</p>
+              <div class="crypto-address" id="usdtAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
+              <button class="copy-btn" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e" data-amount="20" data-currency="USDT">
+                <i class="fas fa-copy"></i> Copy Address
+              </button>
+            </div>
             
-            <div class="plan-payment">
-              <div class="payment-option">
-                <h4><i class="fab fa-usd"></i> Pay with USDT</h4>
-                <p>Send exactly 15 USDT to:</p>
-                <div class="crypto-address" id="usdtProAddress">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
-                <button class="copy-btn" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e" data-amount="15" data-currency="USDT">
-                  <i class="fas fa-copy"></i> Copy Address
-                </button>
-              </div>
-              
-              <div class="payment-option">
-                <h4><i class="fab fa-btc"></i> Pay with BNB</h4>
-                <p>Send exactly 0.05 BNB to:</p>
-                <div class="crypto-address" id="bnbProAddress">bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp</div>
-                <button class="copy-btn" data-address="bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp" data-amount="0.05" data-currency="BNB">
-                  <i class="fas fa-copy"></i> Copy Address
-                </button>
-              </div>
+            <div class="payment-option">
+              <h4><i class="fab fa-btc"></i> Pay with BNB</h4>
+              <p>Send exactly 0.08 BNB to:</p>
+              <div class="crypto-address" id="bnbAddress">bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp</div>
+              <button class="copy-btn" data-address="bnb1v8vkkymvhe2sf7gd2092ujc6hweta38xwd2pnp" data-amount="0.08" data-currency="BNB">
+                <i class="fas fa-copy"></i> Copy Address
+              </button>
             </div>
           </div>
+        </div>
+        
+        <div class="payment-note">
+          <p><i class="fas fa-info-circle"></i> After payment, send your transaction ID to support@memestudio.com to activate your license.</p>
         </div>
       </div>
     </div>
@@ -662,43 +623,22 @@
   <div class="modal-overlay" id="upgradeModal">
     <div class="upgrade-modal">
       <div class="modal-header">
-        <h2>Upgrade to Premium</h2>
-        <p>Unlock all features and remove limitations</p>
+        <h2>Premium Features Unlocked!</h2>
+        <p>Thank you for upgrading to Meme Studio Pro</p>
       </div>
       <div class="modal-body">
-        <h3>Premium Benefits</h3>
+        <p>Your premium features are now activated. You can enjoy:</p>
         <ul class="benefits-list">
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Unlimited HD/4K video exports</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Remove all watermarks</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Access to premium templates</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Advanced AI effects and filters</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Priority customer support</span>
-          </li>
-          <li>
-            <i class="fas fa-check-circle"></i>
-            <span>Commercial usage rights</span>
-          </li>
+          <li><i class="fas fa-check"></i> Watermark-free exports</li>
+          <li><i class="fas fa-check"></i> 4K video rendering</li>
+          <li><i class="fas fa-check"></i> Premium templates library</li>
+          <li><i class="fas fa-check"></i> Commercial usage rights</li>
         </ul>
       </div>
       <div class="modal-footer">
-        <button class="modal-btn close-btn" id="closeModalBtn">Cancel</button>
-        <button class="modal-btn upgrade-btn-modal">
-          <i class="fas fa-lock"></i>
-          View Payment Options
+        <button class="modal-btn upgrade-btn-modal" id="startCreatingBtn">
+          <i class="fas fa-rocket"></i>
+          Start Creating
         </button>
       </div>
     </div>
@@ -708,6 +648,7 @@
     // Initialize variables
     let darkMode = false;
     const canvas = new fabric.Canvas('memeCanvas');
+    let isPremium = false;
     
     // Initialize the canvas with sample content
     function initCanvas() {
@@ -773,8 +714,8 @@
       canvas.renderAll();
     }
     
-    // Upgrade modal functions
-    function showUpgradeModal() {
+    // Show upgrade success modal
+    function showUpgradeSuccess() {
       document.getElementById('upgradeModal').classList.add('active');
     }
     
@@ -831,18 +772,46 @@
       }, 3000);
     }
     
+    // Simulate premium activation
+    function activatePremium() {
+      isPremium = true;
+      showUpgradeSuccess();
+      document.querySelector('.upgrade-panel').innerHTML = `
+        <div class="panel-header">
+          <h2><i class="fas fa-crown"></i> Premium Activated</h2>
+          <p>Thank you for upgrading to Meme Studio Pro</p>
+        </div>
+        <div style="text-align: center; padding: 30px;">
+          <div style="font-size: 6rem; color: var(--accent); margin-bottom: 20px;">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h3>Premium Features Unlocked!</h3>
+          <p style="margin-top: 20px;">You now have full access to all premium features.</p>
+          <button class="preview-btn" style="margin-top: 30px;">
+            <i class="fas fa-rocket"></i> Start Creating
+          </button>
+        </div>
+      `;
+    }
+    
     // Initialize the app
     function initApp() {
       initCanvas();
       
       // Set up event listeners
       document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
-      document.getElementById('upgradeBtn').addEventListener('click', showUpgradeModal);
-      document.getElementById('closeModalBtn').addEventListener('click', hideUpgradeModal);
+      document.getElementById('startCreatingBtn').addEventListener('click', hideUpgradeModal);
       
       // Add copy functionality to all copy buttons
       document.querySelectorAll('.copy-btn').forEach(btn => {
         btn.addEventListener('click', () => copyCryptoAddress(btn));
+      });
+      
+      // Simulate payment for demo purposes
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setTimeout(activatePremium, 2000);
+        });
       });
       
       // Close modal when clicking outside
@@ -862,6 +831,25 @@
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .pricing-card::before {
+        content: 'ONE-TIME PAYMENT';
+        position: absolute;
+        top: 10px;
+        right: -30px;
+        background: var(--accent);
+        color: #333;
+        padding: 5px 35px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        transform: rotate(45deg);
+        z-index: 10;
+      }
+      
+      body.dark .pricing-card::before {
+        background: var(--accent);
+        color: #333;
       }
     `;
     document.head.appendChild(style);
